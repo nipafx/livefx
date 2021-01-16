@@ -14,3 +14,4 @@ A calendar view on static data, but all of those details may change between now 
 * replaced JUnit 4 with JUnit 5
 * added React frontend
 	* ran `npx create-react-app`
+	* used [react-app-rewired](https://github.com/timarney/react-app-rewired) to align frontend's folder structure with project layout
