@@ -11,3 +11,4 @@ A calendar view on static data, but all of those details may change between now 
 	* _Spring Reactive Web_ as dependency
 	* bump Java to 16
 * applied [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html)
+* replaced JUnit 4 with JUnit 5
