@@ -15,3 +15,8 @@ A calendar view on static data, but all of those details may change between now 
 * added React frontend
 	* ran `npx create-react-app`
 	* used [react-app-rewired](https://github.com/timarney/react-app-rewired) to align frontend's folder structure with project layout
+* edited generated backend and frontend code
+	* removed unneeded code
+	* adapted to calendar domain
+	* indented JS/CSS code with tabs
+	* made frontend GET data from backend

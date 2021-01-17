@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+
+    /* fonts */
+    --large-font-size: 24px;
+    --regular-font-size: 18px;
+    --small-font-size: 16px;
+    --tiny-font-size: 14px;
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    font-size: var(--regular-font-size);
+    font-weight: normal;
+    line-height: 1.5;
+
+    /* colors */
+    --bg-color: #262429;
+    --fg-color: white;
+    --alt-color: #69ea7d;
+
+    background-color: var(--bg-color);
+    color: white;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+a {
+    color: var(--alt-color);
+}

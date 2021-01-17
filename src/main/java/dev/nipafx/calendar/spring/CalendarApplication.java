@@ -1,4 +1,4 @@
-package dev.nipafx.calendar;
+package dev.nipafx.calendar.spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
