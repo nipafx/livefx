@@ -1,0 +1,32 @@
+[
+	{
+		"start": "2021-01-18",
+		"length": 7,
+		"category": "vac",
+		"person": "jad"
+	},
+	{
+		"start": "2021-02-25",
+		"length": 14,
+		"category": "vac",
+		"person": "jed"
+	},
+	{
+		"start": "2021-03-02",
+		"length": 7,
+		"category": "vac",
+		"person": "jid"
+	},
+	{
+		"start": "2021-04-18",
+		"length": 21,
+		"category": "vac",
+		"person": "jod"
+	},
+	{
+		"start": "2021-05-02",
+		"length": 14,
+		"category": "vac",
+		"person": "jud"
+	}
+]

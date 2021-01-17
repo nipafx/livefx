@@ -20,3 +20,13 @@ A calendar view on static data, but all of those details may change between now 
 	* adapted to calendar domain
 	* indented JS/CSS code with tabs
 	* made frontend GET data from backend
+
+### First Steps
+
+* backend
+	* made domain model richer
+	* added application property `data.folder` to configure folder with JSON files
+	* created Repository based on JSON files in folder 
+	* used local records (yay!) to ease parsing domain types from JSON
+	* created controller for REST endpoints
+	* handled wiring without relying on Spring annotations in domain model

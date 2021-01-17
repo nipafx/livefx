@@ -1,0 +1,17 @@
+[
+	{
+		"name": "Vacation",
+		"abbreviation": "vac",
+		"color": "#645006"
+	},
+	{
+		"name": "Mailings",
+		"abbreviation": "mls",
+		"color": "#167844"
+	},
+	{
+		"name": "StarCraft 2 Games",
+		"abbreviation": "sg2",
+		"color": "#23a4e0"
+	}
+]

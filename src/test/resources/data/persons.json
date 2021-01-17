@@ -1,0 +1,22 @@
+[
+	{
+		"name": "John Doe",
+		"abbreviation": "jod"
+	},
+	{
+		"name": "Jane Doe",
+		"abbreviation": "jad"
+	},
+	{
+		"name": "Jimmy Doe",
+		"abbreviation": "jid"
+	},
+	{
+		"name": "Jennifer Doe",
+		"abbreviation": "jed"
+	},
+	{
+		"name": "Jules Doe",
+		"abbreviation": "jud"
+	}
+]
