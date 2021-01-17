@@ -30,3 +30,7 @@ A calendar view on static data, but all of those details may change between now 
 	* used local records (yay!) to ease parsing domain types from JSON
 	* created controller for REST endpoints
 	* handled wiring without relying on Spring annotations in domain model
+* frontend
+	* created calendar view with CSS grid
+	* sorted entries into grid
+	* used Luxon for date manipulation

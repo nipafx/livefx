@@ -1,11 +1,38 @@
-.calendar {
+.grid {
+    min-height: 100vh;
+    display: grid;
+}
+
+.month {
+    background: var(--alt-color);
+    color: var(--bg-color);
+
+    font-weight: bold;
     text-align: center;
 }
 
-.calendarHeader {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.person {
+    background: var(--alt-color);
+    color: var(--bg-color);
+
+    font-size: var(--tiny-font-size);
+}
+.person > * {
+    padding: 0.5em 0;
+
+    transform: rotate(-90deg);
+}
+
+.dayOfMonth {
+    background: var(--alt-color);
+    color: var(--bg-color);
+
+    font-weight: bold;
+    text-align: center;
+
+    /* TODO: center align vertically */
+}
+
+.entry {
+    border: 1px solid #69ea7d;
 }
