@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DateTime, Info } from 'luxon';
+import { DateTime, Duration, Info, Interval } from 'luxon';
 
 import style from './calendar.module.css';
 
@@ -61,7 +61,7 @@ const displayDayOfMonth = day => (
 )
 
 const displayEntry = entry => (
-	<div key={entry.gridArea} style={{ gridArea: entry.gridArea, backgroundColor: entry.category.color }}/>
+	<div key={entry.reactKey} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
 )
 
 const createCalendar = (entries, persons) => {
@@ -76,15 +76,16 @@ const createCalendar = (entries, persons) => {
 	entries.forEach(entry => {
 		const start = DateTime.fromISO(entry.start)
 		entry.persons.forEach(_person => {
-			const month = months[start.month - 1]
-			const person = month.persons.find(person => person.abbreviation === _person.abbreviation)
-			const columnIndex = computeColumnIndex(months, entry)
-			const day = start.day
-			const gridArea = computeGridArea(month, person, columnIndex, day)
-			const griddedEntry = { start, person: _person, category: entry.category, gridArea }
-
-			person.columns[columnIndex].push(griddedEntry)
-			griddedEntries.push(griddedEntry)
+			computeEntrySplits(start, entry.length).forEach(entrySplit => {
+				const month = months[entrySplit.start.month - 1]
+				const person = month.persons.find(person => person.abbreviation === _person.abbreviation)
+				const columnIndex = computeColumnIndex(months, entrySplit)
+				const gridArea = computeGridArea(person.abbreviation, columnIndex, entrySplit)
+				const reactKey = computeReactKey(person.abbreviation, columnIndex, entrySplit)
+				const griddedEntry = { person: _person, category: entry.category, gridArea, reactKey }
+				person.columns[columnIndex].push(griddedEntry)
+				griddedEntries.push(griddedEntry)
+			})
 		})
 	})
 
@@ -138,7 +139,26 @@ const computeGridTemplateAreas = months => {
 
 const arrayTo = length => [ ...Array(length).keys() ]
 
-const computeGridArea = (month, person, columnIndex, day) =>
-	`${month.abbreviation}_${person.abbreviation}_c${columnIndex}_d${day}`;
+const computeEntrySplits = (start, length) => {
+	const lastDayOfEachMonth = arrayTo(12)
+		.map(index => ++index)
+		.map(month => DateTime.local(start.year, month, 1))
+	return Interval
+		.after(start, Duration.fromObject({ days: length }))
+		.splitAt(...lastDayOfEachMonth)
+}
+
+const computeGridArea = (person, columnIndex, interval) => {
+	const length = interval.length(`day`)
+	const month = Info.months('short')[interval.start.month - 1]
+	const column = `${month}_${person}_c${columnIndex}`
+	return {
+		gridColumn: `${column}_d${interval.start.day}`,
+		gridRow: `${column}_d${interval.start.day} / span ${length}`
+	}
+}
+
+const computeReactKey = (person, columnIndex, interval) =>
+	`${person}_${columnIndex}_${interval.start.toFormat(`MM-dd`)}`
 
 export default Calendar;
