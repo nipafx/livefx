@@ -24,6 +24,8 @@
 }
 
 .dayOfMonth {
+    padding: 0 0.5em;
+
     background: var(--alt-color);
     color: var(--bg-color);
 

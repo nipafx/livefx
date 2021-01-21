@@ -7,7 +7,11 @@ const NO_PERSON = "NONE";
 
 const Calendar = () => {
 
-	const [ calendar, setCalendar ] = useState({ gridTemplateAreas: "", persons: [], entries: [] })
+	const [ calendar, setCalendar ] = useState({
+		gridStyle: { gridTemplateColumns: "", gridTemplateAreas: "" },
+		persons: [],
+		entries: []
+	})
 
 	useEffect(() => {
 		Promise
@@ -23,7 +27,7 @@ const Calendar = () => {
 	}, [])
 
 	return (
-		<div className={style.grid} style={{ gridTemplateAreas: calendar.gridTemplateAreas }}>
+		<div className={style.grid} style={{ ...calendar.gridStyle }}>
 			{Info.months('numeric').map(displayMonth)}
 			{Info.months('short')
 				.flatMap(monthAbbreviation => calendar
@@ -101,7 +105,7 @@ const createCalendar = (entries, persons) => {
 	})
 
 	return {
-		gridTemplateAreas: computeGridTemplateAreas(months),
+		gridStyle: computeGridStyle(months),
 		persons: personsWithUnknown,
 		entries: griddedEntries
 	}
@@ -116,7 +120,11 @@ const computeColumnIndex = (columns, entrySplit) => {
 	return columns.length
 }
 
-const computeGridTemplateAreas = months => {
+const computeGridStyle = months => {
+	const totalColumns = months
+		.flatMap(month => month.persons.map(person => person.columns.length))
+		.reduce((result, columns) => result + columns, 0)
+
 	const monthRowRaw = months
 		.flatMap(month => month
 			.persons
@@ -124,7 +132,7 @@ const computeGridTemplateAreas = months => {
 				.map(_ => `${month.abbreviation}`)
 			))
 		.join(" ")
-	// to make sure numbers of columns align, add one for the days of the month
+	// add first column for the days of the month
 	const monthRow = `' . ${monthRowRaw}'`
 
 	const personRowRaw = months
@@ -134,7 +142,7 @@ const computeGridTemplateAreas = months => {
 				.map(_ => `${month.abbreviation}_${person.abbreviation}`)
 			))
 		.join(" ")
-	// to make sure numbers of columns align, add one for the days of the month
+	// add first column for the days of the month
 	const personRow = `' . ${personRowRaw}'`
 
 	const dayRows = arrayTo(31)
@@ -149,7 +157,11 @@ const computeGridTemplateAreas = months => {
 		})
 		.join(" ")
 
-	return `${monthRow} ${personRow} ${dayRows}`
+	return {
+		// add first column for the days of the month
+		gridTemplateColumns: `auto repeat(${totalColumns}, 1fr)`,
+		gridTemplateAreas: `${monthRow} ${personRow} ${dayRows}`
+	}
 }
 
 const arrayTo = length => [ ...Array(length).keys() ]
