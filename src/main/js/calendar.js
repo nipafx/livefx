@@ -79,11 +79,12 @@ const createCalendar = (entries, persons) => {
 			computeEntrySplits(start, entry.length).forEach(entrySplit => {
 				const month = months[entrySplit.start.month - 1]
 				const person = month.persons.find(person => person.abbreviation === _person.abbreviation)
-				const columnIndex = computeColumnIndex(months, entrySplit)
+				const columnIndex = computeColumnIndex(person.columns, entrySplit)
 				const gridArea = computeGridArea(person.abbreviation, columnIndex, entrySplit)
 				const reactKey = computeReactKey(person.abbreviation, columnIndex, entrySplit)
 				const griddedEntry = { person: _person, category: entry.category, gridArea, reactKey }
-				person.columns[columnIndex].push(griddedEntry)
+				if (columnIndex === person.columns.length) person.columns.push([])
+				person.columns[columnIndex].push(entrySplit)
 				griddedEntries.push(griddedEntry)
 			})
 		})
@@ -96,9 +97,13 @@ const createCalendar = (entries, persons) => {
 	}
 }
 
-const computeColumnIndex = (months, entry) => {
-	// TODO assuming one column per person is enough
-	return 0
+const computeColumnIndex = (columns, entrySplit) => {
+	for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+		const fitsIntoColumn = !columns[columnIndex].find(split => split.overlaps(entrySplit))
+		if (fitsIntoColumn) return columnIndex
+	}
+
+	return columns.length
 }
 
 const computeGridTemplateAreas = months => {
