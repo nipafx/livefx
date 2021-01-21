@@ -11,8 +11,7 @@
 	},
 	{
 		"start": "2021-06-23",
-		"category": "mls",
-		"person": "jed"
+		"category": "mls"
 	},
 	{
 		"start": "2021-09-15",
@@ -26,7 +25,6 @@
 	},
 	{
 		"start": "2021-12-12",
-		"category": "mls",
-		"person": "jud"
+		"category": "mls"
 	}
 ]

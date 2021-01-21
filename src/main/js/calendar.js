@@ -3,6 +3,8 @@ import { DateTime, Duration, Info, Interval } from 'luxon';
 
 import style from './calendar.module.css';
 
+const NO_PERSON = "NONE";
+
 const Calendar = () => {
 
 	const [ calendar, setCalendar ] = useState({ gridTemplateAreas: "", persons: [], entries: [] })
@@ -46,10 +48,11 @@ const displayMonth = month => {
 
 const displayPerson = (monthAbbreviation, person) => {
 	const gridArea = `${monthAbbreviation}_${person.abbreviation}`
+	// TODO use name
+	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation;
 	return (
 		<div key={gridArea} className={style.person} style={{ gridArea }}>
-			{/* TODO use name */}
-			<div>{person.abbreviation}</div>
+			<div>{text}</div>
 		</div>
 	)
 }
@@ -65,34 +68,41 @@ const displayEntry = entry => (
 )
 
 const createCalendar = (entries, persons) => {
+	const personsWithUnknown = [ ...persons, { name: "", abbreviation: NO_PERSON } ]
+
 	const griddedEntries = []
 	const months = Info
 		.months('short')
 		.map(month => ({
 			abbreviation: month,
-			persons: persons.map(person => ({ ...person, columns: [ [] ] }))
+			persons: personsWithUnknown.map(person => ({ ...person, columns: [ [] ] }))
 		}))
+
+	const process = (person, entry, entrySplit) => {
+		const month = months[entrySplit.start.month - 1]
+		const monthPerson = month.persons.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
+		const columnIndex = computeColumnIndex(monthPerson.columns, entrySplit)
+		const gridArea = computeGridArea(monthPerson.abbreviation, columnIndex, entrySplit)
+		const reactKey = computeReactKey(monthPerson.abbreviation, columnIndex, entrySplit)
+		const griddedEntry = { person, category: entry.category, gridArea, reactKey }
+		if (columnIndex === monthPerson.columns.length) monthPerson.columns.push([])
+		monthPerson.columns[columnIndex].push(entrySplit)
+		griddedEntries.push(griddedEntry)
+	}
 
 	entries.forEach(entry => {
 		const start = DateTime.fromISO(entry.start)
-		entry.persons.forEach(_person => {
-			computeEntrySplits(start, entry.length).forEach(entrySplit => {
-				const month = months[entrySplit.start.month - 1]
-				const person = month.persons.find(person => person.abbreviation === _person.abbreviation)
-				const columnIndex = computeColumnIndex(person.columns, entrySplit)
-				const gridArea = computeGridArea(person.abbreviation, columnIndex, entrySplit)
-				const reactKey = computeReactKey(person.abbreviation, columnIndex, entrySplit)
-				const griddedEntry = { person: _person, category: entry.category, gridArea, reactKey }
-				if (columnIndex === person.columns.length) person.columns.push([])
-				person.columns[columnIndex].push(entrySplit)
-				griddedEntries.push(griddedEntry)
-			})
-		})
+		if (entry.persons.length === 0)
+			computeEntrySplits(start, entry.length)
+				.forEach(entrySplit => process(null, entry, entrySplit))
+		entry.persons
+			.forEach(person => computeEntrySplits(start, entry.length)
+				.forEach(entrySplit => process(person, entry, entrySplit)))
 	})
 
 	return {
 		gridTemplateAreas: computeGridTemplateAreas(months),
-		persons,
+		persons: personsWithUnknown,
 		entries: griddedEntries
 	}
 }
