@@ -18,13 +18,13 @@ const Calendar = () => {
 		() => {
 			Promise
 				.all([
-					fetch(`/api/entry?year=${calendar.year}`)
+					fetch(`/api/entries?year=${calendar.year}`)
 						.then(response => response.text())
 						.then(entriesString => JSON.parse(entriesString)),
-					fetch(`/api/holiday?year=${calendar.year}`)
+					fetch(`/api/holidays?year=${calendar.year}`)
 						.then(response => response.text())
 						.then(holidayString => JSON.parse(holidayString)),
-					fetch(`/api/person`)
+					fetch(`/api/people`)
 						.then(response => response.text())
 						.then(personString => JSON.parse(personString)) ])
 				.then(([ entries, holidays, people ]) =>

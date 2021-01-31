@@ -24,22 +24,22 @@ public class CalendarEndpoints {
 		this.repository = requireNonNull(repository);
 	}
 
-	@GetMapping("/entry")
+	@GetMapping("/entries")
 	public List<Entry> getEntries(@RequestParam("year") int year) {
 		return repository.allEntries(year);
 	}
 
-	@GetMapping("/person")
+	@GetMapping("/people")
 	public List<Person> getPeople() {
 		return repository.allPeople();
 	}
 
-	@GetMapping("/category")
+	@GetMapping("/categories")
 	public List<Category> getCategories() {
 		return repository.allCategories();
 	}
 
-	@GetMapping("/holiday")
+	@GetMapping("/holidays")
 	public List<Holiday> getHolidays(@RequestParam("year") int year) {
 		return repository.allHolidays(year);
 	}
