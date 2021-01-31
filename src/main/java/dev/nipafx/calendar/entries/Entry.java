@@ -19,7 +19,7 @@ public record Entry(
 	public Entry {
 		requireNonNull(start);
 		requireNonNull(category);
-		requireNonNull(persons);
+		requireNonNull(List.copyOf(persons));
 	}
 
 }
