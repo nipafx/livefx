@@ -89,7 +89,10 @@ abstract class FileBasedRepository implements Repository {
 
 	private Stream<String> extractPersonAbbreviations(Optional<String> person, Optional<List<String>> persons) {
 		Stream<String> personsStream = persons.stream()
-				.flatMap(Collection::stream);
+				.flatMap(Collection::stream)
+				// in case the parser does not correctly split the `persons` entry on comma,
+				// do it here explicitly
+				.flatMap(string -> Stream.of(string.split(",")));
 		return Stream
 				.concat(person.stream(), personsStream)
 				.distinct();
