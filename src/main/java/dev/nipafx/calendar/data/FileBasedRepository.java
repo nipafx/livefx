@@ -44,7 +44,7 @@ abstract class FileBasedRepository implements Repository {
 	}
 
 	@Override
-	public final List<Entry> allEntries() {
+	public final List<Entry> allEntries(int year) {
 		Map<String, Category> categoriesByAbbreviation = allCategories().stream()
 				.collect(toMap(Category::abbreviation, identity()));
 		Map<String, Person> personsByAbbreviation = allPersons().stream()
@@ -56,6 +56,8 @@ abstract class FileBasedRepository implements Repository {
 					.filter(file -> file.toString().endsWith(fileEnding))
 					.filter(file -> !knownFiles.contains(file.getFileName().toString()))
 					.flatMap(file -> parseEntries(file, categoriesByAbbreviation, personsByAbbreviation))
+					.filter(entry -> entry.start().getYear() == year
+							|| entry.start().plusDays(entry.lengthInDays()).getYear() == year)
 					.sorted(comparing(Entry::start))
 					.toList();
 		} catch (IOException ex) {

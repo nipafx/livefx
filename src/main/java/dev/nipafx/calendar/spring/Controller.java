@@ -6,6 +6,7 @@ import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Person;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class Controller {
 	}
 
 	@GetMapping("/entry")
-	public List<Entry> getEntries() {
-		return repository.allEntries();
+	public List<Entry> getEntries(@RequestParam("year") int year) {
+		return repository.allEntries(year);
 	}
 
 	@GetMapping("/person")

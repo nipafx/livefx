@@ -10,21 +10,24 @@ const Calendar = () => {
 	const [ calendar, setCalendar ] = useState({
 		gridStyle: { gridTemplateColumns: "", gridTemplateAreas: "" },
 		persons: [],
-		entries: []
+		entries: [],
+		year: DateTime.local().year
 	})
 
-	useEffect(() => {
-		Promise
-			.all([
-				fetch('/api/entry')
-					.then(response => response.text())
-					.then(entriesString => JSON.parse(entriesString)),
-				fetch('/api/person')
-					.then(response => response.text())
-					.then(personString => JSON.parse(personString)) ])
-			.then(([ entries, persons ]) => createCalendar(entries, persons))
-			.then(setCalendar)
-	}, [])
+	useEffect(
+		() => {
+			Promise
+				.all([
+					fetch(`/api/entry?year=${calendar.year}`)
+						.then(response => response.text())
+						.then(entriesString => JSON.parse(entriesString)),
+					fetch('/api/person')
+						.then(response => response.text())
+						.then(personString => JSON.parse(personString)) ])
+				.then(([ entries, persons ]) => createCalendar(calendar.year, entries, persons))
+				.then(setCalendar)
+		},
+		[ calendar.year ])
 
 	return (
 		<div className={style.grid} style={{ ...calendar.gridStyle }}>
@@ -71,7 +74,7 @@ const displayEntry = entry => (
 	<div key={entry.reactKey} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
 )
 
-const createCalendar = (entries, persons) => {
+const createCalendar = (year, entries, persons) => {
 	const personsWithUnknown = [ ...persons, { name: "", abbreviation: NO_PERSON } ]
 
 	const griddedEntries = []
@@ -107,7 +110,8 @@ const createCalendar = (entries, persons) => {
 	return {
 		gridStyle: computeGridStyle(months),
 		persons: personsWithUnknown,
-		entries: griddedEntries
+		entries: griddedEntries,
+		year
 	}
 }
 

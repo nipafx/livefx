@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface Repository {
 
-	List<Entry> allEntries();
+	List<Entry> allEntries(int year);
 
 	List<Category> allCategories();
 

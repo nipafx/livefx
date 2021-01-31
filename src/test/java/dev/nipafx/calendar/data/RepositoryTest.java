@@ -42,7 +42,7 @@ interface RepositoryTest {
 
 	@Test
 	default void allEntries() {
-		List<Entry> entries = createRepository().allEntries();
+		List<Entry> entries = createRepository().allEntries(2021);
 
 		assertThat(entries).hasSize(13);
 	}
