@@ -16,8 +16,13 @@ body {
 
     /* colors */
     --bg-color: #262429;
+    --bg-color-lighter: #3f3c44;
+    --bg-color-darker: #0d0c0e;
     --fg-color: white;
     --alt-color: #69ea7d;
+
+    --weekend-day: var(--bg-color-lighter);
+    --non-day: var(--bg-color-darker);
 
     background-color: var(--bg-color);
     color: white;
