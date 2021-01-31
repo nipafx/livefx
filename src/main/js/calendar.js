@@ -9,7 +9,7 @@ const Calendar = () => {
 
 	const [ calendar, setCalendar ] = useState({
 		gridStyle: { gridTemplateColumns: "", gridTemplateAreas: "" },
-		persons: [],
+		people: [],
 		entries: [],
 		year: DateTime.local().year
 	})
@@ -27,8 +27,8 @@ const Calendar = () => {
 					fetch(`/api/person`)
 						.then(response => response.text())
 						.then(personString => JSON.parse(personString)) ])
-				.then(([ entries, holidays, persons ]) =>
-					createCalendar(calendar.year, entries, holidays, persons))
+				.then(([ entries, holidays, people ]) =>
+					createCalendar(calendar.year, entries, holidays, people))
 				.then(setCalendar)
 		},
 		[ calendar.year ])
@@ -38,7 +38,7 @@ const Calendar = () => {
 			{Info.months('numeric').map(displayMonth)}
 			{Info.months('short')
 				.flatMap(monthAbbreviation => calendar
-					.persons
+					.people
 					.map(person => displayPerson(monthAbbreviation, person)))}
 			{arrayTo(31).map(displayDayOfMonth)}
 			{calendar.entries.map(displayEntry)}
@@ -78,20 +78,20 @@ const displayEntry = entry => (
 	<div key={entry.reactKey} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
 )
 
-const createCalendar = (year, entries, holidays, persons) => {
-	const personsWithUnknown = [ ...persons, { name: "", abbreviation: NO_PERSON } ]
+const createCalendar = (year, entries, holidays, people) => {
+	const peopleWithUnknown = [ ...people, { name: "", abbreviation: NO_PERSON } ]
 
 	const griddedEntries = []
 	const months = Info
 		.months('short')
 		.map(month => ({
 			abbreviation: month,
-			persons: personsWithUnknown.map(person => ({ ...person, columns: [ [] ] }))
+			people: peopleWithUnknown.map(person => ({ ...person, columns: [ [] ] }))
 		}))
 
 	const processEntry = (person, entry, entrySplit) => {
 		const month = months[entrySplit.start.month - 1]
-		const monthPerson = month.persons.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
+		const monthPerson = month.people.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
 		const columnIndex = computeColumnIndex(monthPerson.columns, entrySplit)
 		const gridArea = computeGridAreaFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
 		const reactKey = computeReactKeyFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
@@ -103,10 +103,10 @@ const createCalendar = (year, entries, holidays, persons) => {
 
 	entries.forEach(entry => {
 		const start = DateTime.fromISO(entry.start)
-		if (entry.persons.length === 0)
+		if (entry.people.length === 0)
 			computeEntrySplits(start, entry.length)
 				.forEach(entrySplit => processEntry(null, entry, entrySplit))
-		entry.persons
+		entry.people
 			.forEach(person => computeEntrySplits(start, entry.length)
 				.forEach(entrySplit => processEntry(person, entry, entrySplit)))
 	})
@@ -166,7 +166,7 @@ const createCalendar = (year, entries, holidays, persons) => {
 
 	months
 		.flatMap((month, monthIndex) => month
-			.persons
+			.people
 			.flatMap(person => person.columns
 				.flatMap((_, columnIndex) => arrayTo(31)
 					.forEach(dayIndex => processCalendarStructure(
@@ -174,7 +174,7 @@ const createCalendar = (year, entries, holidays, persons) => {
 
 	return {
 		gridStyle: computeGridStyle(months),
-		persons: personsWithUnknown,
+		people: peopleWithUnknown,
 		entries: griddedEntries,
 		year
 	}
@@ -191,12 +191,12 @@ const computeColumnIndex = (columns, entrySplit) => {
 
 const computeGridStyle = months => {
 	const totalColumns = months
-		.flatMap(month => month.persons.map(person => person.columns.length))
+		.flatMap(month => month.people.map(person => person.columns.length))
 		.reduce((result, columns) => result + columns, 0)
 
 	const monthRowRaw = months
 		.flatMap(month => month
-			.persons
+			.people
 			.flatMap(person => arrayTo(person.columns.length)
 				.map(_ => `${month.abbreviation}`)
 			))
@@ -206,7 +206,7 @@ const computeGridStyle = months => {
 
 	const personRowRaw = months
 		.flatMap(month => month
-			.persons
+			.people
 			.flatMap(person => arrayTo(person.columns.length)
 				.map(_ => `${month.abbreviation}_${person.abbreviation}`)
 			))
@@ -217,7 +217,7 @@ const computeGridStyle = months => {
 	const dayRows = arrayTo(31)
 		.map(day => {
 			const dayRow = months
-				.flatMap(month => month.persons
+				.flatMap(month => month.people
 					.flatMap(person => person.columns
 						.map((_, columnIndex) =>
 							`${month.abbreviation}_${person.abbreviation}_c${columnIndex}_d${day + 1}`)))

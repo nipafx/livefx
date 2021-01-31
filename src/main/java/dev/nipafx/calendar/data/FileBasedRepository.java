@@ -26,7 +26,7 @@ import static java.util.stream.Collectors.toMap;
 abstract class FileBasedRepository implements Repository {
 
 	private static final String CATEGORY_FILE_NAME = "categories";
-	private static final String PERSON_FILE_NAME = "persons";
+	private static final String PERSON_FILE_NAME = "people";
 	private static final String HOLIDAY_FILE_NAME = "holidays";
 
 	private final Path dataFolder;
@@ -51,7 +51,7 @@ abstract class FileBasedRepository implements Repository {
 	public final List<Entry> allEntries(int year) {
 		Map<String, Category> categoriesByAbbreviation = allCategories().stream()
 				.collect(toMap(Category::abbreviation, identity()));
-		Map<String, Person> personsByAbbreviation = allPersons().stream()
+		Map<String, Person> peopleByAbbreviation = allPeople().stream()
 				.collect(toMap(Person::abbreviation, identity()));
 
 		try {
@@ -59,7 +59,7 @@ abstract class FileBasedRepository implements Repository {
 					.filter(Files::isRegularFile)
 					.filter(file -> file.toString().endsWith(fileEnding))
 					.filter(file -> !knownFiles.contains(file.getFileName().toString()))
-					.flatMap(file -> parseEntries(file, categoriesByAbbreviation, personsByAbbreviation))
+					.flatMap(file -> parseEntries(file, categoriesByAbbreviation, peopleByAbbreviation))
 					.filter(entry -> entry.start().getYear() == year
 							|| entry.start().plusDays(entry.lengthInDays()).getYear() == year)
 					.sorted(comparing(Entry::start))
@@ -70,7 +70,7 @@ abstract class FileBasedRepository implements Repository {
 		}
 	}
 
-	private Stream<Entry> parseEntries(Path file, Map<String, Category> categories, Map<String, Person> persons) {
+	private Stream<Entry> parseEntries(Path file, Map<String, Category> categories, Map<String, Person> people) {
 		record FileEntry(
 				@JsonProperty("start") LocalDate start,
 				@JsonProperty("length") OptionalInt length,
@@ -78,7 +78,7 @@ abstract class FileBasedRepository implements Repository {
 				@JsonProperty("person") Optional<String> person,
 				// Jackson deserializes absent fields to null instead of an empty collection,
 				// which makes it more uncomfortable to handle, so I wrap the List into an Optional
-				@JsonProperty("persons") Optional<List<String>> persons) {
+				@JsonProperty("people") Optional<List<String>> people) {
 
 		}
 
@@ -87,20 +87,20 @@ abstract class FileBasedRepository implements Repository {
 						entry.start(),
 						entry.length().orElse(1),
 						categories.get(entry.category),
-						extractPersonAbbreviations(entry.person, entry.persons)
-								.map(persons::get)
+						extractPersonAbbreviations(entry.person, entry.people)
+								.map(people::get)
 								.toList()
 				));
 	}
 
-	private Stream<String> extractPersonAbbreviations(Optional<String> person, Optional<List<String>> persons) {
-		Stream<String> personsStream = persons.stream()
+	private Stream<String> extractPersonAbbreviations(Optional<String> person, Optional<List<String>> people) {
+		Stream<String> peopleStream = people.stream()
 				.flatMap(Collection::stream)
-				// in case the parser does not correctly split the `persons` entry on comma,
+				// in case the parser does not correctly split the `people` entry on comma,
 				// do it here explicitly
 				.flatMap(string -> Stream.of(string.split(",")));
 		return Stream
-				.concat(person.stream(), personsStream)
+				.concat(person.stream(), peopleStream)
 				.distinct();
 	}
 
@@ -110,7 +110,7 @@ abstract class FileBasedRepository implements Repository {
 	}
 
 	@Override
-	public List<Person> allPersons() {
+	public List<Person> allPeople() {
 		return readFromFile(dataFolder.resolve(personFileName), Person.class);
 	}
 

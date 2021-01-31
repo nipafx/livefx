@@ -13,7 +13,7 @@ public interface Repository {
 
 	List<Category> allCategories();
 
-	List<Person> allPersons();
+	List<Person> allPeople();
 
 	List<Holiday> allHolidays(int year);
 

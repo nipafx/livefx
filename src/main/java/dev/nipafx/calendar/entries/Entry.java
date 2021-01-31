@@ -14,12 +14,12 @@ public record Entry(
 		@JsonProperty("start") LocalDate start,
 		@JsonProperty("length") int lengthInDays,
 		@JsonProperty("category") Category category,
-		@JsonProperty("persons") List<Person> persons) {
+		@JsonProperty("people") List<Person> people) {
 
 	public Entry {
 		requireNonNull(start);
 		requireNonNull(category);
-		requireNonNull(List.copyOf(persons));
+		requireNonNull(List.copyOf(people));
 	}
 
 }

@@ -16,11 +16,11 @@ import static java.util.Objects.requireNonNull;
 
 @RestController
 @RequestMapping("/api")
-public class Controller {
+public class CalendarEndpoints {
 
 	private final Repository repository;
 
-	public Controller(Repository repository) {
+	public CalendarEndpoints(Repository repository) {
 		this.repository = requireNonNull(repository);
 	}
 
@@ -30,8 +30,8 @@ public class Controller {
 	}
 
 	@GetMapping("/person")
-	public List<Person> getPersons() {
-		return repository.allPersons();
+	public List<Person> getPeople() {
+		return repository.allPeople();
 	}
 
 	@GetMapping("/category")

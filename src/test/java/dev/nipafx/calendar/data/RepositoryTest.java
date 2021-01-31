@@ -20,9 +20,9 @@ interface RepositoryTest {
 
 	@Test
 	default void allCategories() {
-		List<Category> persons = createRepository().allCategories();
+		List<Category> people = createRepository().allCategories();
 
-		assertThat(persons).containsExactlyInAnyOrder(
+		assertThat(people).containsExactlyInAnyOrder(
 				new Category("Vacation", "vac", "#645006"),
 				new Category("Mailings", "mls", "#167844"),
 				new Category("StarCraft 2 Games", "sc2", "#23a4e0"),
@@ -31,10 +31,10 @@ interface RepositoryTest {
 	}
 
 	@Test
-	default void allPersons() {
-		List<Person> persons = createRepository().allPersons();
+	default void allPeople() {
+		List<Person> people = createRepository().allPeople();
 
-		assertThat(persons).containsExactlyInAnyOrder(
+		assertThat(people).containsExactlyInAnyOrder(
 				new Person("Jane Doe", "jad"),
 				new Person("Jennifer Doe", "jed"),
 				new Person("Jimmy Doe", "jid"),
