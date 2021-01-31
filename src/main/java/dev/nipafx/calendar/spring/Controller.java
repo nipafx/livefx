@@ -3,6 +3,7 @@ package dev.nipafx.calendar.spring;
 import dev.nipafx.calendar.data.Repository;
 import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
+import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,11 @@ public class Controller {
 	@GetMapping("/category")
 	public List<Category> getCategories() {
 		return repository.allCategories();
+	}
+
+	@GetMapping("/holiday")
+	public List<Holiday> getHolidays(@RequestParam("year") int year) {
+		return repository.allHolidays(year);
 	}
 
 }

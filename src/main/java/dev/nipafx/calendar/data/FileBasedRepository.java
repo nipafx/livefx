@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectReader;
 import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
+import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
 
 import java.io.IOException;
@@ -26,12 +27,14 @@ abstract class FileBasedRepository implements Repository {
 
 	private static final String CATEGORY_FILE_NAME = "categories";
 	private static final String PERSON_FILE_NAME = "persons";
+	private static final String HOLIDAY_FILE_NAME = "holidays";
 
 	private final Path dataFolder;
 	private final String fileEnding;
 
 	private final String categoryFileName;
 	private final String personFileName;
+	private final String holidayFileName;
 	private final Collection<String> knownFiles;
 
 	public FileBasedRepository(String dataFolder, String fileEnding) {
@@ -40,7 +43,8 @@ abstract class FileBasedRepository implements Repository {
 
 		categoryFileName = CATEGORY_FILE_NAME + fileEnding;
 		personFileName = PERSON_FILE_NAME + fileEnding;
-		knownFiles = List.of(categoryFileName, personFileName);
+		holidayFileName = HOLIDAY_FILE_NAME + fileEnding;
+		knownFiles = List.of(categoryFileName, personFileName, holidayFileName);
 	}
 
 	@Override
@@ -108,6 +112,13 @@ abstract class FileBasedRepository implements Repository {
 	@Override
 	public List<Person> allPersons() {
 		return readFromFile(dataFolder.resolve(personFileName), Person.class);
+	}
+
+	@Override
+	public List<Holiday> allHolidays(int year) {
+		return readFromFile(dataFolder.resolve(holidayFileName), Holiday.class).stream()
+				.filter(holiday -> holiday.date().getYear() == year)
+				.toList();
 	}
 
 	protected abstract ObjectReader readerFor(Class<?> type);

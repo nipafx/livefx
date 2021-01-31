@@ -21,10 +21,14 @@ const Calendar = () => {
 					fetch(`/api/entry?year=${calendar.year}`)
 						.then(response => response.text())
 						.then(entriesString => JSON.parse(entriesString)),
-					fetch('/api/person')
+					fetch(`/api/holiday?year=${calendar.year}`)
+						.then(response => response.text())
+						.then(holidayString => JSON.parse(holidayString)),
+					fetch(`/api/person`)
 						.then(response => response.text())
 						.then(personString => JSON.parse(personString)) ])
-				.then(([ entries, persons ]) => createCalendar(calendar.year, entries, persons))
+				.then(([ entries, holidays, persons ]) =>
+					createCalendar(calendar.year, entries, holidays, persons))
 				.then(setCalendar)
 		},
 		[ calendar.year ])
@@ -74,7 +78,7 @@ const displayEntry = entry => (
 	<div key={entry.reactKey} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
 )
 
-const createCalendar = (year, entries, persons) => {
+const createCalendar = (year, entries, holidays, persons) => {
 	const personsWithUnknown = [ ...persons, { name: "", abbreviation: NO_PERSON } ]
 
 	const griddedEntries = []
@@ -107,8 +111,25 @@ const createCalendar = (year, entries, persons) => {
 				.forEach(entrySplit => processEntry(person, entry, entrySplit)))
 	})
 
-	const processCalendarStructure = (year, month, day, person, columnIndex) => {
+	const processCalendarStructure = (year, month, day, person, columnIndex, holidays) => {
 		const date = DateTime.local(year, month, day)
+
+		const isHoliday = holidays
+			.map(holiday => DateTime.fromISO(holiday.date))
+			.find(holiday => holiday.equals(date))
+		if (isHoliday) {
+			const category = {
+				name: "holiday",
+				abbreviation: "hds",
+				color: `var(--holiday)`
+			}
+			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
+			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
+			const griddedEntry = { person, category, gridArea, reactKey }
+			console.log(griddedEntry)
+			griddedEntries.unshift(griddedEntry)
+			return
+		}
 
 		const weekend = date.weekday === 6 || date.weekday === 7
 		if (weekend) {
@@ -149,7 +170,7 @@ const createCalendar = (year, entries, persons) => {
 			.flatMap(person => person.columns
 				.flatMap((_, columnIndex) => arrayTo(31)
 					.forEach(dayIndex => processCalendarStructure(
-						year, monthIndex + 1, dayIndex + 1, person, columnIndex)))))
+						year, monthIndex + 1, dayIndex + 1, person, columnIndex, holidays)))))
 
 	return {
 		gridStyle: computeGridStyle(months),

@@ -21,6 +21,7 @@ body {
     --fg-color: white;
     --alt-color: #69ea7d;
 
+    --holiday: hotpink;
     --weekend-day: var(--bg-color-lighter);
     --non-day: var(--bg-color-darker);
 
