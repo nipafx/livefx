@@ -89,6 +89,20 @@ const createCalendar = (year, entries, holidays, people) => {
 			people: peopleWithUnknown.map(person => ({ ...person, columns: [ [] ] }))
 		}))
 
+	// `createEntries` modifies `months` and `griddedEntries` and `createCalendarStructure`
+	// depends on that, so don't reorder these methods
+	createEntries(entries, months, griddedEntries);
+	createCalendarStructure(holidays, year, months, griddedEntries);
+
+	return {
+		gridStyle: computeGridStyle(months),
+		people: peopleWithUnknown,
+		entries: griddedEntries,
+		year
+	}
+}
+
+function createEntries(entries, months, griddedEntries) {
 	const processEntry = (person, entry, entrySplit) => {
 		const month = months[entrySplit.start.month - 1]
 		const monthPerson = month.people.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
@@ -110,74 +124,6 @@ const createCalendar = (year, entries, holidays, people) => {
 			.forEach(person => computeEntrySplits(start, entry.length)
 				.forEach(entrySplit => processEntry(person, entry, entrySplit)))
 	})
-
-	const processCalendarStructure = (year, month, day, person, columnIndex, holidays) => {
-		const date = DateTime.local(year, month, day)
-
-		const isHoliday = holidays
-			.map(holiday => DateTime.fromISO(holiday.date))
-			.find(holiday => holiday.equals(date))
-		if (isHoliday) {
-			const category = {
-				name: "holiday",
-				abbreviation: "hds",
-				color: `var(--holiday)`
-			}
-			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
-			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
-			const griddedEntry = { person, category, gridArea, reactKey }
-			console.log(griddedEntry)
-			griddedEntries.unshift(griddedEntry)
-			return
-		}
-
-		const weekend = date.weekday === 6 || date.weekday === 7
-		if (weekend) {
-			const category = {
-				name: "weekend",
-				abbreviation: "wkd",
-				color: `var(--weekend-day)`
-			}
-			const dateAsInterval = Interval.after(date, { days: 1})
-			const gridArea = computeGridAreaFromInterval(person.abbreviation, columnIndex, dateAsInterval)
-			const reactKey = computeReactKeyFromInterval(person.abbreviation, columnIndex, dateAsInterval)
-			const griddedEntry = { person, category, gridArea, reactKey }
-			console.log(griddedEntry)
-			griddedEntries.unshift(griddedEntry)
-			return
-		}
-
-		const exist = date.isValid
-		if (!exist) {
-			const category = {
-				name: "not-a-day",
-				abbreviation: "nad",
-				color: `var(--non-day)`
-			}
-			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
-			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
-			const griddedEntry = { person, category, gridArea, reactKey }
-			console.log(griddedEntry)
-			griddedEntries.unshift(griddedEntry)
-			return
-		}
-
-	}
-
-	months
-		.flatMap((month, monthIndex) => month
-			.people
-			.flatMap(person => person.columns
-				.flatMap((_, columnIndex) => arrayTo(31)
-					.forEach(dayIndex => processCalendarStructure(
-						year, monthIndex + 1, dayIndex + 1, person, columnIndex, holidays)))))
-
-	return {
-		gridStyle: computeGridStyle(months),
-		people: peopleWithUnknown,
-		entries: griddedEntries,
-		year
-	}
 }
 
 const computeColumnIndex = (columns, entrySplit) => {
@@ -187,6 +133,55 @@ const computeColumnIndex = (columns, entrySplit) => {
 	}
 
 	return columns.length
+}
+
+function createCalendarStructure(holidays, year, months, griddedEntries) {
+	const processCalendarStructure = (year, month, day, person, columnIndex, holidays) => {
+		const category = dayCategory(holidays, DateTime.local(year, month, day))
+		if (category) {
+			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
+			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
+			const griddedEntry = { person, category: category, gridArea, reactKey }
+			griddedEntries.unshift(griddedEntry)
+		}
+	}
+
+	months
+		.flatMap((month, monthIndex) => month
+			.people
+			.flatMap(person => person.columns
+				.flatMap((_, columnIndex) => arrayTo(31)
+					.forEach(dayIndex => processCalendarStructure(
+						year, monthIndex + 1, dayIndex + 1, person, columnIndex, holidays)))))
+}
+
+const dayCategory = (holidays, date) => {
+	if (!date.isValid)
+		return {
+			name: "not-a-day",
+			abbreviation: "nad",
+			color: `var(--non-day)`
+		}
+
+	const isWeekendDay = date.weekday === 6 || date.weekday === 7;
+	if (isWeekendDay)
+		return {
+			name: "weekend",
+			abbreviation: "wkd",
+			color: `var(--weekend-day)`
+		}
+
+	const isHoliday = holidays
+		.map(holiday => DateTime.fromISO(holiday.date))
+		.some(holiday => holiday.equals(date))
+	if (isHoliday)
+		return {
+			name: "holiday",
+			abbreviation: "hds",
+			color: `var(--holiday)`
+		}
+
+	return null
 }
 
 const computeGridStyle = months => {
@@ -257,7 +252,7 @@ const computeGridArea = (person, columnIndex, month, day, length) => {
 }
 
 const computeReactKeyFromInterval = (person, columnIndex, interval) =>
-	computeReactKey(interval.start.toFormat(`MM-dd`))
+	computeReactKey(person, columnIndex, interval.start.toFormat(`MM-dd`))
 
 const computeReactKey = (person, columnIndex, date) =>
 	`${person}_${columnIndex}_${date}`
