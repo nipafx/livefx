@@ -2,6 +2,7 @@ package dev.nipafx.calendar.data;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class CsvRepository extends FileBasedRepository {
 	protected ObjectReader readerFor(Class<?> type) {
 		CsvSchema schema = CsvSchema.emptySchema().withHeader();
 		return csvMapper
+				.enable(CsvParser.Feature.TRIM_SPACES)
 				.readerFor(type)
 				.with(schema);
 	}

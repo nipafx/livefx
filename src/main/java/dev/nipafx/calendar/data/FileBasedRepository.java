@@ -98,7 +98,9 @@ abstract class FileBasedRepository implements Repository {
 				.flatMap(Collection::stream)
 				// in case the parser does not correctly split the `people` entry on comma,
 				// do it here explicitly
-				.flatMap(string -> Stream.of(string.split(",")));
+				.flatMap(string -> Stream.of(string.split(",")))
+				// in case there are spaces around the comma
+				.map(String::strip);
 		return Stream
 				.concat(person.stream(), peopleStream)
 				.distinct();
