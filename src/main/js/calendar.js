@@ -75,7 +75,7 @@ const displayDayOfMonth = day => (
 )
 
 const displayEntry = entry => (
-	<div key={entry.reactKey} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
+	<div key={entry.reactKey} className={entry.className} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
 )
 
 const createCalendar = (year, entries, holidays, people) => {
@@ -109,7 +109,7 @@ function createEntries(entries, months, griddedEntries) {
 		const columnIndex = computeColumnIndex(monthPerson.columns, entrySplit)
 		const gridArea = computeGridAreaFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
 		const reactKey = computeReactKeyFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
-		const griddedEntry = { person, category: entry.category, gridArea, reactKey }
+		const griddedEntry = { person, category: entry.category, className: style.entry, gridArea, reactKey }
 		if (columnIndex === monthPerson.columns.length) monthPerson.columns.push([])
 		monthPerson.columns[columnIndex].push(entrySplit)
 		griddedEntries.push(griddedEntry)
@@ -141,7 +141,7 @@ function createCalendarStructure(holidays, year, months, griddedEntries) {
 		if (category) {
 			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
 			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
-			const griddedEntry = { person, category: category, gridArea, reactKey }
+			const griddedEntry = { person, category: category, className: category.className, gridArea, reactKey }
 			griddedEntries.unshift(griddedEntry)
 		}
 	}
@@ -165,7 +165,7 @@ const dayCategory = (holidays, date) => {
 		return {
 			name: "not-a-day",
 			abbreviation: "nad",
-			color: `var(--non-day)`
+			className: style.nonDay
 		}
 
 	const isHoliday = holidays
@@ -175,7 +175,7 @@ const dayCategory = (holidays, date) => {
 		return {
 			name: "holiday",
 			abbreviation: "hds",
-			color: `var(--holiday)`
+			className: style.holiday
 		}
 
 	const isWeekendDay = date.weekday === 6 || date.weekday === 7;
@@ -183,10 +183,14 @@ const dayCategory = (holidays, date) => {
 		return {
 			name: "weekend",
 			abbreviation: "wkd",
-			color: `var(--weekend-day)`
+			className: style.weekendDay
 		}
 
-	return null
+	return {
+		name: "empty",
+		abbreviation: "emy",
+		className: style.emptyDay
+	}
 }
 
 const computeGridStyle = months => {

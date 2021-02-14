@@ -1,6 +1,8 @@
 .grid {
     min-height: 100vh;
     display: grid;
+
+    --entry-border: 1px solid var(--bg-color-lighter);
 }
 
 .month {
@@ -36,5 +38,22 @@
 }
 
 .entry {
-    border: 1px solid #69ea7d;
+    border: var(--entry-border);
+}
+
+.holiday {
+    background-color: var(--holiday);
+}
+
+.weekendDay {
+    background-color: var(--weekend-day);
+}
+
+.emptyDay {
+    background-color: var(--empty-day);
+    border: var(--entry-border);
+}
+
+.nonDay {
+    background-color: var(--non-day);
 }

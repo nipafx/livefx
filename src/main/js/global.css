@@ -23,6 +23,7 @@ body {
 
     --holiday: hotpink;
     --weekend-day: var(--bg-color-lighter);
+    --empty-day: var(--bg-color);
     --non-day: var(--bg-color-darker);
 
     background-color: var(--bg-color);
