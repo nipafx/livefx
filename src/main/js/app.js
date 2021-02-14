@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { DateTime } from 'luxon'
 
 import Calendar from './calendar'
+import EntryDetails from "./entryDetails"
 
 import './global.css'
 import style from './app.module.css'
@@ -15,6 +16,7 @@ const App = () => {
 		holidays: [],
 		people: [],
 	})
+	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
 
 	useEffect(
 		() => {
@@ -35,7 +37,8 @@ const App = () => {
 
 	return (
 		<div className={style.app}>
-			<Calendar year={year} {...calendar}/>
+			<Calendar year={year} {...calendar} setHoveredEntry={setHoveredEntry}/>
+			<EntryDetails {...calendar} hoveredEntry={hoveredEntry}/>
 		</div>
 	)
 }

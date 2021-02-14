@@ -5,7 +5,7 @@ import style from './calendar.module.css'
 
 const NO_PERSON = "NONE"
 
-const Calendar = ({ year, entries, holidays, people: teamMembers }) => {
+const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry }) => {
 
 	const [ highlight, setHighlight ] = useState({
 		month: null,
@@ -24,7 +24,8 @@ const Calendar = ({ year, entries, holidays, people: teamMembers }) => {
 		<div
 			className={style.grid}
 			style={{ ...gridStyle }}
-			onMouseOver={event => updateHover(setHighlight, event.target)}
+			onMouseOver={event => updateHover(setHighlight, setHoveredEntry, event.target)}
+			onMouseLeave={__ => updateHover(setHighlight, setHoveredEntry)}
 		>
 			{months.map(month => displayMonth(month, highlight))}
 			{months.flatMap(month => people.map(person => displayPerson(month, person, highlight)))}
@@ -34,8 +35,8 @@ const Calendar = ({ year, entries, holidays, people: teamMembers }) => {
 	)
 }
 
-const updateHover = (setHighlight, cell) => {
-	const updateToCell = !cell.classList.contains(style.nonDay);
+const updateHover = (setHighlight, setHoveredEntry, cell) => {
+	const updateToCell = cell && !cell.classList.contains(style.nonDay)
 	const highlight = updateToCell
 		? {
 			month: parseInt(cell.dataset.month),
@@ -48,6 +49,7 @@ const updateHover = (setHighlight, cell) => {
 			person: null,
 		}
 	setHighlight(highlight)
+	setHoveredEntry(cell?.dataset.entryindex ?? -1)
 }
 
 /*
@@ -95,6 +97,7 @@ const displayEntry = (entry, highlight) => {
 			'data-month': entry.data.month,
 			'data-day': entry.data.day,
 			'data-person': entry.data.person,
+			'data-entryIndex': entry.data.entryIndex,
 		}
 		: {}
 	return (
@@ -148,7 +151,7 @@ const createEntries = (entries, people) => {
 			people: people.map(person => ({ ...person, columns: [ [] ] }))
 		}))
 
-	const processEntry = (person, entry, entrySplit) => {
+	const processEntry = (person, entry, entryIndex, entrySplit) => {
 		const month = months[entrySplit.start.month - 1]
 		const monthPerson = month.people.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
 		const columnIndex = computeColumnIndex(monthPerson.columns, entrySplit)
@@ -157,6 +160,7 @@ const createEntries = (entries, people) => {
 			className: style.entry,
 			gridArea: computeGridAreaFromInterval(monthPerson.abbreviation, columnIndex, entrySplit),
 			reactKey: computeReactKeyFromInterval(monthPerson.abbreviation, columnIndex, entrySplit),
+			data: { entryIndex }
 		}
 		if (columnIndex === monthPerson.columns.length) monthPerson.columns.push([])
 
@@ -164,14 +168,14 @@ const createEntries = (entries, people) => {
 		griddedEntries.push(griddedEntry)
 	}
 
-	entries.forEach(entry => {
+	entries.forEach((entry, entryIndex) => {
 		const start = DateTime.fromISO(entry.start)
 		if (entry.people.length === 0)
 			computeEntrySplits(start, entry.length)
-				.forEach(entrySplit => processEntry(null, entry, entrySplit))
+				.forEach(entrySplit => processEntry(null, entry, entryIndex, entrySplit))
 		entry.people
 			.forEach(person => computeEntrySplits(start, entry.length)
-				.forEach(entrySplit => processEntry(person, entry, entrySplit)))
+				.forEach(entrySplit => processEntry(person, entry, entryIndex, entrySplit)))
 	})
 
 	return { months, griddedEntries }
