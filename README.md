@@ -2,6 +2,20 @@
 
 A calendar view on static data, but all of those details may change between now and later - who knows, maybe I can even come up with a good name. 😬
 
+## How to try it out
+
+### Setup
+
+* clone the repo
+* with Java 16, run `mvn verify` in the project root folder
+* with Node 15, run `npm install` in the project root folder
+
+### Launch
+
+* open the app in your IDE and launch `CalendarApplication`
+* run `npm start` in the root directory
+* go to localhost:3000
+
 ## What I did
 
 ### Setup
