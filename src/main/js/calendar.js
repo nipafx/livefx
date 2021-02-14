@@ -136,11 +136,11 @@ const computeColumnIndex = (columns, entrySplit) => {
 }
 
 function createCalendarStructure(holidays, year, months, griddedEntries) {
-	const processCalendarStructure = (year, month, day, person, columnIndex, holidays) => {
+	const processCalendarStructure = (year, month, day, person, columnSpan, holidays) => {
 		const category = dayCategory(holidays, DateTime.local(year, month, day))
 		if (category) {
-			const gridArea = computeGridArea(person.abbreviation, columnIndex, month, day, 1)
-			const reactKey = computeReactKey(person.abbreviation, columnIndex, `${month - 1}-${day}`)
+			const gridArea = computeGridArea(person.abbreviation, 0, month, day, columnSpan, 1)
+			const reactKey = computeReactKey(person.abbreviation, 0, `${month - 1}-${day}`)
 			const griddedEntry = { person, category: category, className: category.className, gridArea, reactKey }
 			griddedEntries.unshift(griddedEntry)
 		}
@@ -149,10 +149,9 @@ function createCalendarStructure(holidays, year, months, griddedEntries) {
 	months
 		.flatMap((month, monthIndex) => month
 			.people
-			.flatMap(person => person.columns
-				.flatMap((_, columnIndex) => arrayTo(31)
+			.flatMap(person => arrayTo(31)
 					.forEach(dayIndex => processCalendarStructure(
-						year, monthIndex + 1, dayIndex + 1, person, columnIndex, holidays)))))
+						year, monthIndex + 1, dayIndex + 1, person, person.columns.length, holidays))))
 }
 
 const dayCategory = (holidays, date) => {
@@ -249,14 +248,14 @@ const computeEntrySplits = (start, length) => {
 }
 
 const computeGridAreaFromInterval = (person, columnIndex, interval) =>
-	computeGridArea(person, columnIndex, interval.start.month, interval.start.day, interval.length(`day`))
+	computeGridArea(person, columnIndex, interval.start.month, interval.start.day, 1, interval.length(`day`))
 
-const computeGridArea = (person, columnIndex, month, day, length) => {
+const computeGridArea = (person, columnIndex, month, day, columnSpan, rowSpan) => {
 	const monthAbbreviation = Info.months('short')[month - 1]
 	const column = `${monthAbbreviation}_${person}_c${columnIndex}`
 	return {
-		gridColumn: `${column}_d${day}`,
-		gridRow: `${column}_d${day} / span ${length}`
+		gridColumn: `${column}_d${day} / span ${columnSpan}`,
+		gridRow: `${column}_d${day} / span ${rowSpan}`
 	}
 }
 
