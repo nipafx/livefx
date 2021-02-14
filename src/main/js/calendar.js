@@ -156,19 +156,16 @@ function createCalendarStructure(holidays, year, months, griddedEntries) {
 }
 
 const dayCategory = (holidays, date) => {
+
+	// the order of the following checks is important:
+	// only one div will be created per grid cell, so later types of divs (e.g. for weekends)
+	// won't be created if an earlier check was true (e.g. holidays)
+
 	if (!date.isValid)
 		return {
 			name: "not-a-day",
 			abbreviation: "nad",
 			color: `var(--non-day)`
-		}
-
-	const isWeekendDay = date.weekday === 6 || date.weekday === 7;
-	if (isWeekendDay)
-		return {
-			name: "weekend",
-			abbreviation: "wkd",
-			color: `var(--weekend-day)`
 		}
 
 	const isHoliday = holidays
@@ -179,6 +176,14 @@ const dayCategory = (holidays, date) => {
 			name: "holiday",
 			abbreviation: "hds",
 			color: `var(--holiday)`
+		}
+
+	const isWeekendDay = date.weekday === 6 || date.weekday === 7;
+	if (isWeekendDay)
+		return {
+			name: "weekend",
+			abbreviation: "wkd",
+			color: `var(--weekend-day)`
 		}
 
 	return null
