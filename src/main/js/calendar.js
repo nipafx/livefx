@@ -14,6 +14,12 @@ const Calendar = () => {
 		year: DateTime.local().year
 	})
 
+	const [ highlight, setHighlight ] = useState({
+		month: null,
+		day: null,
+		person: null,
+	})
+
 	useEffect(
 		() => {
 			Promise
@@ -33,53 +39,116 @@ const Calendar = () => {
 		},
 		[ calendar.year ])
 
+	const months = Info.months('numeric')
+		// `month` is a string (yeah, I know)
+		.map(month => parseInt(month))
 	return (
-		<div className={style.grid} style={{ ...calendar.gridStyle }}>
-			{Info.months('numeric').map(displayMonth)}
-			{Info.months('short')
-				.flatMap(monthAbbreviation => calendar
-					.people
-					.map(person => displayPerson(monthAbbreviation, person)))}
-			{arrayTo(31).map(displayDayOfMonth)}
-			{calendar.entries.map(displayEntry)}
+		<div className={style.grid} style={{ ...calendar.gridStyle }}
+			onMouseOver={event => mouseOver(event, setHighlight)}>
+			{months.map(month => displayMonth(month, highlight))}
+			{months.flatMap(month => calendar
+				.people
+				.map(person => displayPerson(month, person, highlight)))}
+			{arrayTo(31).map(day => displayDayOfMonth(day, highlight))}
+			{calendar.entries.map(entry => displayEntry(entry, highlight))}
 		</div>
 	)
 }
 
-const displayMonth = month => {
+const mouseOver = (event, setHighlight) => {
+	const validDay = !event.target.classList.contains(style.nonDay);
+	const highlight = validDay
+		? {
+			month: parseInt(event.target.dataset.month),
+			day: parseInt(event.target.dataset.day),
+			person: parseInt(event.target.dataset.person)
+		} :
+		{
+			month: null,
+			day: null,
+			person: null
+		}
+	setHighlight(highlight)
+}
+
+/*
+ * DISPLAY CALENDAR
+ */
+
+const displayMonth = (month, highlight) => {
 	const abbreviation = Info.months('short')[month - 1]
 	const name = Info.months('long')[month - 1]
+	const className = style.month + (month === highlight.month ? " " + style.highlighted : "")
 	const gridArea = abbreviation
 	return (
-		<div key={gridArea} className={style.month} style={{ gridArea }}>
+		<div key={gridArea} className={className} style={{ gridArea }}>
 			{name}
 		</div>
 	)
 }
 
-const displayPerson = (monthAbbreviation, person) => {
+const displayPerson = (month, person, highlight) => {
+	const monthAbbreviation = Info.months('short')[month - 1]
 	const gridArea = `${monthAbbreviation}_${person.abbreviation}`
 	// TODO use name
 	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation;
+	const className = style.person + (month === highlight.month && person.indexInPeople === highlight.person ? " " + style.highlighted : "")
 	return (
-		<div key={gridArea} className={style.person} style={{ gridArea }}>
+		<div key={gridArea} className={className} style={{ gridArea }}>
 			<div>{text}</div>
 		</div>
 	)
 }
 
-const displayDayOfMonth = day => (
-	<div key={day} className={style.dayOfMonth} style={{ gridArea: `d_${day + 1}` }}>
-		{day + 1}
-	</div>
-)
+const displayDayOfMonth = (day, highlight) => {
+	const className = style.dayOfMonth + (day + 1 === highlight.day ? " " + style.highlighted : "")
+	return (
+		<div key={day} className={className} style={{ gridArea: `d_${day + 1}` }}>
+			{day + 1}
+		</div>
+	);
+}
 
-const displayEntry = entry => (
-	<div key={entry.reactKey} className={entry.className} style={{ ...entry.gridArea, backgroundColor: entry.category.color }}/>
-)
+const displayEntry = (entry, highlight) => {
+	const className = entry.className + " " + style.cell + " " + detectHighlightClass(entry, highlight);
+	const data = entry.data
+		? {
+			'data-month': entry.data.month,
+			'data-day': entry.data.day,
+			'data-person': entry.data.person,
+		}
+		: {}
+	return (
+		<div
+			key={entry.reactKey}
+			className={className}
+			style={{ ...entry.gridArea, backgroundColor: entry.category.color }}
+			{...data}
+		/>
+	);
+}
+
+const detectHighlightClass = (entry, highlight) => {
+	let data = entry.data;
+	if (!data)
+		return ""
+
+	if (data.day === highlight.day &&
+		(data.month < highlight.month || (data.month === highlight.month && data.person <= highlight.person)))
+		return style.highlightedRow
+	if (data.month === highlight.month && data.person === highlight.person && data.day <= highlight.day)
+		return style.highlightedColumn
+
+	return "";
+}
+
+/*
+ * CREATE CALENDAR
+ */
 
 const createCalendar = (year, entries, holidays, people) => {
 	const peopleWithUnknown = [ ...people, { name: "", abbreviation: NO_PERSON } ]
+		.map((person, index) => ({ ...person, indexInPeople: index }))
 
 	const griddedEntries = []
 	const months = Info
@@ -141,7 +210,8 @@ function createCalendarStructure(holidays, year, months, griddedEntries) {
 		if (category) {
 			const gridArea = computeGridArea(person.abbreviation, 0, month, day, columnSpan, 1)
 			const reactKey = computeReactKey(person.abbreviation, 0, `${month - 1}-${day}`)
-			const griddedEntry = { person, category: category, className: category.className, gridArea, reactKey }
+			const data = { month, day, person: person.indexInPeople }
+			const griddedEntry = { person, category: category, className: category.className, gridArea, reactKey, data }
 			griddedEntries.unshift(griddedEntry)
 		}
 	}

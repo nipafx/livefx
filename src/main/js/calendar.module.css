@@ -2,7 +2,7 @@
     min-height: 100vh;
     display: grid;
 
-    --entry-border: 1px solid var(--bg-color-lighter);
+    --entry-border: 1px solid;
 }
 
 .month {
@@ -11,6 +11,10 @@
 
     font-weight: bold;
     text-align: center;
+}
+
+.month.highlighted {
+    background-color: var(--fg-color);
 }
 
 .person {
@@ -25,6 +29,10 @@
     transform: rotate(-90deg);
 }
 
+.person.highlighted {
+    background-color: var(--fg-color);
+}
+
 .dayOfMonth {
     padding: 0 0.5em;
 
@@ -37,23 +45,49 @@
     /* TODO: center align vertically */
 }
 
+.dayOfMonth.highlighted {
+    background-color: var(--fg-color);
+}
+
+.cell.highlightedRow {
+    border-top-color: var(--fg-color);
+    border-bottom-color: var(--fg-color);
+}
+
+.cell.highlightedColumn {
+    border-left-color: var(--fg-color);
+    border-right-color: var(--fg-color);
+}
+
+.cell:hover {
+    border-color: var(--fg-color);
+}
+
 .entry {
-    border: var(--entry-border);
+    border: var(--entry-border) var(--bg-color-lighter);
 }
 
 .holiday {
     background-color: var(--holiday);
+    border: var(--entry-border) var(--holiday);
 }
 
 .weekendDay {
     background-color: var(--weekend-day);
+    border: var(--entry-border) var(--weekend-day);
 }
 
 .emptyDay {
     background-color: var(--empty-day);
-    border: var(--entry-border);
+    border: var(--entry-border) var(--bg-color-lighter);
 }
 
 .nonDay {
     background-color: var(--non-day);
+    /* set a border with same color as background (this effectively invisible),
+       so border can be highlighted */
+    border: var(--entry-border) var(--non-day);
+}
+.nonDay:hover {
+    border-color: var(--non-day);
 }
