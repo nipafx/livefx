@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { DateTime, Duration, Info, Interval } from 'luxon';
+import React, { useMemo, useState } from 'react'
+import { DateTime, Duration, Info, Interval } from 'luxon'
 
-import style from './calendar.module.css';
+import style from './calendar.module.css'
 
-const NO_PERSON = "NONE";
+const NO_PERSON = "NONE"
 
-const Calendar = () => {
-
-	const [ calendar, setCalendar ] = useState({
-		gridStyle: { gridTemplateColumns: "", gridTemplateAreas: "" },
-		people: [],
-		entries: [],
-		year: DateTime.local().year
-	})
+const Calendar = ({ year, entries, holidays, people: teamMembers }) => {
 
 	const [ highlight, setHighlight ] = useState({
 		month: null,
@@ -20,53 +13,39 @@ const Calendar = () => {
 		person: null,
 	})
 
-	useEffect(
-		() => {
-			Promise
-				.all([
-					fetch(`/api/entries?year=${calendar.year}`)
-						.then(response => response.text())
-						.then(entriesString => JSON.parse(entriesString)),
-					fetch(`/api/holidays?year=${calendar.year}`)
-						.then(response => response.text())
-						.then(holidayString => JSON.parse(holidayString)),
-					fetch(`/api/people`)
-						.then(response => response.text())
-						.then(personString => JSON.parse(personString)) ])
-				.then(([ entries, holidays, people ]) =>
-					createCalendar(calendar.year, entries, holidays, people))
-				.then(setCalendar)
-		},
-		[ calendar.year ])
+	const { gridStyle, people, griddedEntries } = useMemo(
+		() => createCalendar(year, entries, holidays, teamMembers),
+		[ year, entries, holidays, teamMembers ])
 
 	const months = Info.months('numeric')
 		// `month` is a string (yeah, I know)
 		.map(month => parseInt(month))
 	return (
-		<div className={style.grid} style={{ ...calendar.gridStyle }}
-			onMouseOver={event => mouseOver(event, setHighlight)}>
+		<div
+			className={style.grid}
+			style={{ ...gridStyle }}
+			onMouseOver={event => updateHover(setHighlight, event.target)}
+		>
 			{months.map(month => displayMonth(month, highlight))}
-			{months.flatMap(month => calendar
-				.people
-				.map(person => displayPerson(month, person, highlight)))}
+			{months.flatMap(month => people.map(person => displayPerson(month, person, highlight)))}
 			{arrayTo(31).map(day => displayDayOfMonth(day, highlight))}
-			{calendar.entries.map(entry => displayEntry(entry, highlight))}
+			{griddedEntries.map(entry => displayEntry(entry, highlight))}
 		</div>
 	)
 }
 
-const mouseOver = (event, setHighlight) => {
-	const validDay = !event.target.classList.contains(style.nonDay);
-	const highlight = validDay
+const updateHover = (setHighlight, cell) => {
+	const updateToCell = !cell.classList.contains(style.nonDay);
+	const highlight = updateToCell
 		? {
-			month: parseInt(event.target.dataset.month),
-			day: parseInt(event.target.dataset.day),
-			person: parseInt(event.target.dataset.person)
-		} :
-		{
+			month: parseInt(cell.dataset.month),
+			day: parseInt(cell.dataset.day),
+			person: parseInt(cell.dataset.person),
+		}
+		: {
 			month: null,
 			day: null,
-			person: null
+			person: null,
 		}
 	setHighlight(highlight)
 }
@@ -91,7 +70,7 @@ const displayPerson = (month, person, highlight) => {
 	const monthAbbreviation = Info.months('short')[month - 1]
 	const gridArea = `${monthAbbreviation}_${person.abbreviation}`
 	// TODO use name
-	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation;
+	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation
 	const className = style.person + (month === highlight.month && person.indexInPeople === highlight.person ? " " + style.highlighted : "")
 	return (
 		<div key={gridArea} className={className} style={{ gridArea }}>
@@ -106,11 +85,11 @@ const displayDayOfMonth = (day, highlight) => {
 		<div key={day} className={className} style={{ gridArea: `d_${day + 1}` }}>
 			{day + 1}
 		</div>
-	);
+	)
 }
 
 const displayEntry = (entry, highlight) => {
-	const className = entry.className + " " + style.cell + " " + detectHighlightClass(entry, highlight);
+	const className = entry.className + " " + style.cell + " " + detectHighlightClass(entry, highlight)
 	const data = entry.data
 		? {
 			'data-month': entry.data.month,
@@ -122,14 +101,14 @@ const displayEntry = (entry, highlight) => {
 		<div
 			key={entry.reactKey}
 			className={className}
-			style={{ ...entry.gridArea, backgroundColor: entry.category.color }}
+			style={{ ...entry.gridArea, backgroundColor: entry.color }}
 			{...data}
 		/>
-	);
+	)
 }
 
 const detectHighlightClass = (entry, highlight) => {
-	let data = entry.data;
+	let data = entry.data
 	if (!data)
 		return ""
 
@@ -139,7 +118,7 @@ const detectHighlightClass = (entry, highlight) => {
 	if (data.month === highlight.month && data.person === highlight.person && data.day <= highlight.day)
 		return style.highlightedColumn
 
-	return "";
+	return ""
 }
 
 /*
@@ -150,36 +129,37 @@ const createCalendar = (year, entries, holidays, people) => {
 	const peopleWithUnknown = [ ...people, { name: "", abbreviation: NO_PERSON } ]
 		.map((person, index) => ({ ...person, indexInPeople: index }))
 
+	const { months, griddedEntries } = createEntries(entries, peopleWithUnknown)
+	griddedEntries.unshift(...createCalendarStructure(holidays, year, months))
+
+	return {
+		gridStyle: computeGridStyle(months),
+		people: peopleWithUnknown,
+		griddedEntries,
+	}
+}
+
+const createEntries = (entries, people) => {
 	const griddedEntries = []
 	const months = Info
 		.months('short')
 		.map(month => ({
 			abbreviation: month,
-			people: peopleWithUnknown.map(person => ({ ...person, columns: [ [] ] }))
+			people: people.map(person => ({ ...person, columns: [ [] ] }))
 		}))
 
-	// `createEntries` modifies `months` and `griddedEntries` and `createCalendarStructure`
-	// depends on that, so don't reorder these methods
-	createEntries(entries, months, griddedEntries);
-	createCalendarStructure(holidays, year, months, griddedEntries);
-
-	return {
-		gridStyle: computeGridStyle(months),
-		people: peopleWithUnknown,
-		entries: griddedEntries,
-		year
-	}
-}
-
-function createEntries(entries, months, griddedEntries) {
 	const processEntry = (person, entry, entrySplit) => {
 		const month = months[entrySplit.start.month - 1]
 		const monthPerson = month.people.find(p => p.abbreviation === (person?.abbreviation ?? NO_PERSON))
 		const columnIndex = computeColumnIndex(monthPerson.columns, entrySplit)
-		const gridArea = computeGridAreaFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
-		const reactKey = computeReactKeyFromInterval(monthPerson.abbreviation, columnIndex, entrySplit)
-		const griddedEntry = { person, category: entry.category, className: style.entry, gridArea, reactKey }
+		const griddedEntry = {
+			color: entry.category.color,
+			className: style.entry,
+			gridArea: computeGridAreaFromInterval(monthPerson.abbreviation, columnIndex, entrySplit),
+			reactKey: computeReactKeyFromInterval(monthPerson.abbreviation, columnIndex, entrySplit),
+		}
 		if (columnIndex === monthPerson.columns.length) monthPerson.columns.push([])
+
 		monthPerson.columns[columnIndex].push(entrySplit)
 		griddedEntries.push(griddedEntry)
 	}
@@ -193,6 +173,8 @@ function createEntries(entries, months, griddedEntries) {
 			.forEach(person => computeEntrySplits(start, entry.length)
 				.forEach(entrySplit => processEntry(person, entry, entrySplit)))
 	})
+
+	return { months, griddedEntries }
 }
 
 const computeColumnIndex = (columns, entrySplit) => {
@@ -204,62 +186,43 @@ const computeColumnIndex = (columns, entrySplit) => {
 	return columns.length
 }
 
-function createCalendarStructure(holidays, year, months, griddedEntries) {
+const createCalendarStructure = (holidays, year, months) => {
 	const processCalendarStructure = (year, month, day, person, columnSpan, holidays) => {
-		const category = dayCategory(holidays, DateTime.local(year, month, day))
-		if (category) {
-			const gridArea = computeGridArea(person.abbreviation, 0, month, day, columnSpan, 1)
-			const reactKey = computeReactKey(person.abbreviation, 0, `${month - 1}-${day}`)
-			const data = { month, day, person: person.indexInPeople }
-			const griddedEntry = { person, category: category, className: category.className, gridArea, reactKey, data }
-			griddedEntries.unshift(griddedEntry)
+		const data = { month, day, person: person.indexInPeople }
+		return {
+			className: dayClassName(holidays, DateTime.local(year, month, day)),
+			gridArea: computeGridArea(person.abbreviation, 0, month, day, columnSpan, 1),
+			reactKey: computeReactKey(person.abbreviation, 0, `${month - 1}-${day}`),
+			data
 		}
 	}
 
-	months
+	return months
 		.flatMap((month, monthIndex) => month
 			.people
 			.flatMap(person => arrayTo(31)
-					.forEach(dayIndex => processCalendarStructure(
-						year, monthIndex + 1, dayIndex + 1, person, person.columns.length, holidays))))
+				.map(dayIndex => processCalendarStructure(
+					year, monthIndex + 1, dayIndex + 1, person, person.columns.length, holidays))))
 }
 
-const dayCategory = (holidays, date) => {
+const dayClassName = (holidays, date) => {
 
 	// the order of the following checks is important:
 	// only one div will be created per grid cell, so later types of divs (e.g. for weekends)
 	// won't be created if an earlier check was true (e.g. holidays)
 
-	if (!date.isValid)
-		return {
-			name: "not-a-day",
-			abbreviation: "nad",
-			className: style.nonDay
-		}
+	if (!date.isValid) return style.nonDay
 
 	const isHoliday = holidays
 		.map(holiday => DateTime.fromISO(holiday.date))
 		.some(holiday => holiday.equals(date))
-	if (isHoliday)
-		return {
-			name: "holiday",
-			abbreviation: "hds",
-			className: style.holiday
-		}
+	if (isHoliday) return style.holiday
 
-	const isWeekendDay = date.weekday === 6 || date.weekday === 7;
-	if (isWeekendDay)
-		return {
-			name: "weekend",
-			abbreviation: "wkd",
-			className: style.weekendDay
-		}
 
-	return {
-		name: "empty",
-		abbreviation: "emy",
-		className: style.emptyDay
-	}
+	const isWeekendDay = date.weekday === 6 || date.weekday === 7
+	if (isWeekendDay) return style.weekendDay
+
+	return style.emptyDay
 }
 
 const computeGridStyle = months => {
@@ -335,4 +298,4 @@ const computeReactKeyFromInterval = (person, columnIndex, interval) =>
 const computeReactKey = (person, columnIndex, date) =>
 	`${person}_${columnIndex}_${date}`
 
-export default Calendar;
+export default Calendar

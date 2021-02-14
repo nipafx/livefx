@@ -1,13 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import Calendar from './calendar';
-
-import './global.css';
+import App from "./app"
 
 ReactDOM.render(
 	<React.StrictMode>
-		<Calendar/>
+		<App/>
 	</React.StrictMode>,
 	document.getElementById('root')
-);
+)
