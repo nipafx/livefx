@@ -8,9 +8,8 @@ const NO_PERSON = "NONE"
 const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry, setSelectedEntry }) => {
 
 	const [ highlight, setHighlight ] = useState({
-		month: null,
-		day: null,
-		person: null,
+		entryIndex: -1,
+		cell: null,
 	})
 
 	const { gridStyle, people, griddedEntries } = useMemo(
@@ -37,20 +36,24 @@ const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntr
 }
 
 const updateHover = (setHighlight, setHoveredEntry, cell) => {
-	const updateToCell = cell && !cell.classList.contains(style.nonDay)
-	const highlight = updateToCell
-		? {
-			month: parseInt(cell.dataset.month),
-			day: parseInt(cell.dataset.day),
-			person: parseInt(cell.dataset.person),
+	const determineHighlight = cell => {
+		const updateToEntry = Boolean(cell?.dataset.entryindex)
+		const updateToCell = cell && !cell.classList.contains(style.nonDay)
+
+		if (updateToEntry) return { entryIndex: parseInt(cell.dataset.entryindex) }
+		else if (updateToCell) return {
+			cell: {
+				month: parseInt(cell.dataset.month),
+				day: parseInt(cell.dataset.day),
+				person: parseInt(cell.dataset.person),
+			}
 		}
-		: {
-			month: null,
-			day: null,
-			person: null,
-		}
+		else return {}
+	}
+
+	const highlight = determineHighlight(cell)
 	setHighlight(highlight)
-	setHoveredEntry(cell?.dataset.entryindex ?? -1)
+	setHoveredEntry(highlight?.entryIndex ?? -1)
 }
 
 const updateSelected = (setSelectedEntry, cell) => {
@@ -64,7 +67,7 @@ const updateSelected = (setSelectedEntry, cell) => {
 const displayMonth = (month, highlight) => {
 	const abbreviation = Info.months('short')[month - 1]
 	const name = Info.months('long')[month - 1]
-	const className = style.month + (month === highlight.month ? " " + style.highlighted : "")
+	const className = style.month + (month === highlight.cell?.month ? " " + style.highlighted : "")
 	const gridArea = abbreviation
 	return (
 		<div key={gridArea} className={className} style={{ gridArea }}>
@@ -78,7 +81,8 @@ const displayPerson = (month, person, highlight) => {
 	const gridArea = `${monthAbbreviation}_${person.abbreviation}`
 	// TODO use name
 	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation
-	const className = style.person + (month === highlight.month && person.indexInPeople === highlight.person ? " " + style.highlighted : "")
+	const highlightPerson = month === highlight.cell?.month && person.indexInPeople === highlight.cell?.person;
+	const className = style.person + (highlightPerson ? " " + style.highlighted : "")
 	return (
 		<div key={gridArea} className={className} style={{ gridArea }}>
 			<div>{text}</div>
@@ -87,7 +91,7 @@ const displayPerson = (month, person, highlight) => {
 }
 
 const displayDayOfMonth = (day, highlight) => {
-	const className = style.dayOfMonth + (day + 1 === highlight.day ? " " + style.highlighted : "")
+	const className = style.dayOfMonth + (day + 1 === highlight.cell?.day ? " " + style.highlighted : "")
 	return (
 		<div key={day} className={className} style={{ gridArea: `d_${day + 1}` }}>
 			{day + 1}
@@ -116,17 +120,26 @@ const displayEntry = (entry, highlight) => {
 }
 
 const detectHighlightClass = (entry, highlight) => {
-	let data = entry.data
-	if (!data)
+	const data = entry.data
+	const entryCell = Boolean(data.entryIndex)
+
+	if (entryCell) {
+		if (data.entryIndex !== highlight.entryIndex)
+			return ""
+		return style.highlighted
+	} else {
+		// calendar structure cell
+		if (!highlight.cell)
+			return ""
+
+		const cell = highlight.cell
+		if (data.day === cell.day &&
+			(data.month < cell.month || (data.month === cell.month && data.person <= cell.person)))
+			return style.highlightedRow
+		if (data.month === cell.month && data.person === cell.person && data.day <= cell.day)
+			return style.highlightedColumn
 		return ""
-
-	if (data.day === highlight.day &&
-		(data.month < highlight.month || (data.month === highlight.month && data.person <= highlight.person)))
-		return style.highlightedRow
-	if (data.month === highlight.month && data.person === highlight.person && data.day <= highlight.day)
-		return style.highlightedColumn
-
-	return ""
+	}
 }
 
 /*

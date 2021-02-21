@@ -51,6 +51,10 @@
     background-color: var(--fg-color);
 }
 
+.cell.highlighted {
+    border-color: var(--fg-color);
+}
+
 .cell.highlightedRow {
     border-top-color: var(--fg-color);
     border-bottom-color: var(--fg-color);
