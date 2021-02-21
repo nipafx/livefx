@@ -5,7 +5,7 @@ import style from './calendar.module.css'
 
 const NO_PERSON = "NONE"
 
-const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry, setSelectedEntry }) => {
+const Calendar = ({ year, entries, holidays, people: teamMembers, themes, setHoveredEntry, setSelectedEntry }) => {
 
 	const [ highlightWithoutEntry, setHighlight ] = useState({
 		entryIndex: -1,
@@ -14,8 +14,8 @@ const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntr
 	const highlight = { ...highlightWithoutEntry, entry: entries[highlightWithoutEntry.entryIndex] }
 
 	const { gridStyle, people, griddedEntries } = useMemo(
-		() => createCalendar(year, entries, holidays, teamMembers),
-		[ year, entries, holidays, teamMembers ])
+		() => createCalendar(year, entries, holidays, teamMembers, themes),
+		[ year, entries, holidays, teamMembers, themes ])
 
 	const months = Info.months('numeric')
 		// `month` is a string (yeah, I know)
@@ -31,6 +31,10 @@ const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntr
 			{months.map(month => displayMonth(month, highlight))}
 			{months.flatMap(month => people.map(person => displayPerson(month, person, highlight)))}
 			{arrayTo(31).map(day => displayDayOfMonth(day, highlight))}
+			{themes
+				.flatMap((_themes, themesIndex) => _themes.themes
+					.map((theme, themeIndex) => ({ theme, themesIndex, month: themeIndex + 1 })))
+				.map(({ theme, themesIndex, month }) => displayTheme(theme, themesIndex, month, highlight))}
 			{griddedEntries.map(entry => displayEntry(entry, people.map(person => person.abbreviation), highlight))}
 		</div>
 	)
@@ -129,6 +133,33 @@ const dayOfMonthToHighlight = (day, highlight) => {
 	}
 }
 
+const displayTheme = (theme, themesIndex, month, highlight) => {
+	const className = `${style.theme} ${(monthToHighlight(month, highlight) ? style.highlighted : "")}`
+	const abbreviation = Info.months('short')[month - 1]
+	const gridArea = `theme_${themesIndex}_${abbreviation}`
+	const elementStyle = {
+		gridArea,
+		color: color(theme.textColor),
+		backgroundColor: color(theme.cellColor),
+	}
+	return (
+		<div key={gridArea} className={className} style={elementStyle}>
+			{theme.name}
+		</div>
+	)
+}
+
+const color = color => {
+	switch (color) {
+		case "fg":
+			return "var(--fg-color)"
+		case "bg":
+			return "var(--bg-color)"
+		default:
+			return color
+	}
+}
+
 const displayEntry = (entry, allPeople, highlight) => {
 	const className = entry.className + " " + style.cell + " " + detectHighlightedEntryClass(entry, allPeople, highlight)
 	const data = entry.data
@@ -205,7 +236,7 @@ const detectHighlightedEntryClass = ({ data }, allPeople, highlight) => {
  * CREATE CALENDAR
  */
 
-const createCalendar = (year, entries, holidays, people) => {
+const createCalendar = (year, entries, holidays, people, themes) => {
 	const peopleWithUnknown = [ ...people, { name: "", abbreviation: NO_PERSON } ]
 		.map((person, index) => ({ ...person, indexInPeople: index }))
 
@@ -213,7 +244,7 @@ const createCalendar = (year, entries, holidays, people) => {
 	griddedEntries.unshift(...createCalendarStructure(holidays, year, months))
 
 	return {
-		gridStyle: computeGridStyle(months),
+		gridStyle: computeGridStyle(months, themes),
 		people: peopleWithUnknown,
 		griddedEntries,
 	}
@@ -305,7 +336,7 @@ const dayClassName = (holidays, date) => {
 	return style.emptyDay
 }
 
-const computeGridStyle = months => {
+const computeGridStyle = (months, themes) => {
 	const totalColumns = months
 		.flatMap(month => month.people.map(person => person.columns.length))
 		.reduce((result, columns) => result + columns, 0)
@@ -342,10 +373,25 @@ const computeGridStyle = months => {
 		})
 		.join(" ")
 
+	const themeRows = themes
+		.map((_, themeIndex) => {
+			const themeRow = months
+				.flatMap(month => month
+					.people
+					.flatMap(person => arrayTo(person.columns.length)
+						.map(_ => `theme_${themeIndex}_${month.abbreviation}`)
+					))
+				.join(" ")
+			return `'. ${themeRow}'`
+		})
+		.join(" ")
+
 	return {
-		// add first column for the days of the month
+		// first rows for month/people header, last rows for themes
+		gridTemplateRows: `auto auto repeat(31, 1fr) repeat(${themes.length}, auto)`,
+		// first column for the days of the month
 		gridTemplateColumns: `auto repeat(${totalColumns}, 1fr)`,
-		gridTemplateAreas: `${monthRow} ${personRow} ${dayRows}`
+		gridTemplateAreas: `${monthRow} ${personRow} ${dayRows} ${themeRows}`
 	}
 }
 

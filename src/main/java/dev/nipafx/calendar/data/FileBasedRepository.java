@@ -6,6 +6,8 @@ import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
+import dev.nipafx.calendar.entries.Theme;
+import dev.nipafx.calendar.entries.Themes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +30,8 @@ abstract class FileBasedRepository implements Repository {
 	private static final String CATEGORY_FILE_NAME = "categories";
 	private static final String PERSON_FILE_NAME = "people";
 	private static final String HOLIDAY_FILE_NAME = "holidays";
+	private static final String THEME_FILE_NAME = "themes";
+	private static final String THEMES_FILE_NAME = "themesByMonth";
 
 	private final Path dataFolder;
 	private final String fileEnding;
@@ -35,6 +39,8 @@ abstract class FileBasedRepository implements Repository {
 	private final String categoryFileName;
 	private final String personFileName;
 	private final String holidayFileName;
+	private final String themeFileName;
+	private final String themesByMonthFileName;
 	private final Collection<String> knownFiles;
 
 	public FileBasedRepository(String dataFolder, String fileEnding) {
@@ -44,7 +50,9 @@ abstract class FileBasedRepository implements Repository {
 		categoryFileName = CATEGORY_FILE_NAME + fileEnding;
 		personFileName = PERSON_FILE_NAME + fileEnding;
 		holidayFileName = HOLIDAY_FILE_NAME + fileEnding;
-		knownFiles = List.of(categoryFileName, personFileName, holidayFileName);
+		themeFileName = THEME_FILE_NAME + fileEnding;
+		themesByMonthFileName = THEMES_FILE_NAME + fileEnding;
+		knownFiles = List.of(categoryFileName, personFileName, holidayFileName, themeFileName, themesByMonthFileName);
 	}
 
 	@Override
@@ -123,6 +131,52 @@ abstract class FileBasedRepository implements Repository {
 		return readFromFile(dataFolder.resolve(holidayFileName), Holiday.class).stream()
 				.filter(holiday -> holiday.date().getYear() == year)
 				.toList();
+	}
+
+	@Override
+	public List<Themes> allThemes(int year) {
+		Map<String, Theme> themesByName = readFromFile(dataFolder.resolve(themeFileName), Theme.class).stream()
+				.collect(toMap(Theme::name, identity()));
+		return readFromFile(dataFolder.resolve(themesByMonthFileName), FileThemes.class).stream()
+				.filter(themes -> themes.year == year)
+				.map(themes -> parseThemes(themes, themesByName))
+				.toList();
+	}
+
+	private Themes parseThemes(FileThemes themes, Map<String, Theme> themesByName) {
+		List<Theme> themeList = Stream
+			.of(themes.january(),
+				themes.february(),
+				themes.march(),
+				themes.april(),
+				themes.may(),
+				themes.june(),
+				themes.july(),
+				themes.august(),
+				themes.september(),
+				themes.october(),
+				themes.november(),
+				themes.december())
+			.map(themesByName::get)
+			.toList();
+		return new Themes(themeList);
+	}
+
+	private record FileThemes(
+		@JsonProperty("year") int year,
+		@JsonProperty("january") String january,
+		@JsonProperty("february") String february,
+		@JsonProperty("march") String march,
+		@JsonProperty("april") String april,
+		@JsonProperty("may") String may,
+		@JsonProperty("june") String june,
+		@JsonProperty("july") String july,
+		@JsonProperty("august") String august,
+		@JsonProperty("september") String september,
+		@JsonProperty("october") String october,
+		@JsonProperty("november") String november,
+		@JsonProperty("december") String december) {
+
 	}
 
 	protected abstract ObjectReader readerFor(Class<?> type);

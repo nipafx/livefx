@@ -15,6 +15,7 @@ const App = () => {
 		entries: [],
 		holidays: [],
 		people: [],
+		themes: []
 	})
 	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
 	const [ selectedEntry, setSelectedEntry ] = useState(-1)
@@ -31,8 +32,11 @@ const App = () => {
 						.then(holidayString => JSON.parse(holidayString)),
 					fetch(`/api/people`)
 						.then(response => response.text())
-						.then(personString => JSON.parse(personString)) ])
-				.then(([ entries, holidays, people ]) => {
+						.then(personString => JSON.parse(personString)),
+					fetch(`/api/themes?year=${year}`)
+						.then(response => response.text())
+						.then(themesString => JSON.parse(themesString)) ])
+				.then(([ entries, holidays, people, themes ]) => {
 					const entriesWithParsedDates = entries
 						.map(entry => ({
 							...entry,
@@ -44,7 +48,8 @@ const App = () => {
 					setCalendar({
 						entries: entriesWithParsedDates,
 						holidays: holidaysWithParsedDates,
-						people
+						people,
+						themes
 					});
 				})
 		}, [ year ])

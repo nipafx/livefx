@@ -4,6 +4,7 @@ import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
+import dev.nipafx.calendar.entries.Themes;
 import dev.nipafx.calendar.spring.CalendarApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,6 +56,13 @@ interface RepositoryTest {
 				new Holiday(LocalDate.parse("2021-12-26"), "Christian holiday #3"),
 				new Holiday(LocalDate.parse("2021-12-31"), "New Year's Eve")
 		);
+	}
+
+	@Test
+	default void allThemes() {
+		List<Themes> themes = createRepository().allThemes(2021);
+
+		assertThat(themes).hasSize(2);
 	}
 
 	@Test

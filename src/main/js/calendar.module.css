@@ -28,6 +28,7 @@
 
     font-size: var(--tiny-font-size);
 }
+
 .person > * {
     padding: 0.5em 0;
 
@@ -114,6 +115,20 @@
        so border can be highlighted */
     border: var(--entry-border) var(--non-day);
 }
+
 .nonDay:hover {
     border-color: var(--non-day);
+}
+
+.theme {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+    border: var(--entry-border) transparent;
+}
+
+.theme.highlighted {
+    border-color: var(--fg-color);
 }

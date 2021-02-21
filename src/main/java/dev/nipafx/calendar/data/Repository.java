@@ -4,6 +4,7 @@ import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
+import dev.nipafx.calendar.entries.Themes;
 
 import java.util.List;
 
@@ -16,5 +17,7 @@ public interface Repository {
 	List<Person> allPeople();
 
 	List<Holiday> allHolidays(int year);
+
+	List<Themes> allThemes(int year);
 
 }
