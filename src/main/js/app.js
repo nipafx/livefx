@@ -17,6 +17,7 @@ const App = () => {
 		people: [],
 	})
 	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
+	const [ selectedEntry, setSelectedEntry ] = useState(-1)
 
 	useEffect(
 		() => {
@@ -46,6 +47,7 @@ const App = () => {
 			</div>
 			<div className={style.sidebar}>
 				<EntryDetails key="hovered-details" {...calendar} entryIndex={hoveredEntry}/>
+				<EntryDetails key="selected-details" {...calendar} entryIndex={selectedEntry}/>
 			</div>
 		</div>
 	)

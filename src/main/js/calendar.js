@@ -5,7 +5,7 @@ import style from './calendar.module.css'
 
 const NO_PERSON = "NONE"
 
-const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry }) => {
+const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry, setSelectedEntry }) => {
 
 	const [ highlight, setHighlight ] = useState({
 		month: null,
@@ -25,6 +25,7 @@ const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntr
 			className={style.grid}
 			style={{ ...gridStyle }}
 			onMouseOver={event => updateHover(setHighlight, setHoveredEntry, event.target)}
+			onClick={event => updateSelected(setSelectedEntry, event.target)}
 			onMouseLeave={__ => updateHover(setHighlight, setHoveredEntry)}
 		>
 			{months.map(month => displayMonth(month, highlight))}
@@ -50,6 +51,10 @@ const updateHover = (setHighlight, setHoveredEntry, cell) => {
 		}
 	setHighlight(highlight)
 	setHoveredEntry(cell?.dataset.entryindex ?? -1)
+}
+
+const updateSelected = (setSelectedEntry, cell) => {
+	setSelectedEntry(cell?.dataset.entryindex ?? -1)
 }
 
 /*
