@@ -7,12 +7,13 @@
 
 .month {
     padding-top: 0.25em;
+    display: flex;
+    justify-content: center;
 
     background: var(--alt-color);
     color: var(--bg-color);
 
     font-weight: bold;
-    text-align: center;
 }
 
 .month.highlighted {
@@ -22,6 +23,8 @@
 .person {
     background: var(--alt-color);
     color: var(--bg-color);
+    display: flex;
+    justify-content: center;
 
     font-size: var(--tiny-font-size);
 }
@@ -37,14 +40,15 @@
 
 .dayOfMonth {
     padding: 0 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     background: var(--alt-color);
     color: var(--bg-color);
 
     font-weight: bold;
     text-align: center;
-
-    /* TODO: center align vertically */
 }
 
 .dayOfMonth.highlighted {
