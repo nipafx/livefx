@@ -6,6 +6,8 @@
 }
 
 .month {
+    padding-top: 0.25em;
+
     background: var(--alt-color);
     color: var(--bg-color);
 

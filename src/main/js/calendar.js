@@ -97,7 +97,7 @@ const displayEntry = (entry, highlight) => {
 			'data-month': entry.data.month,
 			'data-day': entry.data.day,
 			'data-person': entry.data.person,
-			'data-entryIndex': entry.data.entryIndex,
+			'data-entryindex': entry.data.entryIndex,
 		}
 		: {}
 	return (

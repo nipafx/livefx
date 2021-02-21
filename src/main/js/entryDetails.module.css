@@ -1,2 +1,20 @@
-.details {
+.header {
+    padding: 0.25em 0.5em;
+
+    background: var(--alt-color);
+    color: var(--bg-color);
+
+    font-weight: bold;
+}
+
+.details > p {
+    margin: 0.25em;
+}
+
+.type {
+    color: var(--alt-color);
+}
+
+.person:not(:last-child)::after {
+    content: ", "
 }

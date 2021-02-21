@@ -1,4 +1,13 @@
 .app {
 	display: grid;
-	grid-template-columns: 9fr 1fr;
+	grid-template-columns: 4fr 1fr;
+}
+
+.calendar {
+	border-right: 1px solid var(--alt-color);
+}
+
+.sidebar > * {
+	margin: 0 2px 2px;
+	border: 1px solid var(--alt-color);
 }

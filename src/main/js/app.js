@@ -37,8 +37,16 @@ const App = () => {
 
 	return (
 		<div className={style.app}>
-			<Calendar year={year} {...calendar} setHoveredEntry={setHoveredEntry}/>
-			<EntryDetails {...calendar} hoveredEntry={hoveredEntry}/>
+			<div className={style.calendar}>
+				<Calendar
+					year={year}
+					{...calendar}
+					setHoveredEntry={setHoveredEntry}
+					setSelectedEntry={setSelectedEntry}/>
+			</div>
+			<div className={style.sidebar}>
+				<EntryDetails key="hovered-details" {...calendar} entryIndex={hoveredEntry}/>
+			</div>
 		</div>
 	)
 }
