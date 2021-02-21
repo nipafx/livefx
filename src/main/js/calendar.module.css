@@ -60,8 +60,24 @@
     border-bottom-color: var(--fg-color);
 }
 
+.cell.highlightedTop {
+    border-top-color: var(--fg-color);
+}
+
+.cell.highlightedBottom {
+    border-bottom-color: var(--fg-color);
+}
+
 .cell.highlightedColumn {
     border-left-color: var(--fg-color);
+    border-right-color: var(--fg-color);
+}
+
+.cell.highlightedLeft {
+    border-left-color: var(--fg-color);
+}
+
+.cell.highlightedRight {
     border-right-color: var(--fg-color);
 }
 

@@ -31,7 +31,7 @@ const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntr
 			{months.map(month => displayMonth(month, highlight))}
 			{months.flatMap(month => people.map(person => displayPerson(month, person, highlight)))}
 			{arrayTo(31).map(day => displayDayOfMonth(day, highlight))}
-			{griddedEntries.map(entry => displayEntry(entry, highlight))}
+			{griddedEntries.map(entry => displayEntry(entry, people.map(person => person.abbreviation), highlight))}
 		</div>
 	)
 }
@@ -124,14 +124,14 @@ const dayOfMonthToHighlight = (day, highlight) => {
 	if (highlight.entry) {
 		const start = DateTime.fromISO(highlight.entry.start)
 		return arrayTo(highlight.entry.length)
-			.map(day => start.plus({ days: day}))
+			.map(day => start.plus({ days: day }))
 			.map(date => date.day)
 			.includes(day + 1)
 	}
 }
 
-const displayEntry = (entry, highlight) => {
-	const className = entry.className + " " + style.cell + " " + detectHighlightClass(entry, highlight)
+const displayEntry = (entry, allPeople, highlight) => {
+	const className = entry.className + " " + style.cell + " " + detectHighlightedEntryClass(entry, allPeople, highlight)
 	const data = entry.data
 		? {
 			'data-month': entry.data.month,
@@ -150,19 +150,8 @@ const displayEntry = (entry, highlight) => {
 	)
 }
 
-const detectHighlightClass = (entry, highlight) => {
-	const data = entry.data
-	const entryCell = Boolean(data.entryIndex)
-
-	if (entryCell) {
-		if (data.entryIndex !== highlight.entryIndex)
-			return ""
-		return style.highlighted
-	} else {
-		// calendar structure cell
-		if (!highlight.cell)
-			return ""
-
+const detectHighlightedEntryClass = ({ data }, allPeople, highlight) => {
+	if (highlight.cell) {
 		const cell = highlight.cell
 		if (data.day === cell.day &&
 			(data.month < cell.month || (data.month === cell.month && data.person <= cell.person)))
@@ -170,6 +159,48 @@ const detectHighlightClass = (entry, highlight) => {
 		if (data.month === cell.month && data.person === cell.person && data.day <= cell.day)
 			return style.highlightedColumn
 		return ""
+	}
+
+	if (highlight.entry) {
+		if (data.entryIndex === highlight.entryIndex)
+			return style.highlighted
+
+		const classes = []
+		const entry = highlight.entry
+		const startDate = DateTime.fromISO(entry.start)
+		const endDate = startDate.plus({ days: entry.length - 1 });
+		const peopleIndices = entry.people
+			.map(person => person.abbreviation)
+			.map(abbreviation => allPeople.indexOf(abbreviation));
+		const minPersonIndex = entry.people.length === 0
+			? allPeople.length - 1
+			: Math.min(...peopleIndices)
+		const maxPersonIndex = entry.people.length === 0
+			? allPeople.length - 1
+			: Math.max(...peopleIndices)
+
+		// highlight row
+		const upTo = _date => data.day === _date.day &&
+			(data.month < _date.month || (data.month === _date.month && data.person <= maxPersonIndex))
+		if (upTo(startDate)) {
+			if (entry.length === 1) classes.push(style.highlightedRow)
+			else classes.push(style.highlightedTop)
+		} else if (upTo(endDate) && entry.length > 1)
+			classes.push(style.highlightedBottom)
+
+		// highlight column
+		if (data.month === startDate.month && data.day < startDate.day) {
+			if (entry.people.length === 0) {
+				if (data.person === maxPersonIndex) classes.push(style.highlightedColumn)
+			} else if (entry.people.length === 1) {
+				if (data.person === minPersonIndex) classes.push(style.highlightedColumn)
+			} else {
+				if (data.person === minPersonIndex) classes.push(style.highlightedLeft)
+				if (data.person === maxPersonIndex) classes.push(style.highlightedRight)
+			}
+		}
+
+		return classes.join(" ")
 	}
 }
 
