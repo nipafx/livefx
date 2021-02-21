@@ -29,10 +29,9 @@ const EntryDetails = ({ entries, holidays, people, entryIndex }) => {
 
 const displayDate = entry => {
 	if (!entry) return
-	const startDate = DateTime.fromISO(entry.start);
-	const start = startDate.toFormat('dd.MM.')
+	const start = DateTime.fromISO(entry.start).toFormat('dd.MM.')
 	const end = entry.length > 1
-		? " - " + startDate.plus({ days: entry.length }).toFormat('dd.MM.')
+		? " - " + DateTime.fromISO(entry.end).toFormat('dd.MM.')
 		: ""
 	return start + end
 }

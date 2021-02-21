@@ -81,7 +81,7 @@ const monthToHighlight = (month, highlight) => {
 	if (highlight.cell)
 		return month === highlight.cell?.month
 	if (highlight.entry)
-		return computeEntrySplits(DateTime.fromISO(highlight.entry.start), highlight.entry.length)
+		return computeEntrySplits(highlight.entry.start, highlight.entry.length)
 			.map(monthInterval => monthInterval.start.month)
 			.includes(month)
 }
@@ -122,9 +122,8 @@ const displayDayOfMonth = (day, highlight) => {
 const dayOfMonthToHighlight = (day, highlight) => {
 	if (highlight.cell) return day + 1 === highlight.cell?.day
 	if (highlight.entry) {
-		const start = DateTime.fromISO(highlight.entry.start)
 		return arrayTo(highlight.entry.length)
-			.map(day => start.plus({ days: day }))
+			.map(day => highlight.entry.start.plus({ days: day }))
 			.map(date => date.day)
 			.includes(day + 1)
 	}
@@ -167,8 +166,6 @@ const detectHighlightedEntryClass = ({ data }, allPeople, highlight) => {
 
 		const classes = []
 		const entry = highlight.entry
-		const startDate = DateTime.fromISO(entry.start)
-		const endDate = startDate.plus({ days: entry.length - 1 });
 		const peopleIndices = entry.people
 			.map(person => person.abbreviation)
 			.map(abbreviation => allPeople.indexOf(abbreviation));
@@ -182,14 +179,14 @@ const detectHighlightedEntryClass = ({ data }, allPeople, highlight) => {
 		// highlight row
 		const upTo = _date => data.day === _date.day &&
 			(data.month < _date.month || (data.month === _date.month && data.person <= maxPersonIndex))
-		if (upTo(startDate)) {
+		if (upTo(entry.start)) {
 			if (entry.length === 1) classes.push(style.highlightedRow)
 			else classes.push(style.highlightedTop)
-		} else if (upTo(endDate) && entry.length > 1)
+		} else if (upTo(entry.end) && entry.length > 1)
 			classes.push(style.highlightedBottom)
 
 		// highlight column
-		if (data.month === startDate.month && data.day < startDate.day) {
+		if (data.month === entry.start.month && data.day < entry.start.day) {
 			if (entry.people.length === 0) {
 				if (data.person === maxPersonIndex) classes.push(style.highlightedColumn)
 			} else if (entry.people.length === 1) {
@@ -249,12 +246,11 @@ const createEntries = (entries, people) => {
 	}
 
 	entries.forEach((entry, entryIndex) => {
-		const start = DateTime.fromISO(entry.start)
 		if (entry.people.length === 0)
-			computeEntrySplits(start, entry.length)
+			computeEntrySplits(entry.start, entry.length)
 				.forEach(entrySplit => processEntry(null, entry, entryIndex, entrySplit))
 		entry.people
-			.forEach(person => computeEntrySplits(start, entry.length)
+			.forEach(person => computeEntrySplits(entry.start, entry.length)
 				.forEach(entrySplit => processEntry(person, entry, entryIndex, entrySplit)))
 	})
 
@@ -298,7 +294,7 @@ const dayClassName = (holidays, date) => {
 	if (!date.isValid) return style.nonDay
 
 	const isHoliday = holidays
-		.map(holiday => DateTime.fromISO(holiday.date))
+		.map(holiday => holiday.date)
 		.some(holiday => holiday.equals(date))
 	if (isHoliday) return style.holiday
 

@@ -32,8 +32,21 @@ const App = () => {
 					fetch(`/api/people`)
 						.then(response => response.text())
 						.then(personString => JSON.parse(personString)) ])
-				.then(([ entries, holidays, people ]) =>
-					setCalendar({ entries, holidays, people }))
+				.then(([ entries, holidays, people ]) => {
+					const entriesWithParsedDates = entries
+						.map(entry => ({
+							...entry,
+							start: DateTime.fromISO(entry.start),
+							end: DateTime.fromISO(entry.start).plus({ days: entry.length - 1 }),
+						}))
+					const holidaysWithParsedDates = holidays
+						.map(holiday => ({ ...holiday, date: DateTime.fromISO(holiday.date) }))
+					setCalendar({
+						entries: entriesWithParsedDates,
+						holidays: holidaysWithParsedDates,
+						people
+					});
+				})
 		}, [ year ])
 
 	return (
