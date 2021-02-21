@@ -1,7 +1,7 @@
-start, category, people
-2021-01-19, mls, jad
-2021-04-02, mls, jad
+start, category, people, description
+2021-01-19, mls, jad, "Mailing #1"
+2021-04-02, mls, jad, "Mailing #2"
 2021-06-23, mls
-2021-09-15, mls, jid
+2021-09-15, mls, jid, "Mailing #3"
 2021-10-06, mls, jod
-2021-12-12, mls
+2021-12-12, mls, , "Mailing #4"

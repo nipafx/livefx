@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 const EntryDetails = ({ entries, holidays, people, entryIndex }) => {
 	const entry = entries[entryIndex]
 	return (
-		<div className={style.container}>
+		<div>
 			<div className={style.header}>Details</div>
 			<div className={style.details}>
 				<p key="date">
@@ -21,6 +21,10 @@ const EntryDetails = ({ entries, holidays, people, entryIndex }) => {
 					<span className={style.type}>People: </span>
 					{entry?.people?.map(person =>
 						<span key={person.name} className={style.person}>{person.name}</span>)}
+				</p>
+				<p key="description">
+					<span className={style.type}>Description: </span>
+					{entry?.description}
 				</p>
 			</div>
 		</div>

@@ -5,11 +5,13 @@
 		"people": [
 			"jad",
 			"jed"
-		]
+		],
+		"description": "We're gonna have fun playing some StarCraft 2 (no Voidrays, they're imba!)"
 	},
 	{
 		"start": "2021-03-11",
 		"category": "sc2",
-		"person": "jod"
+		"person": "jod",
+		"description": "We're gonna have a terrible playing some StarCraft 2 because everybody Protoss rushes Voidrays."
 	}
 ]

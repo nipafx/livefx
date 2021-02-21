@@ -8,7 +8,8 @@
 }
 
 .details > p {
-    margin: 0.25em;
+    margin: 0.25em 0.25em 0.25em 1.25em;
+    text-indent: -1em;
 }
 
 .type {

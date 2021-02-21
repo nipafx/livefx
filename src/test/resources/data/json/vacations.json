@@ -15,7 +15,8 @@
 		"start": "2021-03-02",
 		"length": 7,
 		"category": "vac",
-		"person": "jid"
+		"person": "jid",
+		"description": "Maui"
 	},
 	{
 		"start": "2021-04-18",
@@ -27,6 +28,7 @@
 		"start": "2021-05-02",
 		"length": 14,
 		"category": "vac",
-		"person": "jud"
+		"person": "jud",
+		"description": "Borkum"
 	}
 ]

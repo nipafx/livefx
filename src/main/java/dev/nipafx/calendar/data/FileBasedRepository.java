@@ -78,7 +78,8 @@ abstract class FileBasedRepository implements Repository {
 				@JsonProperty("person") Optional<String> person,
 				// Jackson deserializes absent fields to null instead of an empty collection,
 				// which makes it more uncomfortable to handle, so I wrap the List into an Optional
-				@JsonProperty("people") Optional<List<String>> people) {
+				@JsonProperty("people") Optional<List<String>> people,
+				@JsonProperty("description") Optional<String> description) {
 
 		}
 
@@ -89,7 +90,8 @@ abstract class FileBasedRepository implements Repository {
 						categories.get(entry.category),
 						extractPersonAbbreviations(entry.person, entry.people)
 								.map(people::get)
-								.toList()
+								.toList(),
+						entry.description().orElse("")
 				));
 	}
 
