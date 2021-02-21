@@ -7,10 +7,11 @@ const NO_PERSON = "NONE"
 
 const Calendar = ({ year, entries, holidays, people: teamMembers, setHoveredEntry, setSelectedEntry }) => {
 
-	const [ highlight, setHighlight ] = useState({
+	const [ highlightWithoutEntry, setHighlight ] = useState({
 		entryIndex: -1,
 		cell: null,
 	})
+	const highlight = { ...highlightWithoutEntry, entry: entries[highlightWithoutEntry.entryIndex] }
 
 	const { gridStyle, people, griddedEntries } = useMemo(
 		() => createCalendar(year, entries, holidays, teamMembers),
@@ -67,7 +68,7 @@ const updateSelected = (setSelectedEntry, cell) => {
 const displayMonth = (month, highlight) => {
 	const abbreviation = Info.months('short')[month - 1]
 	const name = Info.months('long')[month - 1]
-	const className = style.month + (month === highlight.cell?.month ? " " + style.highlighted : "")
+	const className = `${style.month} ${(monthToHighlight(month, highlight) ? style.highlighted : "")}`
 	const gridArea = abbreviation
 	return (
 		<div key={gridArea} className={className} style={{ gridArea }}>
@@ -76,27 +77,57 @@ const displayMonth = (month, highlight) => {
 	)
 }
 
+const monthToHighlight = (month, highlight) => {
+	if (highlight.cell)
+		return month === highlight.cell?.month
+	if (highlight.entry)
+		return computeEntrySplits(DateTime.fromISO(highlight.entry.start), highlight.entry.length)
+			.map(monthInterval => monthInterval.start.month)
+			.includes(month)
+}
+
 const displayPerson = (month, person, highlight) => {
 	const monthAbbreviation = Info.months('short')[month - 1]
 	const gridArea = `${monthAbbreviation}_${person.abbreviation}`
 	// TODO use name
 	const text = person.abbreviation === NO_PERSON ? "" : person.abbreviation
-	const highlightPerson = month === highlight.cell?.month && person.indexInPeople === highlight.cell?.person;
-	const className = style.person + (highlightPerson ? " " + style.highlighted : "")
+	const className = style.person + (personToHighlight(month, person, highlight) ? " " + style.highlighted : "")
 	return (
 		<div key={gridArea} className={className} style={{ gridArea }}>
 			<div>{text}</div>
 		</div>
 	)
 }
+const personToHighlight = (month, person, highlight) => {
+	if (!monthToHighlight(month, highlight)) return false
+	if (highlight.cell) return person.indexInPeople === highlight.cell.person
+	if (highlight.entry)
+		return highlight.entry.people.length === 0
+			? person.abbreviation === NO_PERSON
+			: highlight.entry.people
+				.map(person => person.abbreviation)
+				.includes(person.abbreviation)
+}
+
 
 const displayDayOfMonth = (day, highlight) => {
-	const className = style.dayOfMonth + (day + 1 === highlight.cell?.day ? " " + style.highlighted : "")
+	const className = style.dayOfMonth + (dayOfMonthToHighlight(day, highlight) ? " " + style.highlighted : "")
 	return (
 		<div key={day} className={className} style={{ gridArea: `d_${day + 1}` }}>
 			{day + 1}
 		</div>
 	)
+}
+
+const dayOfMonthToHighlight = (day, highlight) => {
+	if (highlight.cell) return day + 1 === highlight.cell?.day
+	if (highlight.entry) {
+		const start = DateTime.fromISO(highlight.entry.start)
+		return arrayTo(highlight.entry.length)
+			.map(day => start.plus({ days: day}))
+			.map(date => date.day)
+			.includes(day + 1)
+	}
 }
 
 const displayEntry = (entry, highlight) => {
