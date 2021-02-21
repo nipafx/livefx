@@ -15,6 +15,7 @@ const App = () => {
 		entries: [],
 		holidays: [],
 		people: [],
+		categories: [],
 		themes: [],
 	})
 	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
@@ -33,10 +34,13 @@ const App = () => {
 					fetch(`/api/people`)
 						.then(response => response.text())
 						.then(personString => JSON.parse(personString)),
+					fetch(`/api/categories`)
+						.then(response => response.text())
+						.then(categoriesString => JSON.parse(categoriesString)),
 					fetch(`/api/themes?year=${year}`)
 						.then(response => response.text())
 						.then(themesString => JSON.parse(themesString)) ])
-				.then(([ entries, holidays, people, themes ]) => {
+				.then(([ entries, holidays, people, categories, themes ]) => {
 					const entriesWithParsedDates = entries
 						.map(entry => ({
 							...entry,
@@ -49,6 +53,7 @@ const App = () => {
 						entries: entriesWithParsedDates,
 						holidays: holidaysWithParsedDates,
 						people,
+						categories,
 						themes
 					});
 				})

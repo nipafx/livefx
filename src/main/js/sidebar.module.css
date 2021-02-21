@@ -1,0 +1,31 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar > *:not(.spacer) {
+    border: 1px solid var(--alt-color);
+    margin: 0 2px;
+}
+
+.sidebar > *:not(.spacer):not(:last-child) {
+    margin-bottom: 0.5em;
+}
+
+.sidebar > *:last-child {
+    /* otherwise the border bottom is invisible */
+    margin-bottom: 1px;
+}
+
+.header {
+    padding: 0.25em 0.5em;
+
+    background: var(--alt-color);
+    color: var(--bg-color);
+
+    font-weight: bold;
+}
+
+.spacer {
+    flex-grow: 1;
+}

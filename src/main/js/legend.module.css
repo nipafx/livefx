@@ -1,0 +1,13 @@
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.25em;
+    padding: 0.25em;
+}
+
+.category {
+    padding: 0.25em 0;
+
+    font-weight: bold;
+    text-align: center;
+}
