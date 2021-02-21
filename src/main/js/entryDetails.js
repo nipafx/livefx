@@ -1,13 +1,15 @@
 import React from 'react'
 
-import style from './entryDetails.module.css'
 import { DateTime } from "luxon";
 
-const EntryDetails = ({ entries, holidays, people, entryIndex }) => {
+import style from './entryDetails.module.css'
+import sidebarStyle from './sidebar.module.css'
+
+const EntryDetails = ({ entries, entryIndex }) => {
 	const entry = entries[entryIndex]
 	return (
 		<div>
-			<div className={style.header}>Details</div>
+			<div className={sidebarStyle.header}>Details</div>
 			<div className={style.details}>
 				<p key="date">
 					<span className={style.type}>Date: </span>

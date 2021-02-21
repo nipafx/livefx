@@ -48,6 +48,7 @@
     background: var(--alt-color);
     color: var(--bg-color);
 
+    font-size: var(--small-font-size);
     font-weight: bold;
     text-align: center;
 }
@@ -125,8 +126,10 @@
     align-items: center;
     justify-content: center;
 
+    padding: 0.25em 0;
+
     font-weight: bold;
-    border: var(--entry-border) transparent;
+    border: var(--entry-border) var(--bg-color-lighter);
 }
 
 .theme.highlighted {

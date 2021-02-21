@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { DateTime } from 'luxon'
 
 import Calendar from './calendar'
-import EntryDetails from "./entryDetails"
+import Sidebar from "./sidebar";
 
 import './global.css'
 import style from './app.module.css'
@@ -15,7 +15,7 @@ const App = () => {
 		entries: [],
 		holidays: [],
 		people: [],
-		themes: []
+		themes: [],
 	})
 	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
 	const [ selectedEntry, setSelectedEntry ] = useState(-1)
@@ -63,10 +63,7 @@ const App = () => {
 					setHoveredEntry={setHoveredEntry}
 					setSelectedEntry={setSelectedEntry}/>
 			</div>
-			<div className={style.sidebar}>
-				<EntryDetails key="hovered-details" {...calendar} entryIndex={hoveredEntry}/>
-				<EntryDetails key="selected-details" {...calendar} entryIndex={selectedEntry}/>
-			</div>
+			<Sidebar calendar={calendar} hoveredEntry={hoveredEntry} selectedEntry={selectedEntry}/>
 		</div>
 	)
 }

@@ -1,14 +1,5 @@
-.header {
-    padding: 0.25em 0.5em;
-
-    background: var(--alt-color);
-    color: var(--bg-color);
-
-    font-weight: bold;
-}
-
 .details > p {
-    margin: 0.25em 0.25em 0.25em 1.25em;
+    margin: 0.25em 0.25em 0.25em 1.5em;
     text-indent: -1em;
 }
 
