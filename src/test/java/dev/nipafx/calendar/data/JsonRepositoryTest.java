@@ -2,20 +2,22 @@ package dev.nipafx.calendar.data;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
+@TestPropertySource(properties = {
+		"data.type = json",
+		"data.folder = src/test/resources/data/json" })
 class JsonRepositoryTest implements RepositoryTest {
 
-	private final JsonMapper mapper;
+	private final JsonRepository repository;
 
-	JsonRepositoryTest(@Autowired JsonMapper mapper) {
-		this.mapper = mapper;
+	JsonRepositoryTest(@Autowired JsonRepository repository) {
+		this.repository = repository;
 	}
 
 	@Override
 	public Repository createRepository() {
-		return new JsonRepository(
-				"/home/nipa/code/calendar/src/test/resources/data/json",
-				mapper);
+		return repository;
 	}
 
 }

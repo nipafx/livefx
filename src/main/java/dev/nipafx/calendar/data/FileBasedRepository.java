@@ -8,6 +8,9 @@ import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
 import dev.nipafx.calendar.entries.Theme;
 import dev.nipafx.calendar.entries.Themes;
+import dev.nipafx.calendar.spring.CalendarConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +26,12 @@ import java.util.stream.Stream;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
 abstract class FileBasedRepository implements Repository {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CalendarConfiguration.class);
 
 	private static final String CATEGORY_FILE_NAME = "categories";
 	private static final String PERSON_FILE_NAME = "people";
@@ -53,6 +59,29 @@ abstract class FileBasedRepository implements Repository {
 		themeFileName = THEME_FILE_NAME + fileEnding;
 		themesByMonthFileName = THEMES_FILE_NAME + fileEnding;
 		knownFiles = List.of(categoryFileName, personFileName, holidayFileName, themeFileName, themesByMonthFileName);
+
+		verifyFilesExist();
+	}
+
+	private void verifyFilesExist() {
+		if (Files.exists(dataFolder))
+			LOG.info("Found data folder '{}'.", dataFolder);
+		else
+			throw new RepositoryConfigurationException(
+					"Make sure to pass '--data.folder=PATH' to the application when launching it, where PATH points to an existing data folder.",
+					"Data folder '%s' does not exist.",
+					dataFolder.toAbsolutePath());
+
+		String missingFiles = knownFiles.stream()
+				.filter(fileName -> !Files.exists(dataFolder.resolve(fileName)))
+				.collect(joining("\n - "));
+
+		if (missingFiles.isEmpty())
+			LOG.info("Found all required files in data folder.");
+		else
+			throw new RepositoryConfigurationException(
+					"Make sure all listed files exist in the data folder and have the correct names.",
+					"File(s) missing from data folder " + dataFolder.toAbsolutePath() + ":\n - " + missingFiles);
 	}
 
 	@Override

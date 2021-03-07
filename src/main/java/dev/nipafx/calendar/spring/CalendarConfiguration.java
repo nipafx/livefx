@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.nipafx.calendar.data.CsvRepository;
 import dev.nipafx.calendar.data.JsonRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +22,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 public class CalendarConfiguration {
 
 	@Bean
+	@ConditionalOnProperty(name = "data.type", havingValue = "json")
 	public JsonRepository createJsonRepository(
 			@Value("${data.folder}") String jsonFolder,
 			JsonMapper mapper) {
@@ -28,6 +30,7 @@ public class CalendarConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnProperty(name = "data.type", havingValue = "json")
 	public JsonMapper createJsonMapper() {
 		JsonMapper mapper = new JsonMapper();
 		mapper
@@ -37,15 +40,15 @@ public class CalendarConfiguration {
 	}
 
 	@Bean
-	// use CSV repo (instead of JSON repo)
-	@Primary
+	@ConditionalOnProperty(name = "data.type", havingValue = "csv")
 	public CsvRepository createCsvRepository(
-			@Value("${data.folder}") String jsonFolder,
+			@Value("${data.folder}") String csvFolder,
 			CsvMapper mapper) {
-		return new CsvRepository(jsonFolder, mapper);
+		return new CsvRepository(csvFolder, mapper);
 	}
 
 	@Bean
+	@ConditionalOnProperty(name = "data.type", havingValue = "csv")
 	public CsvMapper createCsvMapper() {
 		CsvMapper mapper = new CsvMapper();
 		mapper
