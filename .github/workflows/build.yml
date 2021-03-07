@@ -1,0 +1,36 @@
+name: Test Build
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out
+        uses: actions/checkout@v2
+      - name: set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+      - name: Node version
+        run: 'echo "Node: `node -v` / NPM: `npm -v`"'
+      - name: cache Node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - name: install frontend dependencies
+        run: npm install
+      - name: build frontend
+        run: npm run build
+      - name: set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16-ea
+      - name: Java version
+        run: ./mvnw -v
+      - name: build backend
+        run: ./mvnw --no-transfer-progress verify
