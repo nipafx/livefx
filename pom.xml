@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.nipafx.calendar</groupId>
 	<artifactId>calendar</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>calendar</name>
 	<description>A calendar view on static data</description>
 
