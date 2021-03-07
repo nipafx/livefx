@@ -1,8 +1,9 @@
-name: Test Build
+name: Build and Maybe Release
 on: push
 
 jobs:
   build:
+    name: Build and Maybe Release
     runs-on: ubuntu-latest
     steps:
       - name: check out
@@ -34,3 +35,16 @@ jobs:
         run: ./mvnw -v
       - name: build backend
         run: ./mvnw --no-transfer-progress verify
+      - name: build images (if on tagged commit)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./build-images.sh
+      - name: release (of on tagged commit)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: ${{ github.event.head_commit.message }}
+          files: |
+            target/calendar-linux.tar.gz
+            target/calendar-windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

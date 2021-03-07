@@ -24,7 +24,12 @@ This app creates a class-path image, i.e.:
 * Spring Boot's fat JAR in a subfolder of the runtime image
 * a launch script in the image's `bin` directory
 
-Check `build.sh` for details or simply execute it.
+Check `build-images.sh` for details or simply execute these two scripts:
+
+```shell
+./build.sh
+./build-images.sh
+```
 
 To launch the application:
 
