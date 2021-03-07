@@ -16,6 +16,23 @@ A calendar view on static data, but all of those details may change between now 
 * run `npm start` in the root directory
 * go to localhost:3000
 
+## How to build it
+
+This app creates a class-path image, i.e.:
+
+* a Java runtime image containing the required modules with `jlink`
+* Spring Boot's fat JAR in a subfolder of the runtime image
+* a launch script in the image's `bin` directory
+
+Check `build.sh` for details or simply execute it.
+
+To launch the application:
+
+* specify path to data folder on the `app/application.properties` in the image
+* launch `bin/calendar` in the image
+
+Go to [localhost:8080](http://localhost:8080/) to see the calendar.
+
 ## What I did
 
 ### Setup

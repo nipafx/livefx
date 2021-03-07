@@ -57,12 +57,23 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<!-- exclude application.properties from the JAR
+					     (build script will place one next to the JAR) -->
+					<exclude>application*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
 	</build>
 
 </project>
