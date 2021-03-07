@@ -1,0 +1,17 @@
+[
+	{
+		"name": "gaming",
+		"textColor": "fg",
+		"cellColor": "#a78d42"
+	},
+	{
+		"name": "health",
+		"textColor": "bg",
+		"cellColor": "#089c35"
+	},
+	{
+		"name": "videos",
+		"textColor": "fg",
+		"cellColor": "#903cee"
+	}
+]

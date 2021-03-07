@@ -26,8 +26,7 @@ interface RepositoryTest {
 		assertThat(people).containsExactlyInAnyOrder(
 				new Category("Vacation", "vac", "#645006"),
 				new Category("Mailings", "mls", "#167844"),
-				new Category("StarCraft 2 Games", "sc2", "#23a4e0"),
-				new Category("Holidays", "hds", "#ff73ff")
+				new Category("StarCraft 2 Games", "sc2", "#23a4e0")
 		);
 	}
 

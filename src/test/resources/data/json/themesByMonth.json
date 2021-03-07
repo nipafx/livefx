@@ -1,0 +1,32 @@
+[
+	{
+		"year": 2021,
+		"january": "gaming",
+		"february": "health",
+		"march": "videos",
+		"april": "gaming",
+		"may": "health",
+		"june": "videos",
+		"july": "gaming",
+		"august": "health",
+		"september": "videos",
+		"october": "gaming",
+		"november": "health",
+		"december": "videos"
+	},
+	{
+		"year": 2021,
+		"january": "gaming",
+		"february": "videos",
+		"march": "gaming",
+		"april": "health",
+		"may": "health",
+		"june": "videos",
+		"july": "health",
+		"august": "videos",
+		"september": "gaming",
+		"october": "gaming",
+		"november": "videos",
+		"december": "health"
+	}
+]
