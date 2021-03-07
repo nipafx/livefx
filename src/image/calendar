@@ -1,5 +1,5 @@
 #!/bin/bash
 
-`dirname "$0"`/java \
-	--class-path `dirname "$0"`/../app:`dirname "$0"`/../app/calendar.jar \
+`dirname "$0"`/bin/java \
+	--class-path `dirname "$0"`/app:`dirname "$0"`/app/calendar.jar \
 	org.springframework.boot.loader.PropertiesLauncher
