@@ -77,3 +77,4 @@ Go to [localhost:8080](http://localhost:8080/) to see the calendar.
 	* included frontend code in JAR
 	* turned backend into Java module
 	* used jlink to create self-contained application image
+* applied TypeScript (way too late; should've started with it)
