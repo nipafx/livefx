@@ -70,3 +70,10 @@ Go to [localhost:8080](http://localhost:8080/) to see the calendar.
 	* created calendar view with CSS grid
 	* sorted entries into grid
 	* used Luxon for date manipulation
+
+### Refinement
+
+* enhanced build
+	* included frontend code in JAR
+	* turned backend into Java module
+	* used jlink to create self-contained application image
