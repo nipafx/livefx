@@ -2,24 +2,28 @@ import React, { useEffect, useState } from 'react'
 
 import { DateTime } from 'luxon'
 
+import { Category, Entry, Holiday, Person, ThemedYear } from "./types";
+
 import Calendar from './calendar'
 import Sidebar from "./sidebar";
 
 import './global.css'
-import style from './app.module.css'
+
+const style = require('./app.module.css')
 
 const App = () => {
 
-	const year = DateTime.local().year
-	const [ calendar, setCalendar ] = useState({
+	const year: number = DateTime.local().year
+	const emptyState: State = {
 		entries: [],
 		holidays: [],
 		people: [],
 		categories: [],
 		themes: [],
-	})
-	const [ hoveredEntry, setHoveredEntry ] = useState(-1)
-	const [ selectedEntry, setSelectedEntry ] = useState(-1)
+	}
+	const [ calendar, setCalendar ] = useState(emptyState)
+	const [ hoveredEntry, setHoveredEntry ] = useState(undefined as Entry | undefined)
+	const [ selectedEntry, setSelectedEntry ] = useState(undefined as Entry | undefined)
 
 	useEffect(
 		() => {
@@ -27,7 +31,7 @@ const App = () => {
 				.all([
 					fetch(`/api/entries?year=${year}`)
 						.then(response => response.text())
-						.then(entriesString => JSON.parse(entriesString)),
+						.then(entriesString => JSON.parse(entriesString) as EntryResponse[]),
 					fetch(`/api/holidays?year=${year}`)
 						.then(response => response.text())
 						.then(holidayString => JSON.parse(holidayString)),
@@ -41,17 +45,9 @@ const App = () => {
 						.then(response => response.text())
 						.then(themesString => JSON.parse(themesString)) ])
 				.then(([ entries, holidays, people, categories, themes ]) => {
-					const entriesWithParsedDates = entries
-						.map(entry => ({
-							...entry,
-							start: DateTime.fromISO(entry.start),
-							end: DateTime.fromISO(entry.start).plus({ days: entry.length - 1 }),
-						}))
-					const holidaysWithParsedDates = holidays
-						.map(holiday => ({ ...holiday, date: DateTime.fromISO(holiday.date) }))
 					setCalendar({
-						entries: entriesWithParsedDates,
-						holidays: holidaysWithParsedDates,
+						entries: entries.map(responseToEntry),
+						holidays: holidays.map(responseToHoliday),
 						people,
 						categories,
 						themes
@@ -68,9 +64,42 @@ const App = () => {
 					setHoveredEntry={setHoveredEntry}
 					setSelectedEntry={setSelectedEntry}/>
 			</div>
-			<Sidebar calendar={calendar} hoveredEntry={hoveredEntry} selectedEntry={selectedEntry}/>
+			<Sidebar {...calendar} hoveredEntry={hoveredEntry} selectedEntry={selectedEntry}/>
 		</div>
 	)
 }
+
+interface State {
+	entries: Entry[]
+	holidays: Holiday[]
+	people: Person[]
+	categories: Category[]
+	themes: ThemedYear[]
+}
+
+interface EntryResponse {
+	category: Category
+	description: string
+	people: Person[]
+
+	start: string
+	length: number
+}
+
+const responseToEntry = (entry: EntryResponse): Entry => ({
+	...entry,
+	start: DateTime.fromISO(entry.start),
+	end: DateTime.fromISO(entry.start).plus({ days: entry.length - 1 }),
+})
+
+interface HolidayResponse {
+	name: string
+	date: string
+}
+
+const responseToHoliday = (holiday: HolidayResponse): Holiday => ({
+	...holiday,
+	date: DateTime.fromISO(holiday.date)
+})
 
 export default App

@@ -1,12 +1,15 @@
 import React from 'react'
 
-import { DateTime } from "luxon";
+import { Entry } from "./types"
 
-import style from './entryDetails.module.css'
-import sidebarStyle from './sidebar.module.css'
+const style = require('./entryDetails.module.css')
+const sidebarStyle = require('./sidebar.module.css')
 
-const EntryDetails = ({ entries, entryIndex }) => {
-	const entry = entries[entryIndex]
+interface EntryDetailsProperties {
+	entry?: Entry
+}
+
+const EntryDetails = ({ entry }: EntryDetailsProperties) => {
 	return (
 		<div>
 			<div className={sidebarStyle.header}>Details</div>
@@ -33,11 +36,11 @@ const EntryDetails = ({ entries, entryIndex }) => {
 	)
 }
 
-const displayDate = entry => {
-	if (!entry) return
-	const start = DateTime.fromISO(entry.start).toFormat('dd.MM.')
+const displayDate = (entry?: Entry): string => {
+	if (!entry) return ""
+	const start = entry.start.toFormat('dd.MM.')
 	const end = entry.length > 1
-		? " - " + DateTime.fromISO(entry.end).toFormat('dd.MM.')
+		? " - " + entry.end.toFormat('dd.MM.')
 		: ""
 	return start + end
 }
