@@ -7,7 +7,7 @@ import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
 import dev.nipafx.calendar.entries.Theme;
-import dev.nipafx.calendar.entries.Themes;
+import dev.nipafx.calendar.entries.ThemedYear;
 import dev.nipafx.calendar.spring.CalendarConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +163,7 @@ abstract class FileBasedRepository implements Repository {
 	}
 
 	@Override
-	public List<Themes> allThemes(int year) {
+	public List<ThemedYear> allThemes(int year) {
 		Map<String, Theme> themesByName = readFromFile(dataFolder.resolve(themeFileName), Theme.class).stream()
 				.collect(toMap(Theme::name, identity()));
 		return readFromFile(dataFolder.resolve(themesByMonthFileName), FileThemes.class).stream()
@@ -172,7 +172,7 @@ abstract class FileBasedRepository implements Repository {
 				.toList();
 	}
 
-	private Themes parseThemes(FileThemes themes, Map<String, Theme> themesByName) {
+	private ThemedYear parseThemes(FileThemes themes, Map<String, Theme> themesByName) {
 		List<Theme> themeList = Stream
 				.of(themes.january(),
 						themes.february(),
@@ -188,7 +188,7 @@ abstract class FileBasedRepository implements Repository {
 						themes.december())
 				.map(themesByName::get)
 				.toList();
-		return new Themes(themeList);
+		return new ThemedYear(themeList);
 	}
 
 	private record FileThemes(

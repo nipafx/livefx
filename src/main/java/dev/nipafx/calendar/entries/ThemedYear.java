@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record Themes(@JsonProperty("themes") List<Theme> themes) {
+public record ThemedYear(@JsonProperty("themes") List<Theme> themes) {
 
-	public Themes {
+	public ThemedYear {
 		themes = List.copyOf(themes);
 		if (themes.size() != 12)
 			throw new IllegalArgumentException();

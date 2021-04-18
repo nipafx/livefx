@@ -4,7 +4,7 @@ import dev.nipafx.calendar.entries.Category;
 import dev.nipafx.calendar.entries.Entry;
 import dev.nipafx.calendar.entries.Holiday;
 import dev.nipafx.calendar.entries.Person;
-import dev.nipafx.calendar.entries.Themes;
+import dev.nipafx.calendar.entries.ThemedYear;
 import dev.nipafx.calendar.spring.CalendarApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,7 +59,7 @@ interface RepositoryTest {
 
 	@Test
 	default void allThemes() {
-		List<Themes> themes = createRepository().allThemes(2021);
+		List<ThemedYear> themes = createRepository().allThemes(2021);
 
 		assertThat(themes).hasSize(2);
 	}
