@@ -1,0 +1,61 @@
+@font-face {
+	font-family: "Source Sans Pro";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Source Sans Pro Regular"), local("Source-Sans-Pro-Regular"),
+		url("./fonts/SourceSansPro-Regular.woff2") format("woff2"),
+		url("./fonts/SourceSansPro-Regular.woff") format("woff"),
+		url("./fonts/SourceSansPro-Regular.ttf") format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Source Sans Pro";
+	font-style: normal;
+	font-weight: bold;
+	src: local("Source Sans Pro SemiBold"), local("Source-Sans-Pro-SemiBold"),
+		url("./fonts/SourceSansPro-SemiBold.woff2") format("woff2"),
+		url("./fonts/SourceSansPro-SemiBold.woff") format("woff"),
+		url("./fonts/SourceSansPro-SemiBold.ttf") format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Source Sans Pro";
+	font-style: italic;
+	font-weight: normal;
+	src: local("Source Sans Pro Italic"), local("Source-Sans-Pro-Italic"),
+		url("./fonts/SourceSansPro-Italic.woff2") format("woff2"),
+		url("./fonts/SourceSansPro-Italic.woff") format("woff"),
+		url("./fonts/SourceSansPro-Italic.ttf") format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Source Sans Pro";
+	font-style: italic;
+	font-weight: bold;
+	src: local("Source Sans Pro SemiBoldItalic"), local("Source-Sans-Pro-SemiBoldItalic"),
+		url("./fonts/SourceSansPro-SemiBoldItalic.woff2") format("woff2"),
+		url("./fonts/SourceSansPro-SemiBoldItalic.woff") format("woff"),
+		url("./fonts/SourceSansPro-SemiBoldItalic.ttf") format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Bedstead";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Bedstead Regular"), local("Bedstead-Regular"), local("BedsteadRegular"),
+		url("./fonts/Bedstead-Regular.otf") format("opentype");
+	font-display: swap;
+}
+
+body {
+	font-family: "Source Sans Pro", sans-serif;
+	font-size: 18px;
+	font-weight: normal;
+	line-height: 1.75;
+
+	--code-font: "Bedstead", monospace;
+}

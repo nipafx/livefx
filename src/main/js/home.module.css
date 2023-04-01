@@ -1,0 +1,173 @@
+#root.hidden {
+	display: none;
+}
+
+/*
+ * LARGE SCREEN LEFT ...
+ */
+
+.largeScreenLeft .screen {
+	/* 1164,309 * 1056,009 */
+	position: absolute;
+	top: var(--margin);
+	bottom: var(--margin);
+	left: var(--margin);
+	width: var(--golden-width);
+}
+
+/* ... LARGE CAM RIGHT */
+
+.largeCamRight .camera {
+	position: absolute;
+	top: var(--margin);
+	height: var(--golden-height);
+	right: var(--margin);
+	width: var(--golden-width-remainder);
+}
+
+.largeCamRight .misc {
+	position: absolute;
+	height: var(--golden-height-remainder);
+	bottom: var(--margin);
+	width: var(--golden-width-remainder);
+	right: var(--margin);
+}
+
+/* ... SMALL CAM RIGHT */
+
+#root.smallCamRight {
+	/* used to be specifically 16:9 but that's not really necessary, it's just a few pixels off */
+	/* --camera-height: calc(var(--golden-width-remainder) / 16 * 9); */
+	--camera-height: var(--golden-height-remainder);
+}
+
+.smallCamRight .camera {
+	position: absolute;
+	top: var(--margin);
+	height: var(--camera-height);
+	right: var(--margin);
+	width: var(--golden-width-remainder);
+}
+
+.smallCamRight .misc {
+	position: absolute;
+	top: calc(2 * var(--margin) + var(--camera-height));
+	bottom: var(--margin);
+	width: var(--golden-width-remainder);
+	right: var(--margin);
+}
+
+/* ... SMALL GUEST RIGHT */
+
+#root.smallCamRight.smallGuestRight {
+	--camera-height: calc((1080px - 4 * var(--margin)) / 3);
+}
+
+.smallGuestRight .guest2 {
+	position: absolute;
+	top: calc(2 * var(--margin) + var(--camera-height));
+	height: var(--camera-height);
+	width: var(--golden-width-remainder);
+	right: var(--margin);
+}
+
+.smallCamRight.smallGuestRight .misc {
+	top: unset;
+	height: var(--camera-height);
+}
+
+/* LARGE CAM LEFT, LARGE SCREEN RIGHT */
+
+.largeCamLeft .camera {
+	/* 1164,309 * 1056,009 */
+	position: absolute;
+	top: var(--margin);
+	bottom: var(--margin);
+	left: var(--margin);
+	width: var(--golden-width);
+}
+
+.largeScreenRight .screen {
+	position: absolute;
+	top: var(--margin);
+	height: var(--golden-height);
+	right: var(--margin);
+	width: var(--golden-width-remainder);
+}
+
+.largeScreenRight .misc {
+	position: absolute;
+	height: var(--golden-height-remainder);
+	bottom: var(--margin);
+	width: var(--golden-width-remainder);
+	right: var(--margin);
+}
+
+/*
+ * FILLER
+ */
+
+.filler {
+	position: absolute;
+	z-index: -1;
+	background-color: var(--bg-color);
+	transition: background-color var(--color-transition) ease;
+}
+
+#filler1 {
+	top: 0;
+	height: var(--margin);
+	left: 0;
+	right: 0;
+}
+
+#filler2 {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: var(--margin);
+}
+
+#filler3 {
+	top: 0;
+	bottom: 0;
+	left: calc(var(--margin) + var(--golden-width));
+	width: var(--margin);
+}
+
+#filler4 {
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: var(--margin);
+}
+
+.largeCamRight #filler5,
+.largeScreenRight #filler5 {
+	top: calc(var(--margin) + var(--golden-height));
+	height: var(--margin);
+	left: calc(var(--margin) + var(--golden-width));
+	right: 0;
+}
+
+.smallCamRight #filler5 {
+	top: calc(var(--margin) + var(--camera-height));
+	height: var(--margin);
+	left: calc(var(--margin) + var(--golden-width));
+	right: 0;
+}
+
+.smallGuestRight #filler6 {
+	top: calc(2 * (var(--margin) + var(--camera-height)));
+	height: var(--margin);
+	left: calc(var(--margin) + var(--golden-width));
+	right: 0;
+}
+
+#filler7 {
+	bottom: 0;
+	height: var(--margin);
+	left: 0;
+	right: 0;
+}
+

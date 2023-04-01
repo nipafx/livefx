@@ -1,0 +1,15 @@
+{
+  "short_name": "LifeFX",
+  "name": "LifeFX",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#69ea7d",
+  "background_color": "#262429"
+}

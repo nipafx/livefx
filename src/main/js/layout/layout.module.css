@@ -1,0 +1,25 @@
+.main {
+	width: 1920px;
+	height: 1080px;
+
+	position: relative;
+
+	--color-transition: 1s;
+
+	--margin: 12px;
+	--border-width: 1px;
+	--tab-title-font-size: 16px;
+	/* this is the total height and width available in situations
+	   where two windows share that dimension
+	   (hence three margins; borders are inside the windows) */
+	--available-width: calc(1920px - 3 * var(--margin));
+	--available-height: calc(1080px - 3 * var(--margin));
+
+	/* golden ratio: 1.61803398875:1 */
+	/* percentage: 61,8% vs 38,2% */
+	--golden: 0.618;
+	--golden-width: calc(var(--golden) * var(--available-width));
+	--golden-width-remainder: calc(var(--available-width) - var(--golden-width));
+	--golden-height: calc(var(--golden) * var(--available-height));
+	--golden-height-remainder: calc(var(--available-height) - var(--golden-height));
+}

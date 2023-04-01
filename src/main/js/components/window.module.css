@@ -1,0 +1,76 @@
+.window {
+	box-sizing: border-box;
+	border: var(--border-width) solid var(--alt-color);
+	transition: border-color var(--color-transition) ease;
+	overflow: hidden;
+}
+
+.input {
+	display: none;
+}
+
+.tabs {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+
+	display: flex;
+	flex-direction: row;
+}
+
+.tab {
+	padding: 0.2em 1em 0.2em 0.5em;
+
+	font-family: var(--code-font);
+	font-size: var(--tab-title-font-size);
+	line-height: 1;
+
+	color: var(--bg-color);
+	background-color: var(--bg-color-shade-2);
+	transition: color var(--color-transition) ease, background-color var(--color-transition) ease, border-color var(--color-transition) ease;
+
+	border-right: 3px solid var(--bg-color-shade-1);
+
+	cursor: pointer;
+}
+
+.tabTitle {
+	user-select: none;
+}
+.tabTitle::before {
+	content: "// "
+}
+
+.panel {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	opacity: 0;
+	transition: opacity var(--color-transition) ease;
+	pointer-events: none;
+}
+
+/* can't use IDs because they're dynamically assigned,
+   so they can be unique across all windows */
+.input:nth-child(1):checked ~ .tabs > .tab:nth-child(1),
+.input:nth-child(2):checked ~ .tabs > .tab:nth-child(2),
+.input:nth-child(3):checked ~ .tabs > .tab:nth-child(3),
+.input:nth-child(4):checked ~ .tabs > .tab:nth-child(4),
+.input:nth-child(5):checked ~ .tabs > .tab:nth-child(5) {
+	color: var(--alt-contrast-color);
+	background-color: var(--alt-color);
+	border-right-color:  var(--alt-color);
+}
+
+.input:nth-child(1):checked ~ .panels > .panel:nth-child(1),
+.input:nth-child(2):checked ~ .panels > .panel:nth-child(2),
+.input:nth-child(3):checked ~ .panels > .panel:nth-child(3),
+.input:nth-child(4):checked ~ .panels > .panel:nth-child(4),
+.input:nth-child(5):checked ~ .panels > .panel:nth-child(5) {
+	opacity: 1;
+	pointer-events: unset;
+}
