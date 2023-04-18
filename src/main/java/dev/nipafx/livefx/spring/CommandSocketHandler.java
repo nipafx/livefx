@@ -2,13 +2,10 @@ package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.ChangeThemeColorCommand;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
-import dev.nipafx.livefx.command.ThemeColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -18,8 +15,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.random.RandomGenerator;
 
 @Component
 public class CommandSocketHandler extends TextWebSocketHandler implements Commander {
