@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 import Layout from './layout/layout'
 import Notes from './components/notes'
@@ -9,29 +10,31 @@ import style from './home.module.css'
 
 // TODO
 const config = {
-	"stream": "reboot"
+	"stream": "reboot",
 }
 
 const LAYOUTS = ["cam, screen", "screen, large cam", "screen, small cam", "screen, small cam, guest2"]
+const THEMES = [ "theme-green", "theme-red", "theme-orange", "theme-yellow", "theme-blue-light", "theme-blue-dark", "theme-purple", "theme-pink" ]
 
 const Home = () => {
-	const [ layout, setLayout ] = useState("cam, screen")
+	const { sendMessage: _, lastMessage: command, readyState: commandState } = useWebSocket("ws://localhost:8080/command")
+	const [ layout, setLayout ] = useState(LAYOUTS[0])
+	const [ theme, setTheme ] = useState(THEMES[0])
+
 	useEffect(() => {
-		const root = document.getElementById(style.root)
+		if (command?.data) executeCommand(JSON.parse(command.data), setLayout, setTheme)
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
-		const unregisterThemeSetter = registerThemeSetter(root)
-		return () => {
-			unregisterSceneSetter()
-			unregisterThemeSetter()
-		}
+		return () => unregisterSceneSetter()
 	})
 
 	const debug = config?.debug
 	const guest = config?.guest
 	const guest2 = config?.guest2
 	const layoutClasses = determineLayoutClasses(layout)
+	const classes = [ theme, ...layoutClasses ]
+
 	return (
-		<Layout id={style.root} className={layoutClasses}>
+		<Layout id={style.root} className={classes}>
 			<Window name="screens" className={style.screen}>
 				{guest && ["cam, screen", "guest, large cam"].includes(layout) && <Tab name={guest} />}
 				<Tab name="screen #1" />
@@ -78,6 +81,20 @@ const registerLayoutSetter = (setLayout) => {
 	return () => window.removeEventListener('obsSceneChanged', sceneSetter)
 }
 
+const executeCommand = (command, setLayout, setTheme) => {
+	console.log("Executing command", command)
+	switch (command.type) {
+		case "change-theme-color":
+			setThemeColor(command.newColor, setTheme)
+			break
+	}
+}
+
+const setThemeColor = (newColor, setTheme) => {
+	const themeName = "theme-" + newColor.toLowerCase().replaceAll("_", "-")
+	setTheme(themeName)
+}
+
 const determineLayoutClasses = name => {
 	switch (name) {
 		case "cam, screen":
@@ -92,19 +109,6 @@ const determineLayoutClasses = name => {
 		default:
 			return [ style.hidden ]
 	}
-}
-
-const registerThemeSetter = root => {
-	const themes = [ "theme-green", "theme-red", "theme-orange", "theme-yellow", "theme-green", "theme-blue-light", "theme-blue-dark", "theme-purple", "theme-pink" ]
-	setTheme(root, themes, 0)
-	return () => clearTimeout()
-}
-
-const setTheme = (root, themes, themeIndex) => {
-	root.classList.remove(...themes)
-	root.classList.add(themes[themeIndex])
-	// TODO fix clearTimeout
-	setTimeout(() => setTheme(root, themes, (themeIndex + 1) % themes.length), 60_000)
 }
 
 export default Home
