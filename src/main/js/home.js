@@ -18,11 +18,9 @@ const LAYOUTS = [ "cam, screen", "screen, large cam", "screen, small cam", "scre
 const THEMES = [ "green", "red", "orange", "yellow", "blue-light", "blue-dark", "purple", "pink" ]
 
 const Home = () => {
-	const { lastJsonMessage: command, readyState: commandState } = useWebSocket("ws://localhost:8080/command")
+	const { sendMessage, lastJsonMessage: command, readyState: commandState } = useWebSocket("ws://localhost:8080/command")
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
-	const nextLayout = () => LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]
 	const [ theme, setTheme ] = useState(THEMES[0])
-	const nextTheme = () => THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]
 
 	useEffect(() => {
 		if (command) executeCommand(command, setLayout, setTheme)
@@ -57,8 +55,8 @@ const Home = () => {
 				{guest2 && layout.startsWith("cam, ") && <Tab name={guest2} />}
 				{debug && <Tab name="debug">
 					<DebugInfo
-						layout={layout} nextLayout={nextLayout}
-						theme={theme} nextTheme={nextTheme}
+						layout={layout} triggerNextLayout={() => triggerNextLayout(layout)}
+						theme={theme} triggerNextTheme={() => triggerNextTheme(sendMessage, theme)}
 						command={command} commandState={commandState}
 					/>
 				</Tab>}
@@ -84,6 +82,16 @@ const registerLayoutSetter = (setLayout) => {
 	return () => window.removeEventListener('obsSceneChanged', sceneSetter)
 }
 
+const triggerNextLayout = (layout) => {
+	const nextLayout = LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]
+	const event = new CustomEvent(
+		'obsSceneChanged',
+		{ detail: { name: nextLayout } }
+	)
+	window.dispatchEvent(event)
+}
+
+
 const executeCommand = (command, setLayout, setTheme) => {
 	console.log("Executing command", command)
 	switch (command.type) {
@@ -94,8 +102,17 @@ const executeCommand = (command, setLayout, setTheme) => {
 }
 
 const setThemeColor = (newColor, setTheme) => {
-	const themeName = "theme-" + newColor.toLowerCase().replaceAll("_", "-")
+	const themeName = newColor.toLowerCase().replaceAll("_", "-")
 	setTheme(themeName)
+}
+
+const triggerNextTheme = (sendMessage, theme) => {
+	const nextTheme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]
+	const nextThemeCommand = {
+		type: "change-theme-color",
+		newColor: nextTheme,
+	}
+	sendMessage("ECHO " + JSON.stringify(nextThemeCommand))
 }
 
 const determineLayoutClasses = name => {

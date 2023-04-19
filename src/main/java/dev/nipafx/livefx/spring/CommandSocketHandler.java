@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class CommandSocketHandler extends TextWebSocketHandler implements Commander {
 
+	private static final String ECHO_MESSAGE_PREFIX = "ECHO ";
 	private static final Logger LOG = LoggerFactory.getLogger(CommandSocketHandler.class);
 
 	private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
@@ -29,16 +30,26 @@ public class CommandSocketHandler extends TextWebSocketHandler implements Comman
 	}
 
 	@Override
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+		LOG.debug("Received text message: {}", message.getPayload());
+		if (message.getPayload().startsWith(ECHO_MESSAGE_PREFIX)) {
+			var echoText = message.getPayload().substring(ECHO_MESSAGE_PREFIX.length());
+			LOG.info("Echoing: {}", echoText);
+			broadcastText(echoText);
+		}
+	}
+
+	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		LOG.info("Command socket connection established");
-		LOG.debug("New session: " + session);
+		LOG.debug("New session: {}", session);
 		sessions.add(session);
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		LOG.info("Command socket connection closed");
-		LOG.debug("Closed session: " + session);
+		LOG.debug("Closed session: {}", session);
 		sessions.remove(session);
 	}
 
@@ -46,16 +57,21 @@ public class CommandSocketHandler extends TextWebSocketHandler implements Comman
 	public void sendCommand(Command command) {
 		try {
 			var commandString = jsonMapper.writeValueAsString(command);
-			LOG.debug("Sending command: " + commandString);
-			for (WebSocketSession session : sessions) {
-				try {
-					session.sendMessage(new TextMessage(commandString));
-				} catch (IOException ex) {
-					LOG.info("Could not send command", ex);
-				}
-			}
+			LOG.debug("Sending command: {}", commandString);
+			broadcastText(commandString);
 		} catch (JsonProcessingException ex) {
-			LOG.info("Could not serialize command", ex);
+			LOG.info("Could not serialize command: " + command, ex);
+		}
+	}
+
+	private void broadcastText(String text) {
+		for (WebSocketSession session : sessions) {
+			LOG.debug("Sending text: {}", text);
+			try {
+				session.sendMessage(new TextMessage(text));
+			} catch (IOException ex) {
+				LOG.warn("Could not send text: " + text, ex);
+			}
 		}
 	}
 
