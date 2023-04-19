@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import useWebSocket, { ReadyState } from 'react-use-websocket'
+import useWebSocket from 'react-use-websocket'
 
 import Layout from './layout/layout'
 import Notes from './components/notes'
@@ -7,22 +7,25 @@ import Tab from './components/tab'
 import Window from './components/window'
 
 import style from './home.module.css'
+import DebugInfo from "./components/debugInfo";
 
-// TODO
 const config = {
+	"debug": true,
 	"stream": "reboot",
 }
 
-const LAYOUTS = ["cam, screen", "screen, large cam", "screen, small cam", "screen, small cam, guest2"]
-const THEMES = [ "theme-green", "theme-red", "theme-orange", "theme-yellow", "theme-blue-light", "theme-blue-dark", "theme-purple", "theme-pink" ]
+const LAYOUTS = [ "cam, screen", "screen, large cam", "screen, small cam", "screen, small cam, guest2" ]
+const THEMES = [ "green", "red", "orange", "yellow", "blue-light", "blue-dark", "purple", "pink" ]
 
 const Home = () => {
-	const { sendMessage: _, lastMessage: command, readyState: commandState } = useWebSocket("ws://localhost:8080/command")
+	const { lastJsonMessage: command, readyState: commandState } = useWebSocket("ws://localhost:8080/command")
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
+	const nextLayout = () => LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]
 	const [ theme, setTheme ] = useState(THEMES[0])
+	const nextTheme = () => THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]
 
 	useEffect(() => {
-		if (command?.data) executeCommand(JSON.parse(command.data), setLayout, setTheme)
+		if (command) executeCommand(command, setLayout, setTheme)
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
 		return () => unregisterSceneSetter()
 	})
@@ -30,13 +33,14 @@ const Home = () => {
 	const debug = config?.debug
 	const guest = config?.guest
 	const guest2 = config?.guest2
+
 	const layoutClasses = determineLayoutClasses(layout)
-	const classes = [ theme, ...layoutClasses ]
+	const classes = [ "theme-" + theme, ...layoutClasses ]
 
 	return (
 		<Layout id={style.root} className={classes}>
 			<Window name="screens" className={style.screen}>
-				{guest && ["cam, screen", "guest, large cam"].includes(layout) && <Tab name={guest} />}
+				{guest && [ "cam, screen", "guest, large cam" ].includes(layout) && <Tab name={guest} />}
 				<Tab name="screen #1" />
 				<Tab name="screen #2" />
 			</Window>
@@ -51,8 +55,15 @@ const Home = () => {
 			<Window name="misc" className={style.misc}>
 				{guest && layout.startsWith("screen, ") && <Tab name={guest} />}
 				{guest2 && layout.startsWith("cam, ") && <Tab name={guest2} />}
+				{debug && <Tab name="debug">
+					<DebugInfo
+						layout={layout} nextLayout={nextLayout}
+						theme={theme} nextTheme={nextTheme}
+						command={command} commandState={commandState}
+					/>
+				</Tab>}
 				<Tab name="notes">
-					<Notes stream={config.stream}/>
+					<Notes stream={config.stream} />
 				</Tab>
 				<Tab name="chat" />
 			</Window>
@@ -63,14 +74,6 @@ const Home = () => {
 			<div id={style.filler5} className={style.filler} />
 			<div id={style.filler6} className={style.filler} />
 			<div id={style.filler7} className={style.filler} />
-			{debug &&
-				<button
-					style={{height: "50px", width: "50px", zIndex: 5, position: "absolute", bottom: 0, right: 0}}
-					onClick={event => window.dispatchEvent(
-						new CustomEvent(
-							'obsSceneChanged',
-							{ detail: {name: LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length] }}))} />
-			}
 		</Layout>
 	)
 }

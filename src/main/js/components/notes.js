@@ -1,7 +1,7 @@
-import style from './notes.module.css'
+import tabStyle from './tab.module.css'
 
-const Notes = ({ stream, className }) => (
-	<div className={`${style.notes} ${className}`}>
+const Notes = ({ stream }) => (
+	<div className={tabStyle.content}>
 		{showNotesFor(stream)}
 	</div>
 )
@@ -28,9 +28,9 @@ const notesJUnitPioneer = () => (
 	// <>
 	// 	<h1>JUnit Pioneer</h1>
 	// 	<p>JUnit Pioneer is a JUnit 5 extension pack, collecting all kinds of useful functionality that isn't big enough for its own project.</p>
-	// 	<p className={style.indent}>https://junit-pioneer.org</p>
-	// 	<p>This is us maintaining it together. We're using a Kanban-style board to manage what to do next:</p>
-	// 	<p className={style.indent}>https://bit.ly/exploring-io</p>
+	// 	<p className={tabStyle.indent}>https://junit-pioneer.org</p>
+	// 	<p>This is us maintaining it together. We're using a Kanban-tabStyle board to manage what to do next:</p>
+	// 	<p className={tabStyle.indent}>https://bit.ly/exploring-io</p>
 	// </>
 	<>
 		<h1>JUnit Pioneer</h1>
@@ -74,7 +74,7 @@ const notesLoom = () => (
 		<p>We're experimenting with Project Loom's virtual threads.
 			You can find the sources here:
 		</p>
-		<p className={style.indent}>https://github.com/nipafx/loom-lab</p>
+		<p className={tabStyle.indent}>https://github.com/nipafx/loom-lab</p>
 		{/* <p>If you want to join via IntelliJ's Code With Me and with mic or cam, let me know and we can make it happen.</p> */}
 	</>
 )
@@ -99,7 +99,7 @@ const notesJavaXDemo = () => (
 	<>
 		<h1>Java X Feature Demo</h1>
 		<p>My feature demo is out of date and I want to spend some time moving it forward towards 18.</p>
-		<p className={style.indent}>https://github.com/nipafx/demo-java-x</p>
+		<p className={tabStyle.indent}>https://github.com/nipafx/demo-java-x</p>
 		<p>Today I want to look into the vector API.</p>
 	</>
 )
