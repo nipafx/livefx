@@ -28,7 +28,7 @@ const Scene = ({ layout, theme, stream, guest, guest2, children }) => {
 			<Window name="misc" className={style.misc}>
 				{guest && layout.startsWith("screen, ") && <Tab name={guest} />}
 				{guest2 && layout.startsWith("cam, ") && <Tab name={guest2} />}
-				{children[0] && <Tab name="debug">{children[0]}</Tab>}
+				{children}
 				<Tab name="notes">
 					<Notes stream={stream} />
 				</Tab>

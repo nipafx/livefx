@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
 
 import Scene from "./scene";
+import Tab from "./components/tab";
 import DebugInfo from "./components/debugInfo";
 
 const config = {
@@ -17,7 +18,14 @@ const App = () => {
 		sendMessage,
 		lastJsonMessage: command,
 		readyState: commandState
-	} = useWebSocket("ws://localhost:8080/command")
+	} = useWebSocket(
+		"ws://localhost:8080/command",
+		{
+			retryOnError: true,
+			shouldReconnect: (closeEvent) => true,
+			reconnectAttempts: 1_000_000,
+			reconnectInterval: 1000,
+		})
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ theme, setTheme ] = useState(THEMES[0])
 
@@ -33,11 +41,14 @@ const App = () => {
 
 	return (
 		<Scene layout={layout} theme={theme} stream={config.stream}>
-			{debug && <DebugInfo
-				layout={layout} triggerNextLayout={() => triggerNextLayout(layout)}
-				theme={theme} triggerNextTheme={() => triggerNextTheme(sendMessage, theme)}
-				command={command} commandState={commandState}
-			/>}
+			{debug && (
+				<Tab name="debug">
+					<DebugInfo
+						layout={layout} triggerNextLayout={() => triggerNextLayout(layout)}
+						theme={theme} triggerNextTheme={() => triggerNextTheme(sendMessage, theme)}
+						command={command} commandState={commandState}
+					/>
+				</Tab>)}
 		</Scene>
 	)
 }
