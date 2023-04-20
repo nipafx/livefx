@@ -1,10 +1,11 @@
 package dev.nipafx.livefx.twitch;
 
+import dev.nipafx.livefx.command.AddChatMessage;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.twitch.ChatMessage.Join;
 import dev.nipafx.livefx.twitch.ChatMessage.NameList;
 import dev.nipafx.livefx.twitch.ChatMessage.Ping;
-import dev.nipafx.livefx.twitch.ChatMessage.Text;
+import dev.nipafx.livefx.twitch.ChatMessage.TextMessage;
 import dev.nipafx.livefx.twitch.ChatMessage.Unknown;
 import dev.nipafx.livefx.twitch.ChatMessage.Welcome;
 import org.slf4j.Logger;
@@ -53,8 +54,8 @@ public class TwitchChatBot {
 		webSocket.sendText("PONG :" + message, true);
 	}
 
-	private void interpretMessage(String message) {
-		// reactions to messages go here
+	private void interpretMessage(TextMessage message) {
+		commander.sendCommand(new AddChatMessage(message.nick(), message.text(), ""));
 	}
 
 	private class WebSocketListener implements Listener {
@@ -90,12 +91,12 @@ public class TwitchChatBot {
 			var msg = data.toString();
 			LOG.trace("Received text message {}", msg);
 			switch (ChatMessage.Factory.create(msg)) {
-				case Welcome(var message) -> LOG.debug("Welcome to channel: {}", message);
-				case Join(var message) -> LOG.debug("Joined channel: {}", message);
-				case NameList(var message) -> LOG.debug("Name list: {}", message);
-				case Ping(var message) -> sendPong(webSocket, message);
-				case Text(var __, var ___, var message) -> interpretMessage(message);
-				case Unknown(var message) -> LOG.warn("Unknown Twitch message: {}", message);
+				case Welcome(var text) -> LOG.debug("Welcome to channel: {}", text);
+				case Join(var text) -> LOG.debug("Joined channel: {}", text);
+				case NameList(var text) -> LOG.debug("Name list: {}", text);
+				case Ping(var text) -> sendPong(webSocket, text);
+				case TextMessage message -> interpretMessage(message);
+				case Unknown(var text) -> LOG.warn("Unknown Twitch text: {}", text);
 			}
 			return Listener.super.onText(webSocket, data, last);
 		}

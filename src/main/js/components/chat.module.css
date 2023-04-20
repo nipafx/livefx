@@ -1,0 +1,36 @@
+.container {
+	overflow: hidden;
+	display: flex;
+	flex-direction: column-reverse;
+
+	padding-top: 1.5em;
+	padding-bottom: 0.5em;
+}
+
+.messageBox {
+	overflow: auto;
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.messageBox::-webkit-scrollbar {
+	display: none;
+}
+
+.message {
+	padding-left: 1em;
+	text-indent: -1em;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+}
+
+.nick {
+	color: var(--alt-color);
+}
+
+.nick:after {
+	content: ": ";
+}
+
+.text {
+}

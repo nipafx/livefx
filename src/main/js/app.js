@@ -28,19 +28,25 @@ const App = () => {
 		})
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ theme, setTheme ] = useState(THEMES[0])
+	const [ messages, setMessages ] = useState([])
+	const addMessage = newMessage => {
+		const newMessages = [newMessage, ...messages];
+		newMessages.length = Math.min(newMessages.length, 50)
+		setMessages(newMessages)
+	}
 
 	useEffect(() => {
-		if (command) executeCommand(command, setLayout, setTheme)
+		if (command) executeCommand(command, setLayout, setTheme, addMessage)
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
 		return () => unregisterSceneSetter()
-	})
+	}, [ command ])
 
 	const debug = config?.debug
 	const guest = config?.guest
 	const guest2 = config?.guest2
 
 	return (
-		<Scene layout={layout} theme={theme} stream={config.stream}>
+		<Scene layout={layout} theme={theme} stream={config.stream} messages={messages}>
 			{debug && (
 				<Tab name="debug">
 					<DebugInfo
@@ -69,9 +75,16 @@ const triggerNextLayout = (layout) => {
 }
 
 
-const executeCommand = (command, setLayout, setTheme) => {
+const executeCommand = (command, setLayout, setTheme, addMessage) => {
 	console.log("Executing command", command)
 	switch (command.type) {
+		case "add-chat-message":
+			addMessage({
+				nick: command.nick,
+				text: command.text,
+				html: command.htmlText,
+			})
+			break
 		case "change-theme-color":
 			setThemeColor(command.newColor, setTheme)
 			break

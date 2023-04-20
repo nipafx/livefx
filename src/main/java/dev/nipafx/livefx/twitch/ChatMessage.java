@@ -4,23 +4,23 @@ import java.util.regex.Pattern;
 
 sealed interface ChatMessage {
 
-	String message();
+	String text();
 
-	record Welcome(String message) implements ChatMessage { }
-	record Ping(String message) implements ChatMessage { }
-	record Join(String message) implements ChatMessage { }
-	record NameList(String message) implements ChatMessage { }
-	record Text(String nick, String channel, String message) implements ChatMessage { }
-	record Unknown(String message) implements ChatMessage { }
+	record Welcome(String text) implements ChatMessage { }
+	record Ping(String text) implements ChatMessage { }
+	record Join(String text) implements ChatMessage { }
+	record NameList(String text) implements ChatMessage { }
+	record TextMessage(String nick, String channel, String text) implements ChatMessage { }
+	record Unknown(String text) implements ChatMessage { }
 
 	class Factory {
 
 		private static final Pattern WELCOME_PATTERN = Pattern
-				.compile("^:tmi.twitch.tv \\d+ \\w+ :(?<message>.*)");
+				.compile("^:tmi.twitch.tv \\d+ \\w+ :(?<text>.*)");
 		private static final Pattern JOIN_PATTERN = Pattern
 				.compile("^:[\\w!@\\.]+ JOIN #(?<channel>\\w+)$");
 		private static final Pattern TEXT_PATTERN = Pattern
-				.compile("^:(?<nick>\\w+)!\\S+ PRIVMSG #(?<channel>\\w+) :(?<message>.*)$");
+				.compile("^:(?<nick>\\w+)!\\S+ PRIVMSG #(?<channel>\\w+) :(?<text>.*)$");
 
 		static ChatMessage create(String msg) {
 			if (msg.startsWith("PING :"))
@@ -31,7 +31,7 @@ sealed interface ChatMessage {
 
 			var welcomeMatcher = WELCOME_PATTERN.matcher(msg);
 			if (welcomeMatcher.find())
-				return new Welcome(welcomeMatcher.group("message"));
+				return new Welcome(welcomeMatcher.group("text"));
 
 			var joinMatcher = JOIN_PATTERN.matcher(msg);
 			if (joinMatcher.find())
@@ -39,10 +39,10 @@ sealed interface ChatMessage {
 
 			var textMatcher = TEXT_PATTERN.matcher(msg);
 			if (textMatcher.find())
-				return new Text(
+				return new TextMessage(
 						textMatcher.group("nick"),
 						textMatcher.group("channel"),
-						textMatcher.group("message"));
+						textMatcher.group("text"));
 
 			return new Unknown(msg);
 		}
