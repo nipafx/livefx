@@ -7,11 +7,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TwitchChatBotLauncher implements ApplicationRunner {
+public class TwitchListenersLauncher implements ApplicationRunner {
 
 	private final TwitchChatBot chatBot;
 
-	public TwitchChatBotLauncher(Commander commander) {
+	public TwitchListenersLauncher(Commander commander) {
 		this.chatBot = new TwitchChatBot(commander);
 	}
 

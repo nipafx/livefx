@@ -3,9 +3,9 @@ package dev.nipafx.livefx.twitch;
 import dev.nipafx.livefx.command.ChangeThemeColorCommand;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.command.ThemeColor;
-import dev.nipafx.livefx.twitch.Message.Chat;
-import dev.nipafx.livefx.twitch.Message.Ping;
-import dev.nipafx.livefx.twitch.Message.Unknown;
+import dev.nipafx.livefx.twitch.ChatMessage.Text;
+import dev.nipafx.livefx.twitch.ChatMessage.Ping;
+import dev.nipafx.livefx.twitch.ChatMessage.Unknown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,17 +14,17 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.concurrent.CompletionStage;
-
-import static dev.nipafx.livefx.twitch.TwitchToken.USER_TOKEN;
 
 public class TwitchChatBot {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
-
 	private static final URI TWITCH_IRC_URL = URI.create("wss://irc-ws.chat.twitch.tv:443");
 	private static final String USER_NAME = "nipafx";
+	private static final String USER_TOKEN = System.getenv("TWITCH_TOKEN");
 	private static final String CHANNEL_NAME = "nipafx";
+
+	private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
 
 	private final Commander commander;
 
@@ -33,6 +33,9 @@ public class TwitchChatBot {
 	}
 
 	public void connectAndListen() {
+		if (USER_TOKEN == null || USER_TOKEN.isEmpty())
+			throw new IllegalArgumentException("No Twitch user token available - set environment variable 'TWITCH_TOKEN'");
+
 		HttpClient
 				.newHttpClient()
 				.newWebSocketBuilder()
@@ -57,7 +60,7 @@ public class TwitchChatBot {
 
 	private void interpretMessageAsNewColor(String substring) {
 		try {
-			var newColor = ThemeColor.valueOf(substring.toUpperCase());
+			var newColor = ThemeColor.valueOf(substring.toUpperCase(Locale.ROOT));
 			commander.sendCommand(new ChangeThemeColorCommand(newColor));
 		} catch (IllegalArgumentException ex) {
 			// do nothing
@@ -94,8 +97,8 @@ public class TwitchChatBot {
 
 		@Override
 		public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-			switch (Message.Factory.read(data.toString())) {
-				case Chat(var __, var ___, var message) -> interpretMessage(message);
+			switch (ChatMessage.Factory.read(data.toString())) {
+				case Text(var __, var ___, var message) -> interpretMessage(message);
 				case Ping(var message) -> sendPong(webSocket, message);
 				case Unknown(var message) -> LOG.warn("Unknown Twitch message: {}", message);
 			}
