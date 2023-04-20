@@ -57,10 +57,10 @@ public class CommandSocketHandler extends TextWebSocketHandler implements Comman
 	public void sendCommand(Command command) {
 		try {
 			var commandString = jsonMapper.writeValueAsString(command);
-			LOG.debug("Sending command: {}", commandString);
+			LOG.info("Sending command: {}", commandString);
 			broadcastText(commandString);
 		} catch (JsonProcessingException ex) {
-			LOG.info("Could not serialize command: " + command, ex);
+			LOG.warn("Could not serialize command: " + command, ex);
 		}
 	}
 
