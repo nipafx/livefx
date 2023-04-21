@@ -21,22 +21,18 @@ import java.util.concurrent.CompletionStage;
 public class TwitchChatBot {
 
 	private static final URI TWITCH_IRC_URL = URI.create("wss://irc-ws.chat.twitch.tv:443");
-	private static final String TWITCH_CHAT_USER_NAME = "nipafx";
-	private static final String TWITCH_CHAT_USER_TOKEN = System.getenv("TWITCH_TOKEN");
-	private static final String TWITCH_CHAT_CHANNEL_NAME = "nipafx";
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
 
+	private final TwitchCredentials credentials;
 	private final Commander commander;
 
-	public TwitchChatBot(Commander commander) {
+	public TwitchChatBot(TwitchCredentials credentials, Commander commander) {
+		this.credentials = credentials;
 		this.commander = commander;
 	}
 
 	public void connectAndListen() {
-		if (TWITCH_CHAT_USER_TOKEN == null || TWITCH_CHAT_USER_TOKEN.isEmpty())
-			throw new IllegalArgumentException("No Twitch chat user token available - set environment variable 'TWITCH_TOKEN'");
-
 		HttpClient
 				.newHttpClient()
 				.newWebSocketBuilder()
@@ -64,14 +60,14 @@ public class TwitchChatBot {
 		public void onOpen(WebSocket webSocket) {
 			LOG.info("Opened web socket connection to Twitch IRC");
 			LOG.debug("Sending PASS...");
-			webSocket.sendText("PASS oauth:" + TWITCH_CHAT_USER_TOKEN, true)
+			webSocket.sendText("PASS oauth:" + credentials.appToken(), true)
 					.thenCompose(websocket -> {
 						LOG.debug("Sending NICK...");
-						return websocket.sendText("NICK " + TWITCH_CHAT_USER_NAME, true);
+						return websocket.sendText("NICK " + credentials.userName(), true);
 					})
 					.thenCompose(websocket -> {
 						LOG.debug("Joining...");
-						return websocket.sendText("JOIN #" + TWITCH_CHAT_CHANNEL_NAME, true);
+						return websocket.sendText("JOIN #" + credentials.userName(), true);
 					});
 			Listener.super.onOpen(webSocket);
 		}

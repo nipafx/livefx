@@ -1,7 +1,5 @@
 package dev.nipafx.livefx.spring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
 import org.springframework.boot.ApplicationArguments;
@@ -14,9 +12,9 @@ public class TwitchListenersLauncher implements ApplicationRunner {
 	private final TwitchChatBot chatBot;
 	private final TwitchEventSubscriber eventListener;
 
-	public TwitchListenersLauncher(Commander commander, ObjectMapper jsonMapper) {
-		this.chatBot = new TwitchChatBot(commander);
-		this.eventListener = new TwitchEventSubscriber(commander, jsonMapper);
+	public TwitchListenersLauncher(TwitchChatBot chatBot, TwitchEventSubscriber eventListener) {
+		this.chatBot = chatBot;
+		this.eventListener = eventListener;
 	}
 
 	@Override

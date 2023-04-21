@@ -28,28 +28,22 @@ public class TwitchEventSubscriber {
 
 	private static final URI TWITCH_EVENT_WEBSOCKET_URL = URI.create("wss://eventsub.wss.twitch.tv/ws");
 	private static final URI TWITCH_EVENT_SUBSCRIPTION_ENDPOINT = URI.create("https://api.twitch.tv/helix/eventsub/subscriptions");
-	private static final String TWITCH_CLIENT_ID = System.getenv("TWITCH_CLIENT_ID");
-	private static final String TWITCH_USER_ID = "416053808";
-	private static final String TWITCH_USER_TOKEN = System.getenv("TWITCH_USER_TOKEN");
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchEventSubscriber.class);
 
+	private final TwitchCredentials credentials;
 	private final Commander commander;
 	private final HttpClient httpClient;
 	private final ObjectMapper jsonMapper;
 
-	public TwitchEventSubscriber(Commander commander, ObjectMapper jsonMapper) {
+	public TwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
+		this.credentials = credentials;
 		this.commander = commander;
 		this.httpClient = HttpClient.newHttpClient();
 		this.jsonMapper = jsonMapper;
 	}
 
 	public void connectAndSubscribe() {
-		if (TWITCH_CLIENT_ID == null || TWITCH_CLIENT_ID.isEmpty())
-			throw new IllegalArgumentException("No Twitch client ID available - set environment variable 'TWITCH_CLIENT_ID'");
-		if (TWITCH_USER_TOKEN == null || TWITCH_USER_TOKEN.isEmpty())
-			throw new IllegalArgumentException("No Twitch user token available - set environment variable 'TWITCH_USER_TOKEN'");
-
 		httpClient
 				.newWebSocketBuilder()
 				.buildAsync(TWITCH_EVENT_WEBSOCKET_URL, new WebSocketListener())
@@ -85,11 +79,11 @@ public class TwitchEventSubscriber {
 						"session_id": "%s"
 					}
 				}
-				""".formatted(TWITCH_USER_ID, welcome.sessionId());
+				""".formatted(credentials.userId(), welcome.sessionId());
 		var request = HttpRequest.newBuilder(TWITCH_EVENT_SUBSCRIPTION_ENDPOINT)
 				.POST(HttpRequest.BodyPublishers.ofString(requestBody))
-				.header("Authorization", "Bearer " + TWITCH_USER_TOKEN)
-				.header("Client-Id", TWITCH_CLIENT_ID)
+				.header("Authorization", "Bearer " + credentials.userToken())
+				.header("Client-Id", credentials.appId())
 				.header("Content-Type", "application/json")
 				.build();
 		try {
