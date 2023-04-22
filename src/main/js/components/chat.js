@@ -44,9 +44,10 @@ const Message = ({message, globalEmotes, globalBadges}) => {
     const wordEmoteMap = parseEmotes(message.text, globalEmotes)
     const msg_tags = parseTags(message.tags)
     const badgesRaw = msg_tags.badges.split(',')
-    const badges = badgesRaw.map( badgeRaw => {
+    const badges = badgesRaw.map(badgeRaw => {
         return badgeRaw.split('/')
     })
+    const showBadge = badges === ""
     const msg_words = message.text.split(" ");
     // actually replace everything collected at once
     let parsed_msg = msg_words.map(word => {
@@ -57,16 +58,18 @@ const Message = ({message, globalEmotes, globalBadges}) => {
         return word + " ";
     });
     return (<div className={style.message}>
-        <span className="bages">{badges.map(badge => {
-            let badge_url;
-            if (badge[0] === "subscriber") {
-                badge_url = getSubBadge(badge[1]) || getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
-                return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+        <span style={showBadge ? 'hidden' : undefined} className={style.badge}>{badges.map(badge => {
+                if (badges !== "") {
+                    let badge_url;
+                    if (badge[0] === "subscriber") {
+                        badge_url = getSubBadge(badge[1]) || getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
+                        return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+                    }
+                    badge_url = getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
+                    return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+                }
             }
-            badge_url = getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
-            return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
-        })
-        }
+        )}
         </span>
         <span className={style.nick}>{message.nick}</span>
         <span className={style.text}>{parsed_msg}</span>
@@ -81,10 +84,12 @@ const getSubBadge = (version, twitchGlobalBadges) => {
 
 const getBadgeByNameAndVersion = (name, version, twitchGlobalBadges) => {
     const badge = twitchGlobalBadges[name];
-    if (badge.versions[version]) {
-        return badge.versions[version].image_url_2x;
-    } else {
-        return badge.versions[Object.keys(badge.versions)[0]].image_url_2x;
+    if (badge) {
+        if (badge.versions[version]) {
+            return badge.versions[version].image_url_2x;
+        } else {
+            return badge.versions[Object.keys(badge.versions)[0]].image_url_2x;
+        }
     }
 }
 

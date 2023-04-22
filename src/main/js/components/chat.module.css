@@ -1,38 +1,44 @@
 .container {
-	overflow: hidden;
-	display: flex;
-	flex-direction: column-reverse;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
 
-	padding-top: 1.5em;
-	padding-bottom: 0.5em;
+    padding-top: 1.5em;
+    padding-bottom: 0.5em;
 }
 
 .messageBox {
-	overflow: auto;
-	display: flex;
-	flex-direction: column-reverse;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .messageBox::-webkit-scrollbar {
-	display: none;
+    display: none;
 }
 
 .message {
-	padding-left: 1em;
-	text-indent: -1em;
-	word-wrap: break-word;
-	white-space: pre-wrap;
+    padding-left: 1em;
+    text-indent: -1em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
+
+.hidden {
+    display: none;
+}
+
 .badge {
-	display:inline-flex;
-	padding-right:2px;
+    display: inline-flex;
+    padding-right: 2px;
 }
+
 .nick {
-	color: var(--alt-color);
+    color: var(--alt-color);
 }
 
 .nick:after {
-	content: ": ";
+    content: ": ";
 }
 
 .text {
