@@ -58,7 +58,7 @@ const Message = ({message, globalEmotes, globalBadges}) => {
         return word + " ";
     });
     return (<div className={style.message}>
-        <span style={showBadge ? 'hidden' : undefined} className={style.badge}>{badges.map(badge => {
+        <span className={showBadge ? 'hidden' : style.badge}>{badges.map(badge => {
                 if (badges !== "") {
                     let badge_url;
                     if (badge[0] === "subscriber") {
