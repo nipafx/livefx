@@ -7,48 +7,6 @@ export class Badge {
     constructor({versions}) {
         this.versions = versions;
     }
-
-    get url() {
-        const theme = "dark";
-        const format = "default";
-        return Badge.url_template
-            .replace("{{format}}", format)
-            .replace("{{theme}}", theme)
-            .replace("{{scale}}", Badge.scale_template.x1);
-    }
-
-    getUrlForScale(scale) {
-        const theme = "dark";
-        const format = "default";
-        return Badge.url_template
-            .replace("{{format}}", format)
-            .replace("{{theme}}", theme)
-            .replace("{{scale}}", Badge.scale_template[scale]);
-    }
-
-    get x1Url() {
-        return this.getUrlForScale("x1");
-    }
-
-    get x2Url() {
-        return this.getUrlForScale("x2");
-    }
-
-    get x3Url() {
-        return this.getUrlForScale("x3");
-    }
-
-    static get url_template() {
-        return "https://static-cdn.jtvnw.net/emoticons/v2/{{id}}/{{format}}/{{theme}}/{{scale}}";
-    }
-
-    static get scale_template() {
-        return {
-            x1: "1.0",
-            x2: "2.0",
-            x3: "3.0",
-        };
-    }
 }
 
 export default function TwitchBadges() {

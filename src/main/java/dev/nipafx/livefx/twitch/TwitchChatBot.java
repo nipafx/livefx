@@ -21,7 +21,9 @@ import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.CompletionStage;
 
-import static dev.nipafx.livefx.twitch.TwitchToken.*;
+import static dev.nipafx.livefx.twitch.TwitchToken.TWITCH_CHAT_CHANNEL_NAME;
+import static dev.nipafx.livefx.twitch.TwitchToken.TWITCH_CHAT_USER_NAME;
+import static dev.nipafx.livefx.twitch.TwitchToken.TWITCH_USER_TOKEN;
 
 public class TwitchChatBot {
     private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
