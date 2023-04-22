@@ -23,7 +23,10 @@
 	word-wrap: break-word;
 	white-space: pre-wrap;
 }
-
+.badge {
+	display:inline-flex;
+	padding-right:2px;
+}
 .nick {
 	color: var(--alt-color);
 }

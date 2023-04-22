@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import useWebSocket from 'react-use-websocket'
-
+import React from 'react'
 import Scene from "./scene";
 import Tab from "./components/tab";
 import DebugInfo from "./components/debugInfo";
@@ -81,6 +81,7 @@ const executeCommand = (command, setLayout, setTheme, addMessage) => {
 		case "add-chat-message":
 			addMessage({
 				nick: command.nick,
+				tags: command.tags,
 				text: command.text,
 				html: command.htmlText,
 			})

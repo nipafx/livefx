@@ -10,7 +10,7 @@ sealed interface ChatMessage {
 	record Ping(String text) implements ChatMessage { }
 	record Join(String text) implements ChatMessage { }
 	record NameList(String text) implements ChatMessage { }
-	record TextMessage(String nick, String channel, String text) implements ChatMessage { }
+	record TextMessage(String nick,String tags, String channel, String text) implements ChatMessage { }
 	record Unknown(String text) implements ChatMessage { }
 
 	class Factory {
@@ -20,7 +20,7 @@ sealed interface ChatMessage {
 		private static final Pattern JOIN_PATTERN = Pattern
 				.compile("^:[\\w!@\\.]+ JOIN #(?<channel>\\w+)$");
 		private static final Pattern TEXT_PATTERN = Pattern
-				.compile("^:(?<nick>\\w+)!\\S+ PRIVMSG #(?<channel>\\w+) :(?<text>.*)$");
+				.compile("^@badge-info=(?<tags>;\\S*);.*:(?<nick>[^!]+)![^@]+@[^ ]+\\.twitch\\.tv\\s+PRIVMSG\\s+#(?<channel>[^\\s]+)\\s+:(?<text>.*)$");
 
 		static ChatMessage create(String msg) {
 			if (msg.startsWith("PING :"))
@@ -41,6 +41,7 @@ sealed interface ChatMessage {
 			if (textMatcher.find())
 				return new TextMessage(
 						textMatcher.group("nick"),
+						textMatcher.group("tags"),
 						textMatcher.group("channel"),
 						textMatcher.group("text"));
 
