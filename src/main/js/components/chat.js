@@ -40,14 +40,24 @@ const Chat = ({messages}) => {
     )
 }
 
+const Badge = ({badge, globalBadges}) => {
+    let badge_url;
+    if (badge[0] === "subscriber") {
+        badge_url = getSubBadge(badge[1]) || getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
+        return <img key={badge.id} className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+    }
+    badge_url = getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
+    return <img key={badge.id} className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+}
+
 const Message = ({message, globalEmotes, globalBadges}) => {
     const wordEmoteMap = parseEmotes(message.text, globalEmotes)
     const msg_tags = parseTags(message.tags)
-    const badgesRaw = msg_tags.badges.split(',')
-    const badges = badgesRaw.map(badgeRaw => {
+    const color = msg_tags.color
+    let badgesRaw = msg_tags.badges.split(',')
+    let badges = badgesRaw.map(badgeRaw => {
         return badgeRaw.split('/')
     })
-    const showBadge = badges === ""
     const msg_words = message.text.split(" ");
     // actually replace everything collected at once
     let parsed_msg = msg_words.map(word => {
@@ -57,23 +67,18 @@ const Message = ({message, globalEmotes, globalBadges}) => {
         }
         return word + " ";
     });
-    return (<div className={style.message}>
-        <span className={showBadge ? 'hidden' : style.badge}>{badges.map(badge => {
-                if (badges !== "") {
-                    let badge_url;
-                    if (badge[0] === "subscriber") {
-                        badge_url = getSubBadge(badge[1]) || getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
-                        return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
-                    }
-                    badge_url = getBadgeByNameAndVersion(badge[0], badge[1], globalBadges);
-                    return <img className={style.badge} alt={badge[0]} src={badge_url} width="18" height="18"/>
+    return (
+        <div className={style.message}>
+        <span className={style.badge}>{badges.map(badge => {
+                if (badge.length === 2) {
+                    return <Badge key={msg_tags.id + badge[0]} badge={badge} globalBadges={globalBadges}></Badge>
                 }
             }
         )}
         </span>
-        <span className={style.nick}>{message.nick}</span>
-        <span className={style.text}>{parsed_msg}</span>
-    </div>)
+            <span style={{color: `${color}`}} className={style.nick}>{message.nick}</span>
+            <span className={style.text}>{parsed_msg}</span>
+        </div>)
 }
 
 const getSubBadge = (version, twitchGlobalBadges) => {
