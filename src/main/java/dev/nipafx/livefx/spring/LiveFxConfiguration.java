@@ -2,6 +2,7 @@ package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.Commander;
+import dev.nipafx.livefx.markdown.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
@@ -29,6 +30,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, Commander commander) {
 		return new TwitchChatBot(credentials);
+	}
+
+	@Bean
+	public SimpleMark createSimpleMark() {
+		return new SimpleMark();
 	}
 
 	@Bean

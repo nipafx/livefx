@@ -16,8 +16,8 @@ const Chat = ({ messages }) => {
 
 const Message = ({ message }) => (
 	<div className={style.message}>
-		<span className={style.nick}>{message.nick}</span>
-		<span className={style.text}>{message.text}</span>
+		<div className={style.nick}>{message.nick}</div>
+		<div className={style.text} dangerouslySetInnerHTML={{__html: message.text}} />
 	</div>
 )
 

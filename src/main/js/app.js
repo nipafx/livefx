@@ -53,6 +53,7 @@ const App = () => {
 						layout={layout} triggerNextLayout={() => triggerNextLayout(layout)}
 						theme={theme} triggerNextTheme={() => triggerNextTheme(sendMessage, theme)}
 						command={command} commandState={commandState}
+						triggerNextMessage={() => triggerNextMessage(sendMessage)}
 					/>
 				</Tab>)}
 		</Scene>
@@ -82,7 +83,6 @@ const executeCommand = (command, setLayout, setTheme, addMessage) => {
 			addMessage({
 				nick: command.nick,
 				text: command.text,
-				html: command.htmlText,
 			})
 			break
 		case "change-theme-color":
@@ -103,6 +103,27 @@ const triggerNextTheme = (sendMessage, theme) => {
 		newColor: nextTheme,
 	}
 	sendMessage("ECHO " + JSON.stringify(nextThemeCommand))
+}
+
+const triggerNextMessage = (sendMessage) => {
+	const nicks = [
+		"John Doe",
+		"Jane Doe",
+	]
+	const nickIndex = Math.floor(Math.random() * nicks.length)
+	const messages = [
+		"<p>This is a simple message.</p>",
+		"<p>This is a message with some <b>bold</b>, <i>italic</i>, and <em>emphasized</em> text.</p>",
+		"<p>This is a very long message that wraps to the next line, so we can see what that looks like.</p>",
+	]
+	const messageIndex = Math.floor(Math.random() * messages.length)
+
+	const nextCommand = {
+		type: "add-chat-message",
+		nick: nicks[nickIndex],
+		text: messages[messageIndex],
+	}
+	sendMessage("ECHO " + JSON.stringify(nextCommand))
 }
 
 export default App

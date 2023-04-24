@@ -3,7 +3,7 @@ import { ReadyState } from "react-use-websocket";
 import style from './debugInfo.module.css'
 import tabStyle from './tab.module.css'
 
-const DebugInfo = ({ layout, triggerNextLayout, theme, triggerNextTheme, command, commandState }) => {
+const DebugInfo = ({ layout, triggerNextLayout, theme, triggerNextTheme, command, commandState, triggerNextMessage }) => {
 	const commandStateString = {
 		[ReadyState.CONNECTING]: 'connecting...',
 		[ReadyState.OPEN]: 'open',
@@ -29,6 +29,7 @@ const DebugInfo = ({ layout, triggerNextLayout, theme, triggerNextTheme, command
 				<li>status: {commandStateString}</li>
 				<li>last command: {command?.data || "n.a."}</li>
 			</ul>
+			<p>Messages: <button className={style.button} onClick={event => triggerNextMessage()}>populate</button></p>
 		</div>
 	)
 }

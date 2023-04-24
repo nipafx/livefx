@@ -18,10 +18,11 @@
 }
 
 .message {
-	padding-left: 1em;
-	text-indent: -1em;
 	word-wrap: break-word;
 	white-space: pre-wrap;
+
+	display: grid;
+	grid-template-columns: auto 1fr;
 }
 
 .nick {
@@ -32,5 +33,11 @@
 	content: ": ";
 }
 
-.text {
+.text p {
+	margin: 0;
+}
+
+.text em {
+	color: var(--alt-color);
+	font-style: normal;
 }

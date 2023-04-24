@@ -52,7 +52,7 @@ public class TwitchChatBot {
 	}
 
 	private void interpretMessage(TextMessage message) {
-		pipelineSource.emit(new AddChatMessage(message.nick(), message.text(), ""));
+		pipelineSource.emit(new AddChatMessage(message.nick(), message.text()));
 	}
 
 	private void sendPong(WebSocket webSocket, String message) {
