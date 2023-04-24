@@ -28,12 +28,12 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 
 	@Bean
 	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, Commander commander) {
-		return new TwitchChatBot(credentials, commander);
+		return new TwitchChatBot(credentials);
 	}
 
 	@Bean
 	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
-		return new TwitchEventSubscriber(credentials, commander, jsonMapper);
+		return new TwitchEventSubscriber(credentials, jsonMapper);
 	}
 
 	@Override

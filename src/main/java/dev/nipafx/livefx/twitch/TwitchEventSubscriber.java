@@ -3,8 +3,11 @@ package dev.nipafx.livefx.twitch;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.ChangeThemeColorCommand;
+import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.command.ThemeColor;
+import dev.nipafx.livefx.pipeline.Source;
+import dev.nipafx.livefx.pipeline.Step;
 import dev.nipafx.livefx.twitch.Event.Error;
 import dev.nipafx.livefx.twitch.Event.KeepAlive;
 import dev.nipafx.livefx.twitch.Event.RewardRedemption;
@@ -32,15 +35,19 @@ public class TwitchEventSubscriber {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchEventSubscriber.class);
 
 	private final TwitchCredentials credentials;
-	private final Commander commander;
 	private final HttpClient httpClient;
 	private final ObjectMapper jsonMapper;
+	private final Source<Command> pipelineSource;
 
-	public TwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
+	public TwitchEventSubscriber(TwitchCredentials credentials, ObjectMapper jsonMapper) {
 		this.credentials = credentials;
-		this.commander = commander;
 		this.httpClient = HttpClient.newHttpClient();
 		this.jsonMapper = jsonMapper;
+		this.pipelineSource = Source.create();
+	}
+
+	public Step<Command> source() {
+		return pipelineSource.asStep();
 	}
 
 	public void connectAndSubscribe() {
@@ -101,7 +108,7 @@ public class TwitchEventSubscriber {
 		LOG.info("Reward redeemed: {}", rewardRedemption);
 		try {
 			var newColor = ThemeColor.valueOf(rewardRedemption.input().toUpperCase(Locale.ROOT));
-			commander.sendCommand(new ChangeThemeColorCommand(newColor));
+			pipelineSource.emit(new ChangeThemeColorCommand(newColor));
 		} catch (IllegalArgumentException ex) {
 			// the user input could not be parsed to a color ~> do nothing
 		}

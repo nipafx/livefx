@@ -1,7 +1,9 @@
 package dev.nipafx.livefx.twitch;
 
 import dev.nipafx.livefx.command.AddChatMessage;
-import dev.nipafx.livefx.command.Commander;
+import dev.nipafx.livefx.command.Command;
+import dev.nipafx.livefx.pipeline.Source;
+import dev.nipafx.livefx.pipeline.Step;
 import dev.nipafx.livefx.twitch.ChatMessage.Join;
 import dev.nipafx.livefx.twitch.ChatMessage.NameList;
 import dev.nipafx.livefx.twitch.ChatMessage.Ping;
@@ -25,11 +27,15 @@ public class TwitchChatBot {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
 
 	private final TwitchCredentials credentials;
-	private final Commander commander;
+	private final Source<Command> pipelineSource;
 
-	public TwitchChatBot(TwitchCredentials credentials, Commander commander) {
+	public TwitchChatBot(TwitchCredentials credentials) {
 		this.credentials = credentials;
-		this.commander = commander;
+		this.pipelineSource = Source.create();
+	}
+
+	public Step<Command> source() {
+		return pipelineSource.asStep();
 	}
 
 	public void connectAndListen() {
@@ -45,13 +51,13 @@ public class TwitchChatBot {
 				});
 	}
 
+	private void interpretMessage(TextMessage message) {
+		pipelineSource.emit(new AddChatMessage(message.nick(), message.text(), ""));
+	}
+
 	private void sendPong(WebSocket webSocket, String message) {
 		LOG.debug("Sending PONG...");
 		webSocket.sendText("PONG :" + message, true);
-	}
-
-	private void interpretMessage(TextMessage message) {
-		commander.sendCommand(new AddChatMessage(message.nick(), message.text(), ""));
 	}
 
 	private class WebSocketListener implements Listener {
