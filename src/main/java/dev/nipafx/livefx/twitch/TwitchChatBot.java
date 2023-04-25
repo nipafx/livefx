@@ -19,6 +19,7 @@ import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TwitchChatBot {
 
@@ -28,10 +29,12 @@ public class TwitchChatBot {
 
 	private final TwitchCredentials credentials;
 	private final Source<Command> pipelineSource;
+	private final AtomicReference<WebSocket> connectedWebsocketHolder;
 
 	public TwitchChatBot(TwitchCredentials credentials) {
 		this.credentials = credentials;
 		this.pipelineSource = Source.create();
+		connectedWebsocketHolder = new AtomicReference<>(null);
 	}
 
 	public Step<Command> source() {
@@ -44,11 +47,20 @@ public class TwitchChatBot {
 				.newWebSocketBuilder()
 				.buildAsync(TWITCH_IRC_URL, new WebSocketListener())
 				.whenComplete((websocket, throwable) -> {
-					if (websocket != null)
+					if (websocket != null) {
 						LOG.info("Successfully connected to Twitch IRC");
+						connectedWebsocketHolder.set(websocket);
+					}
 					if (throwable != null)
 						LOG.error("Could not connect to Twitch IRC", throwable);
 				});
+	}
+
+	public void shutdown() {
+		WebSocket websocket = connectedWebsocketHolder.getAndSet(null);
+		if (websocket != null)
+			websocket.sendClose(WebSocket.NORMAL_CLOSURE, "")
+					.join();
 	}
 
 	private void interpretMessage(TextMessage message) {

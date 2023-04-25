@@ -27,7 +27,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return properties.toTwitchCredentials();
 	}
 
-	@Bean(initMethod = "connectAndListen")
+	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
 	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, Commander commander) {
 		return new TwitchChatBot(credentials);
 	}
@@ -37,7 +37,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return new SimpleMark();
 	}
 
-	@Bean(initMethod = "connectAndSubscribe")
+	@Bean(initMethod = "connectAndSubscribe", destroyMethod = "shutdown")
 	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
 		return new TwitchEventSubscriber(credentials, jsonMapper);
 	}
