@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TwitchEventSubscriber {
 
@@ -38,12 +39,14 @@ public class TwitchEventSubscriber {
 	private final HttpClient http;
 	private final ObjectMapper json;
 	private final Source<Command> pipelineSource;
+	private final AtomicReference<WebSocket> connectedWebsocket;
 
 	public TwitchEventSubscriber(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
 		this.credentials = credentials;
 		this.http = http;
 		this.json = json;
 		this.pipelineSource = Source.create();
+		this.connectedWebsocket = new AtomicReference<>(null);
 	}
 
 	public Step<Command> source() {
@@ -55,11 +58,20 @@ public class TwitchEventSubscriber {
 				.newWebSocketBuilder()
 				.buildAsync(TWITCH_EVENT_WEBSOCKET_URL, new WebSocketListener())
 				.whenComplete((websocket, throwable) -> {
-					if (websocket != null)
+					if (websocket != null) {
 						LOG.info("Successfully connected to Twitch Event Publisher");
+						this.connectedWebsocket.set(websocket);
+					}
 					if (throwable != null)
 						LOG.error("Could not connect to Twitch Event Publisher", throwable);
 				});
+	}
+
+	public void shutdown() {
+		WebSocket webSocket = connectedWebsocket.getAndSet(null);
+		if (webSocket != null)
+			webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "")
+					.join();
 	}
 
 	private void handleSubscriptionEvent(Map<String, Object> message) {

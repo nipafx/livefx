@@ -38,17 +38,17 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return new TwitchAuthorizer(http, json, Path.of("/home/nipa/.twitch-credentials.json")).createCredentials();
 	}
 
-	@Bean
+	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
 	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials) {
 		return new TwitchChatBot(credentials);
 	}
 
-	@Bean
+	@Bean(initMethod = "connectAndSubscribe", destroyMethod = "shutdown")
 	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
 		return new TwitchEventSubscriber(http, credentials, json);
 	}
 
-	@Bean
+	@Bean(initMethod = "fetchGraphics")
 	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
 		return new TwitchGraphics(http, credentials, json);
 	}
