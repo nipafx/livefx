@@ -27,7 +27,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return TwitchCredentials.createFromEnvVars();
 	}
 
-	@Bean
+	@Bean(initMethod = "connectAndListen")
 	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, Commander commander) {
 		return new TwitchChatBot(credentials);
 	}
@@ -37,7 +37,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return new SimpleMark();
 	}
 
-	@Bean
+	@Bean(initMethod = "connectAndSubscribe")
 	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
 		return new TwitchEventSubscriber(credentials, jsonMapper);
 	}
