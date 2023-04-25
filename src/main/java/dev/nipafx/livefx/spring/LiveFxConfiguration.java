@@ -23,8 +23,8 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public TwitchCredentials createTwitchCredentials() {
-		return TwitchCredentials.createFromEnvVars();
+	public TwitchCredentials createTwitchCredentials(TwitchCredentialsProperties properties) {
+		return properties.toTwitchCredentials();
 	}
 
 	@Bean(initMethod = "connectAndListen")
