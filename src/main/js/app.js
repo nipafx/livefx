@@ -113,6 +113,7 @@ const triggerNextMessage = (sendMessage) => {
 	const nickIndex = Math.floor(Math.random() * nicks.length)
 	const messages = [
 		"<p>This is a simple message.</p>",
+		"<p>This is a &lt;a href=\"https://evilcorp.com\"&gt;link&lt;/a&gt;.</p>",
 		"<p>This is a message with some <b>bold</b>, <i>italic</i>, and <em>emphasized</em> text.</p>",
 		"<p>This is a very long message that wraps to the next line, so we can see what that looks like.</p>",
 	]

@@ -16,6 +16,13 @@ class SimpleMarkTests {
 		assertThat(parsed).isEqualTo("<p></p>");
 	}
 
+	@Test
+	void containsHtml_escaped() {
+		var parsed = mark.parse("This is <a href=\"https://evilcorp.com\">a link</a>.");
+
+		assertThat(parsed).isEqualTo("<p>This is &lt;a href=\"https://evilcorp.com\"&gt;a link&lt;/a&gt;.</p>");
+	}
+
 	@Nested
 	class SingleLine {
 

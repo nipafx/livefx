@@ -9,8 +9,13 @@ public class SimpleMark {
 	private static final Pattern EMPHASIZE = Pattern.compile("(?<leading>^|\\s)\\+(?:(?<text>\\S.*\\S)|(?<character>\\S))\\+(?<trailing>\\s|$)");
 
 	public String parse(String text) {
-		var markedUpText = parseInlineMarkup(text);
+		var escapedText = escapeHtml(text);
+		var markedUpText = parseInlineMarkup(escapedText);
 		return "<p>" + markedUpText + "</p>";
+	}
+
+	private String escapeHtml(String text) {
+		return text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 
 	private String parseInlineMarkup(String text) {
