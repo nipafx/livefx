@@ -9,10 +9,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 @Configuration
-@Component
+@Order(0)
 public class PipelineConfiguration implements ApplicationRunner {
 
 	private final TwitchChatBot chatBot;
@@ -27,7 +26,6 @@ public class PipelineConfiguration implements ApplicationRunner {
 		this.commander = commander;
 	}
 
-	@Order(0)
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		chatBot.source()
