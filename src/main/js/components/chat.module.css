@@ -45,3 +45,7 @@
 .text code {
 	font-family: var(--code-font);
 }
+
+.text pre {
+	margin: 0;
+}

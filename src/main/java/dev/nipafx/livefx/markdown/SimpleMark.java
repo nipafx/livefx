@@ -1,9 +1,12 @@
 package dev.nipafx.livefx.markdown;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
 
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.joining;
 
 public class SimpleMark {
 
@@ -19,9 +22,25 @@ public class SimpleMark {
 	}
 
 	public String parse(String text) {
-		var escapedText = removeHtmlTags(text);
-		var markedUpText = parseInlineMarkup(escapedText);
-		return "<p>" + markedUpText + "</p>";
+		return LineSplitter.splitIntoBlocks(text)
+				.<Block> map(block -> switch (block) {
+					case Paragraph(var pText) -> new Paragraph(parseInlineMarkup(removeHtmlTags(pText)));
+					case Code code -> code;
+				})
+				.map(block -> switch (block) {
+					// treating the edited user input as potentially dangerous
+					case Paragraph(var html) -> new Element("p").append(html).outerHtml();
+					case Code(var code, var language) -> {
+						var codeElement = new Element("code").appendText(code);
+						var preElement = new Element("pre").appendChild(codeElement);
+						language.ifPresent(lang -> {
+							codeElement.addClass("language-" + lang);
+							preElement.addClass("language-" + lang);
+						});
+						yield preElement.outerHtml();
+					}
+				})
+				.collect(joining());
 	}
 
 	private String removeHtmlTags(String text) {

@@ -10,10 +10,10 @@ class SimpleMarkTests {
 	private final SimpleMark mark = new SimpleMark();
 
 	@Test
-	void emptyLine_emptyParagraph() {
+	void emptyLine_emptyString() {
 		var parsed = mark.parse("");
 
-		assertThat(parsed).isEqualTo("<p></p>");
+		assertThat(parsed).isEqualTo("");
 	}
 
 	@Nested
@@ -120,6 +120,60 @@ class SimpleMarkTests {
 			var parsed = mark.parse("Text with *almost bol*d text");
 
 			assertThat(parsed).isEqualTo("<p>Text with *almost bol*d text</p>");
+		}
+
+	}
+
+	@Nested
+	class CodeBlocks {
+
+		@Test
+		void justBlock() {
+			var parsed = mark.parse("``` var foo = \"foo\" ```");
+
+			assertThat(parsed).isEqualTo("<pre><code>var foo = \"foo\"</code></pre>");
+		}
+
+		@Test
+		void blockWithJava() {
+			var parsed = mark.parse("```java var foo = \"foo\" ```");
+
+			assertThat(parsed).isEqualTo("<pre class=\"language-java\"><code class=\"language-java\">var foo = \"foo\"</code></pre>");
+		}
+
+		@Test
+		void blockWithJavaScript() {
+			var parsed = mark.parse("```javascript const foo = \"foo\" ```");
+
+			assertThat(parsed).isEqualTo("<pre class=\"language-javascript\"><code class=\"language-javascript\">const foo = \"foo\"</code></pre>");
+		}
+
+		@Test
+		void blockWithUnknownLanguage() {
+			var parsed = mark.parse("```unknown var foo = \"foo\" ```");
+
+			assertThat(parsed).isEqualTo("<pre><code>unknown var foo = \"foo\"</code></pre>");
+		}
+
+		@Test
+		void blockThenParagraph() {
+			var parsed = mark.parse("``` var foo = \"foo\" ``` Some text after the code block.");
+
+			assertThat(parsed).isEqualTo("<pre><code>var foo = \"foo\"</code></pre><p>Some text after the code block.</p>");
+		}
+
+		@Test
+		void paragraphThenBlock() {
+			var parsed = mark.parse("Some text before the code block. ``` var foo = \"foo\" ```");
+
+			assertThat(parsed).isEqualTo("<p>Some text before the code block.</p><pre><code>var foo = \"foo\"</code></pre>");
+		}
+
+		@Test
+		void paragraphThenBlockThenParagraph() {
+			var parsed = mark.parse("Some text before the code block. ``` var foo = \"foo\" ``` Some text after the code block.");
+
+			assertThat(parsed).isEqualTo("<p>Some text before the code block.</p><pre><code>var foo = \"foo\"</code></pre><p>Some text after the code block.</p>");
 		}
 
 	}
