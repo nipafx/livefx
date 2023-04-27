@@ -1,35 +1,51 @@
 package dev.nipafx.livefx.markdown;
 
-import java.util.regex.Pattern;
-
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
+import java.util.Map;
+import java.util.regex.Pattern;
+
 public class SimpleMark {
 
-	private static final Pattern BOLD = Pattern.compile("(?<leading>^|\\s)\\*(?:(?<text>\\S.*\\S)|(?<character>\\S))\\*(?<trailing>\\s|$)");
-	private static final Pattern ITALIC = Pattern.compile("(?<leading>^|\\s)_(?:(?<text>\\S.*\\S)|(?<character>\\S))_(?<trailing>\\s|$)");
-	private static final Pattern EMPHASIZE = Pattern.compile("(?<leading>^|\\s)\\+(?:(?<text>\\S.*\\S)|(?<character>\\S))\\+(?<trailing>\\s|$)");
+	private static final Pattern BOLD = createPatternForInlineMarkup("*");
+	private static final Pattern ITALIC = createPatternForInlineMarkup("_");
+	private static final Pattern EMPHASIZE = createPatternForInlineMarkup("+");
+
+	private static Pattern createPatternForInlineMarkup(String markupChar) {
+		var escapedChar = Pattern.quote(markupChar);
+		return Pattern.compile("(?<leading>^|\\s)" + escapedChar + "(?<text>\\S.*\\S|\\S)" + escapedChar + "(?<trailing>\\s|$)");
+	}
 
 	public String parse(String text) {
-		var escapedText = escapeHtml(text);
+		var escapedText = removeHtmlTags(text);
 		var markedUpText = parseInlineMarkup(escapedText);
 		return "<p>" + markedUpText + "</p>";
 	}
 
-	private String escapeHtml(String text) {
+	private String removeHtmlTags(String text) {
 		return Jsoup.clean(text, Safelist.simpleText());
 	}
 
 	private String parseInlineMarkup(String text) {
-		// either the "text" or the "character" group will match
-		//  ~> the other will be the empty string
-		//  ~> replace with both to always get the right replacement
-		var boldedText = BOLD.matcher(text).replaceAll("$1<b>$2$3</b>$4");
-		var italicizedText = ITALIC.matcher(boldedText).replaceAll("$1<i>$2$3</i>$4");
-		var emphasizedText = EMPHASIZE.matcher(italicizedText).replaceAll("$1<em>$2$3</em>$4");
+		return InlineMatcher
+				.of(text)
+				.replaceAll(BOLD, "$1<b>$2</b>$3")
+				.replaceAll(ITALIC, "$1<i>$2</i>$3")
+				.replaceAll(EMPHASIZE, "$1<em>$2</em>$3")
+				.text();
+	}
 
-		return emphasizedText;
+	private record InlineMatcher(String text) {
+
+		static InlineMatcher of(String text) {
+			return new InlineMatcher(text);
+		}
+
+		InlineMatcher replaceAll(Pattern pattern, String replacement) {
+			return new InlineMatcher(pattern.matcher(text).replaceAll(replacement));
+		}
+
 	}
 
 }
