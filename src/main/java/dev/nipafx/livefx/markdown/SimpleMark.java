@@ -2,6 +2,9 @@ package dev.nipafx.livefx.markdown;
 
 import java.util.regex.Pattern;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+
 public class SimpleMark {
 
 	private static final Pattern BOLD = Pattern.compile("(?<leading>^|\\s)\\*(?:(?<text>\\S.*\\S)|(?<character>\\S))\\*(?<trailing>\\s|$)");
@@ -15,7 +18,7 @@ public class SimpleMark {
 	}
 
 	private String escapeHtml(String text) {
-		return text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+		return Jsoup.clean(text, Safelist.simpleText());
 	}
 
 	private String parseInlineMarkup(String text) {

@@ -16,11 +16,44 @@ class SimpleMarkTests {
 		assertThat(parsed).isEqualTo("<p></p>");
 	}
 
-	@Test
-	void containsHtml_escaped() {
-		var parsed = mark.parse("This is <a href=\"https://evilcorp.com\">a link</a>.");
+	@Nested
+	class Html {
 
-		assertThat(parsed).isEqualTo("<p>This is &lt;a href=\"https://evilcorp.com\"&gt;a link&lt;/a&gt;.</p>");
+		@Test
+		void containsOnLoad_removed() {
+			var parsed = mark.parse("<body onload=alert('Alert!')>This alerts on load.</body>");
+
+			assertThat(parsed).isEqualTo("<p>This alerts on load.</p>");
+		}
+
+		@Test
+		void containsScriptTag_removed() {
+			var parsed = mark.parse("This has a script tag. <script>alert('Alert!')</script>");
+
+			assertThat(parsed).isEqualTo("<p>This has a script tag.</p>");
+		}
+
+		@Test
+		void containsDiv_removed() {
+			var parsed = mark.parse("<div>This is in a div.</div>");
+
+			assertThat(parsed).isEqualTo("<p>This is in a div.</p>");
+		}
+
+		@Test
+		void containsAnchor_removed() {
+			var parsed = mark.parse("This is <a href=\"https://evilcorp.com\">a link</a>.");
+
+			assertThat(parsed).isEqualTo("<p>This is a link.</p>");
+		}
+
+		@Test
+		void containsUrl_remains() {
+			var parsed = mark.parse("This is a URL: https://evilcorp.com");
+
+			assertThat(parsed).isEqualTo("<p>This is a URL: https://evilcorp.com</p>");
+		}
+
 	}
 
 	@Nested

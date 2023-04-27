@@ -10,6 +10,7 @@ module dev.nipafx.livefx {
 	requires spring.web;
 	requires spring.websocket;
 
+	requires org.jsoup;
 	requires org.slf4j;
 	requires com.fasterxml.jackson.databind;
 
