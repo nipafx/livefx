@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.joining;
 
-public class SimpleMark {
+public class SimpleMark implements MarkdownProcessor {
 
 	private static final Pattern BOLD = createPatternForInlineMarkup("*");
 	private static final Pattern ITALIC = createPatternForInlineMarkup("_");

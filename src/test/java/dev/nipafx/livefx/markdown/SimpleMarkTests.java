@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SimpleMarkTests {
 
-	private final SimpleMark mark = new SimpleMark();
+	private final MarkdownProcessor mark = new SimplerMark();
 
 	@Test
 	void emptyLine_emptyString() {
