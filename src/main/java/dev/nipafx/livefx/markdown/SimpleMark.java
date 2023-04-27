@@ -11,6 +11,8 @@ public class SimpleMark {
 	private static final Pattern BOLD = createPatternForInlineMarkup("*");
 	private static final Pattern ITALIC = createPatternForInlineMarkup("_");
 	private static final Pattern EMPHASIZE = createPatternForInlineMarkup("+");
+	private static final Pattern STRIKE_THROUGH = createPatternForInlineMarkup("~");
+	private static final Pattern CODE = createPatternForInlineMarkup("`");
 
 	private static Pattern createPatternForInlineMarkup(String markupChar) {
 		var escapedChar = Pattern.quote(markupChar);
@@ -33,6 +35,8 @@ public class SimpleMark {
 				.replaceAll(BOLD, "$1<b>$2</b>$3")
 				.replaceAll(ITALIC, "$1<i>$2</i>$3")
 				.replaceAll(EMPHASIZE, "$1<em>$2</em>$3")
+				.replaceAll(STRIKE_THROUGH, "$1<strike>$2</strike>$3")
+				.replaceAll(CODE, "$1<code>$2</code>$3")
 				.text();
 	}
 

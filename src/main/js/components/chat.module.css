@@ -41,3 +41,7 @@
 	color: var(--alt-color);
 	font-style: normal;
 }
+
+.text code {
+	font-family: var(--code-font);
+}
