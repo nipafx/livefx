@@ -3,7 +3,6 @@ package dev.nipafx.livefx.markdown;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class SimpleMark {
@@ -16,7 +15,7 @@ public class SimpleMark {
 
 	private static Pattern createPatternForInlineMarkup(String markupChar) {
 		var escapedChar = Pattern.quote(markupChar);
-		return Pattern.compile("(?<leading>^|\\s)" + escapedChar + "(?<text>\\S.*\\S|\\S)" + escapedChar + "(?<trailing>\\s|$)");
+		return Pattern.compile("(?<leading>^|\\s)" + escapedChar + "(?<text>\\S.*?\\S|\\S)" + escapedChar + "(?<trailing>\\s|\\.|$)");
 	}
 
 	public String parse(String text) {
