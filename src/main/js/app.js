@@ -53,7 +53,7 @@ const App = () => {
 						layout={layout} triggerNextLayout={() => triggerNextLayout(layout)}
 						theme={theme} triggerNextTheme={() => triggerNextTheme(sendMessage, theme)}
 						command={command} commandState={commandState}
-						triggerNextMessage={() => triggerNextMessage(sendMessage)}
+						triggerNextMessage={() => triggerNextMessage(messages, sendMessage)}
 					/>
 				</Tab>)}
 		</Scene>
@@ -81,8 +81,9 @@ const executeCommand = (command, setLayout, setTheme, addMessage) => {
 	switch (command.type) {
 		case "add-chat-message":
 			addMessage({
+				id: command.id,
 				nick: command.nick,
-				text: command.text,
+				blocks: command.blocks,
 			})
 			break
 		case "change-theme-color":
@@ -105,26 +106,37 @@ const triggerNextTheme = (sendMessage, theme) => {
 	sendMessage("ECHO " + JSON.stringify(nextThemeCommand))
 }
 
-const triggerNextMessage = (sendMessage) => {
+const triggerNextMessage = (messages, sendMessage) => {
 	const nicks = [
 		"John Doe",
 		"Jane Doe",
 	]
-	const nickIndex = Math.floor(Math.random() * nicks.length)
-	const messages = [
-		"<p>This is a simple message.</p>",
-		"<p>This is a &lt;a href=\"https://evilcorp.com\"&gt;link&lt;/a&gt;.</p>",
-		"<p>This is a message with some <b>bold</b>, <i>italic</i>, and <em>emphasized</em> text.</p>",
-		"<p>This is a very long message that wraps to the next line, so we can see what that looks like.</p>",
+	const mockMessages = [
+		[ { type: "paragraph", text: "This is a simple message." } ],
+		[ { type: "paragraph", text: "This is a message with some <b>bold</b>, <i>italic</i>, and <em>emphasized</em> text." } ],
+		[ { type: "paragraph", text: "This is a very long message that wraps to the next line, so we can see what that looks like." } ],
+		[ { type: "code", text: "public static void main() { System.out.println(\"Hello, World!\"); }" } ],
+		[
+			{ type: "paragraph", text: "This is a bit of text before the code." },
+			{ type: "code", text: "public static void main() { System.out.println(\"Hello, World!\"); }" },
+			{ type: "paragraph", text: "And then there's a lot more text after the code. So much, in fact, that it will contain at least one line-break." },
+		],
 	]
-	const messageIndex = Math.floor(Math.random() * messages.length)
 
-	const nextCommand = {
-		type: "add-chat-message",
-		nick: nicks[nickIndex],
-		text: messages[messageIndex],
+	let msgIndex = 0
+	if (messages.length > 0) {
+		const lastMessageId = parseInt(messages[0].id);
+		if (lastMessageId || lastMessageId === 0)
+			msgIndex = lastMessageId + 1
 	}
-	sendMessage("ECHO " + JSON.stringify(nextCommand))
+
+	const command = {
+		type: "add-chat-message",
+		id: msgIndex,
+		nick: nicks[msgIndex % nicks.length],
+		blocks: mockMessages[msgIndex % mockMessages.length],
+	}
+	sendMessage("ECHO " + JSON.stringify(command))
 }
 
 export default App

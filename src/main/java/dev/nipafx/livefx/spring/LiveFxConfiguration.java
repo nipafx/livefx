@@ -2,7 +2,7 @@ package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.Commander;
-import dev.nipafx.livefx.markdown.SimpleMark;
+import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;

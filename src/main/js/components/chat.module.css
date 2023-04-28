@@ -1,5 +1,6 @@
 .container {
 	overflow: hidden;
+	/* this sticks the message box to the bottom of the container */
 	display: flex;
 	flex-direction: column-reverse;
 
@@ -9,6 +10,7 @@
 
 .messageBox {
 	overflow: auto;
+	/* this reverses message order and puts the first rendered message at the bottom */
 	display: flex;
 	flex-direction: column-reverse;
 }

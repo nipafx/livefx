@@ -1,6 +1,6 @@
 package dev.nipafx.livefx.twitch;
 
-import dev.nipafx.livefx.command.AddChatMessage;
+import dev.nipafx.livefx.command.AddRawChatMessage;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.pipeline.Source;
 import dev.nipafx.livefx.pipeline.Step;
@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 public class TwitchChatBot {
@@ -52,7 +53,7 @@ public class TwitchChatBot {
 	}
 
 	private void interpretMessage(TextMessage message) {
-		pipelineSource.emit(new AddChatMessage(message.nick(), message.text()));
+		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text()));
 	}
 
 	private void sendPong(WebSocket webSocket, String message) {

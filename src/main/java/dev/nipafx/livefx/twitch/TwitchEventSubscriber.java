@@ -25,6 +25,7 @@ import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 public class TwitchEventSubscriber {
@@ -108,7 +109,7 @@ public class TwitchEventSubscriber {
 		LOG.info("Reward redeemed: {}", rewardRedemption);
 		try {
 			var newColor = ThemeColor.valueOf(rewardRedemption.input().toUpperCase(Locale.ROOT));
-			pipelineSource.emit(new ChangeThemeColorCommand(newColor));
+			pipelineSource.emit(new ChangeThemeColorCommand(UUID.randomUUID().toString(), newColor));
 		} catch (IllegalArgumentException ex) {
 			// the user input could not be parsed to a color ~> do nothing
 		}
