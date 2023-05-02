@@ -28,6 +28,8 @@
 }
 
 .nick {
+	padding-right: 0.25em;
+	white-space: nowrap;
 	color: var(--alt-color);
 }
 
@@ -46,6 +48,7 @@
 
 .text code {
 	font-family: var(--code-font);
+	font-size: 0.8em;
 }
 
 .text pre {

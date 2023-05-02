@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
 
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -47,9 +48,30 @@ public class SimpleMark {
 	public Stream<Block> parse(String text) {
 		return LineSplitter.splitIntoBlocks(text)
 				.map(block -> switch (block) {
-					case Paragraph(var pText) -> new Paragraph(parseInlineMarkup(removeHtmlTags(pText)));
-					case Code code -> code;
+					case Paragraph(var pText) -> parseParagraph(pText);
+					case Code code -> parseCode(code);
 				});
+	}
+
+	private Paragraph parseParagraph(String pText) {
+		return new Paragraph(parseInlineMarkup(removeHtmlTags(pText)));
+	}
+
+	private static Code parseCode(Code code) {
+		var formattedCode = code
+				.language()
+				.<UnaryOperator<String>> map(language -> switch (language) {
+					case JAVA -> SimpleMark::bestEffortFormatting;
+					case JAVASCRIPT -> SimpleMark::bestEffortFormatting;
+				})
+				.orElse(SimpleMark::bestEffortFormatting)
+				.apply(code.text());
+
+		return new Code(formattedCode, code.language());
+	}
+
+	private static String bestEffortFormatting(String code) {
+		return code.replaceAll("([;{}])", "$1\n");
 	}
 
 	private String removeHtmlTags(String text) {
