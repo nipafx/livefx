@@ -68,13 +68,17 @@ public class TwitchChatBot {
 			LOG.info("Opened web socket connection to Twitch IRC");
 			LOG.debug("Sending PASS...");
 			webSocket.sendText("PASS oauth:" + credentials.appToken(), true)
-					.thenCompose(websocket -> {
+					.thenCompose(ws -> {
 						LOG.debug("Sending NICK...");
-						return websocket.sendText("NICK " + credentials.userName(), true);
+						return ws.sendText("NICK " + credentials.userName(), true);
 					})
-					.thenCompose(websocket -> {
+					.thenCompose(ws -> {
+						LOG.debug("Requesting capabilities...");
+						return ws.sendText("CAP REQ :twitch.tv/tags twitch.tv/commands", true);
+					})
+					.thenCompose(ws -> {
 						LOG.debug("Joining...");
-						return websocket.sendText("JOIN #" + credentials.userName(), true);
+						return ws.sendText("JOIN #" + credentials.userName(), true);
 					});
 			Listener.super.onOpen(webSocket);
 		}
