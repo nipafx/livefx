@@ -6,6 +6,7 @@ import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
+import dev.nipafx.livefx.twitch.TwitchGraphics;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -33,13 +34,18 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public SimpleMark createSimpleMark() {
-		return new SimpleMark();
+	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
+		return new TwitchEventSubscriber(credentials, jsonMapper);
 	}
 
 	@Bean
-	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
-		return new TwitchEventSubscriber(credentials, jsonMapper);
+	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, ObjectMapper jsonMapper) {
+		return new TwitchGraphics(credentials, jsonMapper);
+	}
+
+	@Bean
+	public SimpleMark createSimpleMark() {
+		return new SimpleMark();
 	}
 
 	@Override

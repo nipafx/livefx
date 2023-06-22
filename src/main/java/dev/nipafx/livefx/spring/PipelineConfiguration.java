@@ -33,7 +33,7 @@ public class PipelineConfiguration implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		chatBot.source()
 				.thenIf(AddRawChatMessage.class, msg ->
-						new AddChatMessage(msg.id(), msg.nick(), simpleMark.parse(msg.text()).toList()))
+						new AddChatMessage(msg.id(), msg.nick(), simpleMark.parse(msg.text()).toList(), msg.badges()))
 				.sink(commander::sendCommand);
 		eventSubscriber.source()
 				.sink(commander::sendCommand);

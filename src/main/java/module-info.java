@@ -14,7 +14,8 @@ module dev.nipafx.livefx {
 	requires org.slf4j;
 	requires com.fasterxml.jackson.databind;
 
-	opens dev.nipafx.livefx.spring to spring.beans, spring.core, spring.context;
+	opens dev.nipafx.livefx.spring to spring.beans, spring.core, spring.context, spring.web, com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.command to com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.markup to com.fasterxml.jackson.databind;
+	opens dev.nipafx.livefx.twitch to com.fasterxml.jackson.databind;
 }

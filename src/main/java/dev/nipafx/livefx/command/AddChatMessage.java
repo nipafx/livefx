@@ -6,4 +6,4 @@ import dev.nipafx.livefx.markup.Block;
 import java.util.List;
 
 @JsonTypeName("add-chat-message")
-public record AddChatMessage(String id, String nick, List<Block> blocks) implements Command { }
+public record AddChatMessage(String id, String nick, List<Block> blocks, List<String> badges) implements Command { }

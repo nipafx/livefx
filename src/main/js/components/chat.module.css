@@ -6,6 +6,7 @@
 
 	padding-top: 1.5em;
 	padding-bottom: 0.5em;
+	padding-left: 0.5em;
 }
 
 .messageBox {
@@ -24,10 +25,22 @@
 	white-space: pre-wrap;
 
 	display: grid;
-	grid-template-columns: auto 1fr;
+	/* give badge column fixed width, so users without badge are indented */
+	grid-template-columns: calc(var(--font-size) * 1.25) auto 1fr;
+	grid-template-areas: "badge nick text";
+}
+
+.badge {
+	grid-area: badge;
+
+	height: var(--font-size);
+	/* assumes line height is 1.5 */
+	padding-top: calc(var(--font-size) * 0.25);
 }
 
 .nick {
+	grid-area: nick;
+
 	padding-right: 0.25em;
 	white-space: nowrap;
 	color: var(--alt-color);
@@ -35,6 +48,10 @@
 
 .nick:after {
 	content: ": ";
+}
+
+.text {
+	grid-area: text;
 }
 
 .text p {

@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
@@ -53,7 +54,10 @@ public class TwitchChatBot {
 	}
 
 	private void interpretMessage(TextMessage message) {
-		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text()));
+		var badges = message.tags().containsKey("badges")
+				? List.of(message.tags().get("badges").split(","))
+				: List.<String> of();
+		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges));
 	}
 
 	private void sendPong(WebSocket webSocket, String message) {
