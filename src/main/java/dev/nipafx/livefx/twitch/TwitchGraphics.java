@@ -23,16 +23,15 @@ public class TwitchGraphics {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchGraphics.class);
 
 	private final TwitchCredentials credentials;
-	private final ObjectMapper jsonMapper;
-
-	private final HttpClient httpClient;
+	private final HttpClient http;
+	private final ObjectMapper json;
 
 	private Optional<Collection<Badge>> globalBadges;
 
-	public TwitchGraphics(TwitchCredentials credentials, ObjectMapper jsonMapper) {
+	public TwitchGraphics(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
 		this.credentials = credentials;
-		this.jsonMapper = jsonMapper;
-		this.httpClient = HttpClient.newHttpClient();
+		this.http = http;
+		this.json = json;
 	}
 
 	public void fetchGraphics() throws InterruptedException {
@@ -44,14 +43,14 @@ public class TwitchGraphics {
 		LOG.info("Fetching global badges...");
 		var request = createRequestTo(TWITCH_GLOBAL_BADGE_URL, credentials);
 		try {
-			var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() != 200) {
 				LOG.trace("Twitch replied with status " + response.statusCode() + ": " + response.body());
 				return List.of();
 			}
 
 			LOG.debug("Parsing global badges...");
-			var badgesJson = jsonMapper.readTree(response.body());
+			var badgesJson = json.readTree(response.body());
 
 			var badges = new ArrayList<Badge>();
 			for (JsonNode badgeSet : badgesJson.get("data")) {

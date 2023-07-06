@@ -1,8 +1,8 @@
 package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.markup.SimpleMark;
+import dev.nipafx.livefx.twitch.TwitchAuthorizer;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.nio.file.Path;
 
 @Configuration
 @EnableWebSocket
@@ -24,23 +28,28 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public TwitchCredentials createTwitchCredentials() {
-		return TwitchCredentials.createFromEnvVars();
+	public HttpClient createHttpClient() {
+		return HttpClient.newHttpClient();
 	}
 
 	@Bean
-	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, Commander commander) {
+	public TwitchCredentials createTwitchCredentials(HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
+		return new TwitchAuthorizer(http, json, Path.of("/home/nipa/.twitch-credentials.json")).createCredentials();
+	}
+
+	@Bean
+	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials) {
 		return new TwitchChatBot(credentials);
 	}
 
 	@Bean
-	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, Commander commander, ObjectMapper jsonMapper) {
-		return new TwitchEventSubscriber(credentials, jsonMapper);
+	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
+		return new TwitchEventSubscriber(http, credentials, json);
 	}
 
 	@Bean
-	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, ObjectMapper jsonMapper) {
-		return new TwitchGraphics(credentials, jsonMapper);
+	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
+		return new TwitchGraphics(http, credentials, json);
 	}
 
 	@Bean

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.ChangeThemeColorCommand;
 import dev.nipafx.livefx.command.Command;
-import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.command.ThemeColor;
 import dev.nipafx.livefx.pipeline.Source;
 import dev.nipafx.livefx.pipeline.Step;
@@ -36,14 +35,14 @@ public class TwitchEventSubscriber {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchEventSubscriber.class);
 
 	private final TwitchCredentials credentials;
-	private final HttpClient httpClient;
-	private final ObjectMapper jsonMapper;
+	private final HttpClient http;
+	private final ObjectMapper json;
 	private final Source<Command> pipelineSource;
 
-	public TwitchEventSubscriber(TwitchCredentials credentials, ObjectMapper jsonMapper) {
+	public TwitchEventSubscriber(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
 		this.credentials = credentials;
-		this.httpClient = HttpClient.newHttpClient();
-		this.jsonMapper = jsonMapper;
+		this.http = http;
+		this.json = json;
 		this.pipelineSource = Source.create();
 	}
 
@@ -52,7 +51,7 @@ public class TwitchEventSubscriber {
 	}
 
 	public void connectAndSubscribe() {
-		httpClient
+		http
 				.newWebSocketBuilder()
 				.buildAsync(TWITCH_EVENT_WEBSOCKET_URL, new WebSocketListener())
 				.whenComplete((websocket, throwable) -> {
@@ -88,15 +87,19 @@ public class TwitchEventSubscriber {
 					}
 				}
 				""".formatted(credentials.userId(), welcome.sessionId());
-		var request = HttpRequest.newBuilder(TWITCH_EVENT_SUBSCRIPTION_ENDPOINT)
+		var request = HttpRequest
+				.newBuilder(TWITCH_EVENT_SUBSCRIPTION_ENDPOINT)
 				.POST(HttpRequest.BodyPublishers.ofString(requestBody))
 				.header("Authorization", "Bearer " + credentials.userToken())
 				.header("Client-Id", credentials.appId())
 				.header("Content-Type", "application/json")
 				.build();
 		try {
-			var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			LOG.info("Response: [{}] {}", response.statusCode(), response.body());
+			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() > 400)
+				LOG.error("Response: [{}] {}", response.statusCode(), response.body());
+			else
+				LOG.info("Response: [{}] {}", response.statusCode(), response.body());
 		} catch (IOException ex) {
 			LOG.error("Processing welcome failed - there will probably not be any events", ex);
 		} catch (InterruptedException ex) {
@@ -142,7 +145,7 @@ public class TwitchEventSubscriber {
 			LOG.trace("Received text event {}", message);
 			try {
 				@SuppressWarnings("unchecked")
-				Map<String, Object> msg = jsonMapper.readValue(message, Map.class);
+				Map<String, Object> msg = json.readValue(message, Map.class);
 				handleSubscriptionEvent(msg);
 			} catch (JsonProcessingException ex) {
 				LOG.error("Error while parsing Twitch event", ex);
