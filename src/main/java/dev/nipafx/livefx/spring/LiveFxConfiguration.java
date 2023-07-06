@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.nipafx.livefx.markup.MessageProcessor;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
@@ -55,6 +56,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public SimpleMark createSimpleMark() {
 		return new SimpleMark();
+	}
+
+	@Bean
+	public MessageProcessor createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics) {
+		return new MessageProcessor(simpleMark, twitchGraphics::resolveBadgesIn);
 	}
 
 	@Override

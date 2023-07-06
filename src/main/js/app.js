@@ -34,35 +34,22 @@ const App = () => {
 		newMessages.length = Math.min(newMessages.length, 50)
 		setMessages(newMessages)
 	}
-	const [ graphics, setGraphics ] = useState(null)
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
 		return () => unregisterSceneSetter()
-	}, [ command, graphics ])
+	}, [ command ])
 
 	useEffect(() => {
 		if (command) executeCommand(command, setLayout, setTheme, addMessage)
 	}, [ command ])
-
-	useEffect(() => {
-		if (!graphics)
-			fetch(`/api/graphics`)
-				.then(response => response.json())
-				.then(graphics => {
-					const graphicsMap = { "badges": { } }
-					graphics.badges.forEach(badge => graphicsMap.badges[badge.id] = badge)
-					return graphicsMap
-				})
-				.then(graphics => setGraphics(graphics))
-	}, [ graphics ])
 
 	const debug = config?.debug
 	const guest = config?.guest
 	const guest2 = config?.guest2
 
 	return (
-		<Scene layout={layout} theme={theme} stream={config.stream} messages={messages} graphics={graphics}>
+		<Scene layout={layout} theme={theme} stream={config.stream} messages={messages}>
 			{debug && (
 				<Tab name="debug">
 					<DebugInfo
