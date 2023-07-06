@@ -1,16 +1,22 @@
 package dev.nipafx.livefx.markup;
 
-import dev.nipafx.livefx.markup.Block.Code;
-import dev.nipafx.livefx.markup.Block.Paragraph;
+import dev.nipafx.livefx.markup.BlockElement.CodeElement;
+import dev.nipafx.livefx.markup.BlockElement.ParagraphElement;
+import dev.nipafx.livefx.markup.InlineElement.EmoteElement;
+import dev.nipafx.livefx.markup.InlineElement.TextElement;
+import dev.nipafx.livefx.markup.LineSplitter.Block.Code;
+import dev.nipafx.livefx.markup.LineSplitter.Block.Paragraph;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
 import org.jsoup.safety.Safelist;
 
-import java.util.function.UnaryOperator;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.joining;
 
 public class SimpleMark {
 
@@ -25,57 +31,59 @@ public class SimpleMark {
 		return Pattern.compile("(?<leading>^|\\s)" + escapedChar + "(?<text>\\S.*?\\S|\\S)" + escapedChar + "(?<trailing>\\s|\\.|$)");
 	}
 
-	/** @deprecated use {@link SimpleMark#parse(String) parse} instead */
-	@Deprecated
-	public String render(String text) {
-		return parse(text)
+	public Stream<BlockElement> parse(String text, Map<String, URI> emotes) {
+		return LineSplitter
+				.splitIntoBlocks(text)
 				.map(block -> switch (block) {
-					// treating the edited user input as HTML is potentially dangerous
-					case Paragraph(var html) -> new Element("p").append(html).outerHtml();
-					case Code(var code, var language) -> {
-						var codeElement = new Element("code").appendText(code);
-						var preElement = new Element("pre").appendChild(codeElement);
-						language.ifPresent(lang -> {
-							codeElement.addClass("language-" + lang);
-							preElement.addClass("language-" + lang);
-						});
-						yield preElement.outerHtml();
-					}
-				})
-				.collect(joining());
-	}
-
-	public Stream<Block> parse(String text) {
-		return LineSplitter.splitIntoBlocks(text)
-				.map(block -> switch (block) {
-					case Paragraph(var pText) -> parseParagraph(pText);
-					case Code code -> parseCode(code);
+					case Paragraph(var paragraph) -> parseParagraph(paragraph, emotes);
+					case Code(var code) -> createCodeElement(code);
 				});
 	}
 
-	private Paragraph parseParagraph(String pText) {
-		return new Paragraph(parseInlineMarkup(removeHtmlTags(pText)));
-	}
+	/*
+	 * PARAGRAPH PARSING
+	 */
 
-	private static Code parseCode(Code code) {
-		var formattedCode = code
-				.language()
-				.<UnaryOperator<String>> map(language -> switch (language) {
-					case JAVA -> SimpleMark::bestEffortFormatting;
-					case JAVASCRIPT -> SimpleMark::bestEffortFormatting;
-				})
-				.orElse(SimpleMark::bestEffortFormatting)
-				.apply(code.text());
-
-		return new Code(formattedCode, code.language());
-	}
-
-	private static String bestEffortFormatting(String code) {
-		return code.replaceAll("([;{}])", "$1\n");
+	private ParagraphElement parseParagraph(String paragraphText, Map<String, URI> emotes) {
+		var sanitizedText = removeHtmlTags(paragraphText.strip());
+		var inlineElements = parseInline(sanitizedText, emotes);
+		return new ParagraphElement(inlineElements);
 	}
 
 	private String removeHtmlTags(String text) {
 		return Jsoup.clean(text, Safelist.simpleText());
+	}
+
+	private List<InlineElement> parseInline(String text, Map<String, URI> emotes) {
+		var textSnippets = List.of(text);
+		for (String emote : emotes.keySet())
+			textSnippets = textSnippets.stream()
+					.flatMap(snippet -> Arrays.stream(splitWithDelimiter(snippet, emote)))
+					.toList();
+
+		return textSnippets.stream()
+				.<InlineElement>map(snippet -> emotes.containsKey(snippet)
+						? new EmoteElement(emotes.get(snippet))
+						: new TextElement(parseInlineMarkup(snippet))
+				)
+				.toList();
+	}
+
+	private static String[] splitWithDelimiter(String text, String delimiter) {
+		var split = text.split(Pattern.quote(delimiter));
+		// guess how we found this out (hint: it wasn't a test)
+		if (split.length == 0)
+			return new String[] { delimiter };
+
+		var splitWithDelimiter = new ArrayList<String>();
+		for (int i = 0; i < split.length; i++) {
+			splitWithDelimiter.add(split[i]);
+			splitWithDelimiter.add(delimiter);
+		}
+		if (!text.endsWith(delimiter))
+			splitWithDelimiter.remove(splitWithDelimiter.size() - 1);
+
+		return splitWithDelimiter.toArray(String[]::new);
 	}
 
 	private String parseInlineMarkup(String text) {
@@ -99,6 +107,33 @@ public class SimpleMark {
 			return new InlineMatcher(pattern.matcher(text).replaceAll(replacement));
 		}
 
+	}
+
+	/*
+	 * CODE PARSING
+	 */
+
+	private static CodeElement createCodeElement(String text) {
+		var firstSpaceIndex = text.indexOf(" ");
+		if (firstSpaceIndex < 0)
+			return formattedCodeElement(text);
+
+		return CodeBlockLanguage
+				.parse(text.substring(0, firstSpaceIndex))
+				.map(lang -> formattedCodeElement(text.substring(firstSpaceIndex)))
+				.orElseGet(() -> formattedCodeElement(text));
+	}
+
+	private static CodeElement formattedCodeElement(String text) {
+		return new CodeElement(bestEffortFormatting(text.strip()), Optional.empty());
+	}
+
+	private static CodeElement formattedCodeElement(String text, CodeBlockLanguage lang) {
+		return new CodeElement(bestEffortFormatting(text.strip()), Optional.of(lang));
+	}
+
+	private static String bestEffortFormatting(String code) {
+		return code.replaceAll("([;{}])", "$1\n");
 	}
 
 }

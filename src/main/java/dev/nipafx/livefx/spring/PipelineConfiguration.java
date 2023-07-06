@@ -1,7 +1,6 @@
 package dev.nipafx.livefx.spring;
 
 import dev.nipafx.livefx.command.AddRawChatMessage;
-import dev.nipafx.livefx.command.AddChatMessage;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.markup.MessageProcessor;
 import dev.nipafx.livefx.twitch.TwitchChatBot;

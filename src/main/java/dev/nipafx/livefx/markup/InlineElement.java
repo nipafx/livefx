@@ -3,19 +3,17 @@ package dev.nipafx.livefx.markup;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import java.util.Optional;
+import java.net.URI;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeInfo(property = "type", use = NAME)
-public sealed interface Block {
+public sealed interface InlineElement {
 
-	String text();
+	@JsonTypeName("text")
+	record TextElement(String text) implements InlineElement { }
 
-	@JsonTypeName("paragraph")
-	record Paragraph(String text) implements Block { }
-
-	@JsonTypeName("code")
-	record Code(String text, Optional<CodeBlockLanguage> language) implements Block { }
+	@JsonTypeName("emote")
+	record EmoteElement(URI url) implements InlineElement { }
 
 }

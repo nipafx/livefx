@@ -96,7 +96,7 @@ public class TwitchEventSubscriber {
 				.build();
 		try {
 			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
-			if (response.statusCode() > 400)
+			if (response.statusCode() >= 400)
 				LOG.error("Response: [{}] {}", response.statusCode(), response.body());
 			else
 				LOG.info("Response: [{}] {}", response.statusCode(), response.body());

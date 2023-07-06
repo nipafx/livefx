@@ -18,9 +18,13 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 public class TwitchChatBot {
 
@@ -54,10 +58,29 @@ public class TwitchChatBot {
 	}
 
 	private void interpretMessage(TextMessage message) {
-		var badges = message.tags().containsKey("badges")
+		var badges = parseBadges(message);
+		var emotes = parseEmotes(message);
+		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes));
+	}
+
+	private static List<String> parseBadges(TextMessage message) {
+		return message.tags().containsKey("badges")
 				? List.of(message.tags().get("badges").split(","))
-				: List.<String> of();
-		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges));
+				: List.of();
+	}
+
+	private static Collection<String> parseEmotes(TextMessage message) {
+		return message.tags().containsKey("emotes")
+				? parseEmotes(message.tags().get("emotes"))
+				: List.of();
+	}
+
+	private static Collection<String> parseEmotes(String emotesString) {
+		return Stream
+				.of(emotesString.split("/"))
+				// each emote is of the form "$id:$range"
+				.map(emote -> emote.split(":")[0])
+				.collect(toSet());
 	}
 
 	private void sendPong(WebSocket webSocket, String message) {

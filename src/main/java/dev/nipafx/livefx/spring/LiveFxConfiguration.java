@@ -60,7 +60,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 
 	@Bean
 	public MessageProcessor createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics) {
-		return new MessageProcessor(simpleMark, twitchGraphics::resolveBadgesIn);
+		return new MessageProcessor(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn);
 	}
 
 	@Override

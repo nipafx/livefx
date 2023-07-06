@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TwitchGraphics {
 
@@ -29,6 +30,7 @@ public class TwitchGraphics {
 	private final ObjectMapper json;
 
 	private Map<String, Badge> globalBadges;
+	private Map<String, Emote> twitchEmotes;
 
 	public TwitchGraphics(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
 		this.credentials = credentials;
@@ -39,15 +41,58 @@ public class TwitchGraphics {
 	public void fetchGraphics() throws InterruptedException {
 		// use structured concurrency
 		globalBadges = getGlobalBadges();
+		twitchEmotes = getTwitchEmotes();
+	}
+
+	private Map<String, Emote> getTwitchEmotes() throws InterruptedException {
+		LOG.info("Fetching Twitch emotes...");
+		var getEmotes = createTwitchEmoteRequest();
+		try {
+			var response = http.send(getEmotes, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() != 200) {
+				LOG.warn("Twitch emote endpoint replied with status {}: {}", response.statusCode(), response.body());
+				return Map.of();
+			}
+
+			LOG.debug("Parsing Twitch emotes...");
+			var emoteJson = json.readTree(response.body());
+
+			var emotes = new HashMap<String, Emote>();
+			for (JsonNode emote : emoteJson.get("data")) {
+				var id = emote.get("id").textValue();
+				var name = emote.get("name").textValue();
+				var urlString = emote.get("images").get("url_1x").textValue();
+				try {
+					var url = new URI(urlString);
+					emotes.put(id, new Emote(id, name, url));
+				} catch (URISyntaxException ex) {
+					LOG.warn("Twitch returned an illegal URL for an emote {}: {}", id, urlString);
+				}
+			}
+			LOG.debug("Parsed " + emotes.size() + " Twitch emotes");
+			return Collections.unmodifiableMap(emotes);
+		} catch (IOException ex) {
+			LOG.error("Error fetching Twitch emotes", ex);
+			return Map.of();
+		}
+	}
+
+	private HttpRequest createTwitchEmoteRequest() {
+		return HttpRequest
+				.newBuilder(URI.create("https://api.twitch.tv/helix/chat/emotes/global"))
+				.GET()
+				.header("Authorization", "Bearer " + credentials.userToken())
+				.header("Client-Id", credentials.appId())
+				.build();
 	}
 
 	private Map<String, Badge> getGlobalBadges() throws InterruptedException {
 		LOG.info("Fetching global badges...");
-		var request = createRequestTo(TWITCH_GLOBAL_BADGE_URL, credentials);
+		var request = createGlobalBadgeRequest(credentials);
 		try {
 			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() != 200) {
-				LOG.trace("Twitch replied with status " + response.statusCode() + ": " + response.body());
+				LOG.warn("Twitch badge endpoint replied with status {}: {}", response.statusCode(), response.body());
 				return Map.of();
 			}
 
@@ -77,12 +122,11 @@ public class TwitchGraphics {
 		}
 	}
 
-	private static HttpRequest createRequestTo(URI url, TwitchCredentials credentials) {
-		return HttpRequest.newBuilder(url)
+	private static HttpRequest createGlobalBadgeRequest(TwitchCredentials credentials) {
+		return HttpRequest.newBuilder(TwitchGraphics.TWITCH_GLOBAL_BADGE_URL)
 				.GET()
 				.header("Authorization", "Bearer " + credentials.userToken())
 				.header("Client-Id", credentials.appId())
-				.header("Content-Type", "application/json")
 				.build();
 	}
 
@@ -95,6 +139,15 @@ public class TwitchGraphics {
 				.toList();
 	}
 
+	public Map<String, URI> resolveEmotesIn(AddRawChatMessage msg) {
+		return msg.emotes()
+				.stream()
+				.map(twitchEmotes::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toMap(Emote::name, Emote::url));
+	}
+
 	private record Badge(String id, URI url) { }
+	private record Emote(String id, String name, URI url) { }
 
 }

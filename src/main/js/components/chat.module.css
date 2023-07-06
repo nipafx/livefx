@@ -26,16 +26,16 @@
 
 	display: grid;
 	/* give badge column fixed width, so users without badge are indented */
-	grid-template-columns: calc(var(--font-size) * 1.25) auto 1fr;
+	grid-template-columns: calc(var(--font-size) * 1.5) auto 1fr;
 	grid-template-areas: "badge nick text";
 }
 
 .badge {
 	grid-area: badge;
 
-	height: var(--font-size);
+	height: calc(var(--font-size) * 1.25);
 	/* assumes line height is 1.5 */
-	padding-top: calc(var(--font-size) * 0.25);
+	padding-top: calc(var(--font-size) * 0.125);
 }
 
 .nick {
@@ -56,6 +56,13 @@
 
 .text p {
 	margin: 0;
+}
+
+.text .emote {
+	vertical-align: middle;
+	height: calc(var(--font-size) * 1.25);
+	/* assumes line height is 1.5 */
+	padding-top: calc(var(--font-size) * 0.125);
 }
 
 .text em {

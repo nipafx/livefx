@@ -35,9 +35,20 @@ const Badge = ({ msgId, msgBadges }) => {
 const Block = ({ block }) => {
 	switch (block.type) {
 		case "paragraph":
-			return <p dangerouslySetInnerHTML={{ __html: block.text }} />
+			return <p>{block.elements.map((element, index) => <Inline key={index} inline={element} />)}</p>
 		case "code":
 			return <pre><code>{block.text}</code></pre>
+		default:
+			return null
+	}
+}
+
+const Inline = ({ inline }) => {
+	switch (inline.type) {
+		case "text":
+			return <span dangerouslySetInnerHTML={{ __html: inline.text }} />
+		case "emote":
+			return <img className={style.emote} src={inline.url} />
 		default:
 			return null
 	}
