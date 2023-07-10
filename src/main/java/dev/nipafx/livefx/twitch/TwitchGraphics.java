@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class TwitchGraphics {
 
-	public static final URI TWITCH_GLOBAL_BADGE_URL = URI.create("https://api.twitch.tv/helix/chat/badges/global");
+	public static final URI TWITCH_BADGE_ENDPOINT = URI.create("https://api.twitch.tv/helix/chat/badges");
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchGraphics.class);
 
@@ -29,7 +29,7 @@ public class TwitchGraphics {
 	private final HttpClient http;
 	private final ObjectMapper json;
 
-	private Map<String, Badge> globalBadges;
+	private Map<String, Badge> badges;
 	private Map<String, Emote> twitchEmotes;
 
 	public TwitchGraphics(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
@@ -40,8 +40,14 @@ public class TwitchGraphics {
 
 	public void fetchGraphics() throws InterruptedException {
 		// use structured concurrency
-		globalBadges = getGlobalBadges();
-		twitchEmotes = getTwitchEmotes();
+		this.badges = getAllBadges();
+		this.twitchEmotes = getTwitchEmotes();
+	}
+
+	private Map<String, Badge> getAllBadges() throws InterruptedException {
+		var badges = getBadges(BadgeType.GLOBAL);
+		badges.putAll(getBadges(BadgeType.CHANNEL));
+		return Collections.unmodifiableMap(badges);
 	}
 
 	private Map<String, Emote> getTwitchEmotes() throws InterruptedException {
@@ -86,9 +92,9 @@ public class TwitchGraphics {
 				.build();
 	}
 
-	private Map<String, Badge> getGlobalBadges() throws InterruptedException {
-		LOG.info("Fetching global badges...");
-		var request = createGlobalBadgeRequest(credentials);
+	private Map<String, Badge> getBadges(BadgeType type) throws InterruptedException {
+		LOG.info("Fetching {} badges...", type.readableName());
+		var request = createBadgeRequest(credentials, type.queryParameter(credentials));
 		try {
 			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() != 200) {
@@ -96,7 +102,7 @@ public class TwitchGraphics {
 				return Map.of();
 			}
 
-			LOG.debug("Parsing global badges...");
+			LOG.debug("Parsing {} badges...", type.readableName());
 			var badgesJson = json.readTree(response.body());
 
 			var badges = new HashMap<String, Badge>();
@@ -110,20 +116,21 @@ public class TwitchGraphics {
 						var badgeUrl = new URI(badgeUrlString);
 						badges.put(fullId, new Badge(fullId, badgeUrl));
 					} catch (URISyntaxException ex) {
-						LOG.warn("Twitch returned an illegal URL for global badge {}: {}", fullId, badgeUrlString);
+						LOG.warn("Twitch returned an illegal URL for {} badge {}: {}", type.readableName(), fullId, badgeUrlString);
 					}
 				}
 			}
-			LOG.debug("Parsed " + badges.size() + " global badges");
-			return Collections.unmodifiableMap(badges);
+			LOG.debug("Parsed {} {} badges", badges.size(), type.readableName());
+			return badges;
 		} catch (IOException ex) {
-			LOG.error("Error fetching global badges", ex);
+			LOG.error("Error fetching " + type.readableName() + " badges", ex);
 			return Map.of();
 		}
 	}
 
-	private static HttpRequest createGlobalBadgeRequest(TwitchCredentials credentials) {
-		return HttpRequest.newBuilder(TwitchGraphics.TWITCH_GLOBAL_BADGE_URL)
+	private static HttpRequest createBadgeRequest(TwitchCredentials credentials, String queryParameter) {
+		var url = URI.create(TwitchGraphics.TWITCH_BADGE_ENDPOINT + queryParameter);
+		return HttpRequest.newBuilder(url)
 				.GET()
 				.header("Authorization", "Bearer " + credentials.userToken())
 				.header("Client-Id", credentials.appId())
@@ -133,7 +140,7 @@ public class TwitchGraphics {
 	public List<URI> resolveBadgesIn(AddRawChatMessage msg) {
 		return msg.badges()
 				.stream()
-				.map(globalBadges::get)
+				.map(badges::get)
 				.filter(Objects::nonNull)
 				.map(Badge::url)
 				.toList();
@@ -149,5 +156,28 @@ public class TwitchGraphics {
 
 	private record Badge(String id, URI url) { }
 	private record Emote(String id, String name, URI url) { }
+
+	private enum BadgeType {
+
+		GLOBAL("global"),
+		CHANNEL("channel");
+
+		private final String name;
+
+		BadgeType(String typeName) {
+			this.name = typeName;
+		}
+
+		public String readableName() {
+			return name;
+		}
+
+		public String queryParameter(TwitchCredentials credentials) {
+			return switch (this) {
+				case GLOBAL -> "/global";
+				case CHANNEL -> "?broadcaster_id=" + credentials.userId();
+			};
+		}
+	}
 
 }
