@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.nipafx.livefx.config.Configurator;
 import dev.nipafx.livefx.markup.MessageProcessor;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
@@ -8,6 +9,7 @@ import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
 import dev.nipafx.livefx.twitch.TwitchGraphics;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -33,9 +35,19 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return HttpClient.newHttpClient();
 	}
 
+	@Bean(initMethod = "loadAndObserveConfig")
+	public Configurator createConfigurator(@Value("${livefx.configFolder}") Path configFolder, ObjectMapper json) {
+		return new Configurator(configFolder, json);
+	}
+
 	@Bean
-	public TwitchCredentials createTwitchCredentials(HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
-		return new TwitchAuthorizer(http, json, Path.of("/home/nipa/.twitch-credentials.json")).createCredentials();
+	public dev.nipafx.livefx.config.Configuration getConfiguration(Configurator configurator) {
+		return configurator.config();
+	}
+
+	@Bean
+	public TwitchCredentials createTwitchCredentials(dev.nipafx.livefx.config.Configuration configuration, HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
+		return new TwitchAuthorizer(http, json, configuration.twitchCredentials()).createCredentials();
 	}
 
 	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
