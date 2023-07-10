@@ -56,8 +56,14 @@ public class SimpleMark {
 
 	private List<InlineElement> parseInline(String text, Map<String, URI> emotes) {
 		var textSnippets = List.of(text);
+		// TODO:
+		// 	Emote names can be prefixes of other emote names, e.g. "fooBar" of "fooBar2".
+		// 	Since the recursive split doesn't distinguish between text and emote,
+		// 	"fooBar2" will eventually be split into ["foobar", "2"]. One way to fix this
+		// 	is to ferry the emote index info all the way here.
 		for (String emote : emotes.keySet())
 			textSnippets = textSnippets.stream()
+					// TODO: use bug-free `splitWithDelimiter` implementation from JDK 21
 					.flatMap(snippet -> Arrays.stream(splitWithDelimiter(snippet, emote)))
 					.toList();
 

@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.twitch;
 
 import dev.nipafx.livefx.command.AddRawChatMessage;
+import dev.nipafx.livefx.command.ChatMessageEmote;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.pipeline.Source;
 import dev.nipafx.livefx.pipeline.Step;
@@ -82,18 +83,40 @@ public class TwitchChatBot {
 				: List.of();
 	}
 
-	private static Collection<String> parseEmotes(TextMessage message) {
+	private static Collection<ChatMessageEmote> parseEmotes(TextMessage message) {
 		return message.tags().containsKey("emotes")
-				? parseEmotes(message.tags().get("emotes"))
+				? parseEmotes(message.text(), message.tags().get("emotes"))
 				: List.of();
 	}
 
-	private static Collection<String> parseEmotes(String emotesString) {
+	private static Collection<ChatMessageEmote> parseEmotes(String message, String emotesString) {
 		return Stream
 				.of(emotesString.split("/"))
 				// each emote is of the form "$id:$range"
-				.map(emote -> emote.split(":")[0])
+				.flatMap(emoteString -> parseEmote(message, emoteString))
 				.collect(toSet());
+	}
+
+	private static Stream<ChatMessageEmote> parseEmote(String message, String emoteString) {
+		try {
+			var idAndPositions = emoteString.split(":");
+			var id = idAndPositions[0];
+
+			// If the same emote is used multiple times, the string has the form "emote_id:0-3,5-8".
+			// Since we don't need the positions for anything than parsing the name (and that's the
+			// same at all positions), it suffices to take the first interval. Splitting by "," and
+			// using [0] achieves that and also works even if the emote is used just once and there's
+			// no ",".
+			var position = idAndPositions[1].split(",")[0].split("-");
+			var startPosition = Integer.parseInt(position[0]);
+			var endPosition = Integer.parseInt(position[1]);
+			var name = message.substring(startPosition, endPosition + 1);
+
+			return Stream.of(new ChatMessageEmote(id, name));
+		} catch (Exception ex) {
+			LOG.warn("Error parsing emote string " + emoteString, ex);
+			return Stream.empty();
+		}
 	}
 
 	private void sendPong(WebSocket webSocket, String message) {

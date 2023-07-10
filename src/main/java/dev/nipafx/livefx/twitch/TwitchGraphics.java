@@ -3,6 +3,7 @@ package dev.nipafx.livefx.twitch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.AddRawChatMessage;
+import dev.nipafx.livefx.command.ChatMessageEmote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,8 @@ import java.util.stream.Collectors;
 
 public class TwitchGraphics {
 
-	public static final URI TWITCH_BADGE_ENDPOINT = URI.create("https://api.twitch.tv/helix/chat/badges");
+	private static final URI TWITCH_BADGE_ENDPOINT = URI.create("https://api.twitch.tv/helix/chat/badges");
+	private static final String TWITCH_EMOTE_ENDPOINT__DEFAULT_DARK_MEDIUM = "https://static-cdn.jtvnw.net/emoticons/v2/%s/default/dark/2.0";
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchGraphics.class);
 
@@ -30,7 +32,6 @@ public class TwitchGraphics {
 	private final ObjectMapper json;
 
 	private Map<String, Badge> badges;
-	private Map<String, Emote> twitchEmotes;
 
 	public TwitchGraphics(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
 		this.credentials = credentials;
@@ -41,55 +42,12 @@ public class TwitchGraphics {
 	public void fetchGraphics() throws InterruptedException {
 		// use structured concurrency
 		this.badges = getAllBadges();
-		this.twitchEmotes = getTwitchEmotes();
 	}
 
 	private Map<String, Badge> getAllBadges() throws InterruptedException {
 		var badges = getBadges(BadgeType.GLOBAL);
 		badges.putAll(getBadges(BadgeType.CHANNEL));
 		return Collections.unmodifiableMap(badges);
-	}
-
-	private Map<String, Emote> getTwitchEmotes() throws InterruptedException {
-		LOG.info("Fetching Twitch emotes...");
-		var getEmotes = createTwitchEmoteRequest();
-		try {
-			var response = http.send(getEmotes, HttpResponse.BodyHandlers.ofString());
-			if (response.statusCode() != 200) {
-				LOG.warn("Twitch emote endpoint replied with status {}: {}", response.statusCode(), response.body());
-				return Map.of();
-			}
-
-			LOG.debug("Parsing Twitch emotes...");
-			var emoteJson = json.readTree(response.body());
-
-			var emotes = new HashMap<String, Emote>();
-			for (JsonNode emote : emoteJson.get("data")) {
-				var id = emote.get("id").textValue();
-				var name = emote.get("name").textValue();
-				var urlString = emote.get("images").get("url_1x").textValue();
-				try {
-					var url = new URI(urlString);
-					emotes.put(id, new Emote(id, name, url));
-				} catch (URISyntaxException ex) {
-					LOG.warn("Twitch returned an illegal URL for an emote {}: {}", id, urlString);
-				}
-			}
-			LOG.debug("Parsed " + emotes.size() + " Twitch emotes");
-			return Collections.unmodifiableMap(emotes);
-		} catch (IOException ex) {
-			LOG.error("Error fetching Twitch emotes", ex);
-			return Map.of();
-		}
-	}
-
-	private HttpRequest createTwitchEmoteRequest() {
-		return HttpRequest
-				.newBuilder(URI.create("https://api.twitch.tv/helix/chat/emotes/global"))
-				.GET()
-				.header("Authorization", "Bearer " + credentials.userToken())
-				.header("Client-Id", credentials.appId())
-				.build();
 	}
 
 	private Map<String, Badge> getBadges(BadgeType type) throws InterruptedException {
@@ -147,15 +105,15 @@ public class TwitchGraphics {
 	}
 
 	public Map<String, URI> resolveEmotesIn(AddRawChatMessage msg) {
-		return msg.emotes()
-				.stream()
-				.map(twitchEmotes::get)
-				.filter(Objects::nonNull)
-				.collect(Collectors.toMap(Emote::name, Emote::url));
+		return msg
+				.emotes().stream()
+				// https://dev.twitch.tv/docs/irc/emotes/#using-the-cdn-url-template-to-create-an-image-url
+				.collect(Collectors.toMap(
+						ChatMessageEmote::name,
+						emote -> URI.create(TWITCH_EMOTE_ENDPOINT__DEFAULT_DARK_MEDIUM.formatted(emote.id()))));
 	}
 
 	private record Badge(String id, URI url) { }
-	private record Emote(String id, String name, URI url) { }
 
 	private enum BadgeType {
 
