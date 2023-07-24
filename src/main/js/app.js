@@ -29,11 +29,6 @@ const App = () => {
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ theme, setTheme ] = useState(THEMES[0])
 	const [ messages, setMessages ] = useState([])
-	const addMessage = newMessage => {
-		const newMessages = [newMessage, ...messages];
-		newMessages.length = Math.min(newMessages.length, 50)
-		setMessages(newMessages)
-	}
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -41,7 +36,7 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
-		if (command) executeCommand(command, setLayout, setTheme, addMessage)
+		if (command) executeCommand(command, setLayout, setTheme, () => updateMessages(setMessages))
 	}, [ command ])
 
 	const debug = config?.debug
@@ -79,21 +74,22 @@ const triggerNextLayout = (layout) => {
 }
 
 
-const executeCommand = (command, setLayout, setTheme, addMessage) => {
+const executeCommand = (command, setLayout, setTheme, updateMessages) => {
 	console.log("Executing command", command)
 	switch (command.type) {
-		case "add-chat-message":
-			addMessage({
-				id: command.id,
-				nick: command.nick,
-				blocks: command.blocks,
-				badges: command.badges,
-			})
+		case "update-messages":
+			updateMessages()
 			break
 		case "change-theme-color":
 			setThemeColor(command.newColor, setTheme)
 			break
 	}
+}
+
+const updateMessages = (setMessages) => {
+	fetch(`/api/messages?count=20`)
+		.then(response => response.json())
+		.then(setMessages)
 }
 
 const setThemeColor = (newColor, setTheme) => {

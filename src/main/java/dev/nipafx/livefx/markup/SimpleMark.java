@@ -10,7 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

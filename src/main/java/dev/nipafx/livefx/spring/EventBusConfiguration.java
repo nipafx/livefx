@@ -1,10 +1,10 @@
 package dev.nipafx.livefx.spring;
 
-import dev.nipafx.livefx.command.AddRawChatMessage;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.event.EventBus;
-import dev.nipafx.livefx.markup.MessageProcessor;
+import dev.nipafx.livefx.messages.Messenger;
+import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
 import org.springframework.boot.ApplicationArguments;
@@ -19,25 +19,21 @@ public class EventBusConfiguration implements ApplicationRunner {
 	private final EventBus eventBus;
 
 	private final TwitchChatBot chatBot;
-	private final MessageProcessor messageProcessor;
+	private final Messenger messenger;
 	private final TwitchEventSubscriber eventSubscriber;
 	private final Commander commander;
 
-	public EventBusConfiguration(EventBus eventBus, TwitchChatBot chatBot, MessageProcessor messageProcessor, TwitchEventSubscriber eventSubscriber, Commander commander) {
+	public EventBusConfiguration(EventBus eventBus, TwitchChatBot chatBot, Messenger messenger, TwitchEventSubscriber eventSubscriber, Commander commander) {
 		this.eventBus = eventBus;
 		this.chatBot = chatBot;
-		this.messageProcessor = messageProcessor;
+		this.messenger = messenger;
 		this.eventSubscriber = eventSubscriber;
 		this.commander = commander;
 	}
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		eventBus.subscribe(AddRawChatMessage.class, message -> {
-			var addChatMessage = messageProcessor.process(message);
-			eventBus.submit(addChatMessage);
-		});
-
+		eventBus.subscribe(TextChatMessage.class, messenger::process);
 		eventBus.subscribe(Command.class, commander::sendCommand);
 	}
 

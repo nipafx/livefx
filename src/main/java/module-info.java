@@ -19,6 +19,7 @@ module dev.nipafx.livefx {
 	opens dev.nipafx.livefx.config to spring.beans, com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.command to com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.markup to com.fasterxml.jackson.databind;
+	opens dev.nipafx.livefx.messages to com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.spring to spring.beans, spring.core, spring.context, spring.web, com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.twitch to spring.beans;
 	opens dev.nipafx.livefx.twitch.store to com.fasterxml.jackson.databind;

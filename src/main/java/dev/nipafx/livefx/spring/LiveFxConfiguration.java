@@ -3,8 +3,9 @@ package dev.nipafx.livefx.spring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.config.Configurator;
 import dev.nipafx.livefx.event.EventBus;
-import dev.nipafx.livefx.markup.MessageProcessor;
 import dev.nipafx.livefx.markup.SimpleMark;
+import dev.nipafx.livefx.messages.Messenger;
+import dev.nipafx.livefx.messages.RichChatMessage;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
@@ -20,6 +21,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Function;
 
 @Configuration
 @EnableWebSocket
@@ -77,8 +80,13 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public MessageProcessor createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics) {
-		return new MessageProcessor(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn);
+	public Messenger createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics, EventBus eventBus) {
+		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus);
+	}
+
+	@Bean("fetchMessages")
+	public Function<Integer, List<RichChatMessage>> createMessageFetching(Messenger messenger) {
+		return messenger::getMessages;
 	}
 
 	@Override

@@ -2,8 +2,8 @@ package dev.nipafx.livefx.twitch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.AddRawChatMessage;
 import dev.nipafx.livefx.command.ChatMessageEmote;
+import dev.nipafx.livefx.messages.TextChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class TwitchGraphics {
 				.build();
 	}
 
-	public List<URI> resolveBadgesIn(AddRawChatMessage msg) {
+	public List<URI> resolveBadgesIn(TextChatMessage msg) {
 		return msg.badges()
 				.stream()
 				.map(badges::get)
@@ -104,7 +104,7 @@ public class TwitchGraphics {
 				.toList();
 	}
 
-	public Map<String, URI> resolveEmotesIn(AddRawChatMessage msg) {
+	public Map<String, URI> resolveEmotesIn(TextChatMessage msg) {
 		return msg
 				.emotes().stream()
 				// https://dev.twitch.tv/docs/irc/emotes/#using-the-cdn-url-template-to-create-an-image-url

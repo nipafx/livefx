@@ -1,8 +1,8 @@
 package dev.nipafx.livefx.twitch;
 
-import dev.nipafx.livefx.command.AddRawChatMessage;
 import dev.nipafx.livefx.command.ChatMessageEmote;
 import dev.nipafx.livefx.event.EventSource;
+import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.twitch.ChatMessage.Join;
 import dev.nipafx.livefx.twitch.ChatMessage.NameList;
 import dev.nipafx.livefx.twitch.ChatMessage.Ping;
@@ -68,8 +68,8 @@ public class TwitchChatBot {
 	private void interpretMessage(TextMessage message) {
 		var badges = parseBadges(message);
 		var emotes = parseEmotes(message);
-		var addRawChatMessage = new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes);
-		eventSource.submit(addRawChatMessage);
+		var chatMessage = new TextChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes);
+		eventSource.submit(chatMessage);
 	}
 
 	private static List<String> parseBadges(TextMessage message) {

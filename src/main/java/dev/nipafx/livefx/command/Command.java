@@ -7,7 +7,7 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 @JsonTypeInfo(property = "type", use = NAME)
 public sealed interface Command extends Event
-		permits AddRawChatMessage, AddChatMessage, ChangeThemeColorCommand {
+		permits ChangeThemeColorCommand, UpdateMessages {
 
 	String id();
 
