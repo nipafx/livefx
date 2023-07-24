@@ -2,9 +2,7 @@ package dev.nipafx.livefx.twitch;
 
 import dev.nipafx.livefx.command.AddRawChatMessage;
 import dev.nipafx.livefx.command.ChatMessageEmote;
-import dev.nipafx.livefx.command.Command;
-import dev.nipafx.livefx.pipeline.Source;
-import dev.nipafx.livefx.pipeline.Step;
+import dev.nipafx.livefx.event.EventSource;
 import dev.nipafx.livefx.twitch.ChatMessage.Join;
 import dev.nipafx.livefx.twitch.ChatMessage.NameList;
 import dev.nipafx.livefx.twitch.ChatMessage.Ping;
@@ -23,10 +21,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TwitchChatBot {
 
@@ -35,17 +33,13 @@ public class TwitchChatBot {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchChatBot.class);
 
 	private final TwitchCredentials credentials;
-	private final Source<Command> pipelineSource;
+	private final EventSource eventSource;
 	private final AtomicReference<WebSocket> connectedWebsocket;
 
-	public TwitchChatBot(TwitchCredentials credentials) {
+	public TwitchChatBot(TwitchCredentials credentials, EventSource eventSource) {
 		this.credentials = credentials;
-		this.pipelineSource = Source.create();
+		this.eventSource = eventSource;
 		connectedWebsocket = new AtomicReference<>(null);
-	}
-
-	public Step<Command> source() {
-		return pipelineSource.asStep();
 	}
 
 	public void connectAndListen() {
@@ -74,7 +68,8 @@ public class TwitchChatBot {
 	private void interpretMessage(TextMessage message) {
 		var badges = parseBadges(message);
 		var emotes = parseEmotes(message);
-		pipelineSource.emit(new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes));
+		var addRawChatMessage = new AddRawChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes);
+		eventSource.submit(addRawChatMessage);
 	}
 
 	private static List<String> parseBadges(TextMessage message) {

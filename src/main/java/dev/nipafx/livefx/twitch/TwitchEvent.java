@@ -6,18 +6,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public sealed interface Event {
+public sealed interface TwitchEvent {
 
 	String id();
 	ZonedDateTime timestamp();
 
 	class Factory {
 
-
-		static Event create(Map<String, Object> msg) {
+		static TwitchEvent create(Map<String, Object> msg) {
 			try {
 				return extract(msg, "metadata", "message_type")
-						.<Event> map(messageType -> switch (messageType) {
+						.<TwitchEvent> map(messageType -> switch (messageType) {
 							case "session_keepalive" -> new KeepAlive(
 									extractRequiredId(msg),
 									extractRequiredTimestamp(msg));
@@ -38,7 +37,7 @@ public sealed interface Event {
 			}
 		}
 
-		private static Event createNotification(Map<String, Object> msg) {
+		private static TwitchEvent createNotification(Map<String, Object> msg) {
 			return switch (extractRequired(msg, "metadata", "subscription_type")) {
 				case "channel.channel_points_custom_reward_redemption.add" -> new RewardRedemption(
 						extractRequiredId(msg),
@@ -83,12 +82,12 @@ public sealed interface Event {
 
 	}
 
-	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements Event { }
-	record KeepAlive(String id, ZonedDateTime timestamp) implements Event { }
-	record RewardRedemption(String id, ZonedDateTime timestamp, String input) implements Event { }
+	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements TwitchEvent { }
+	record KeepAlive(String id, ZonedDateTime timestamp) implements TwitchEvent { }
+	record RewardRedemption(String id, ZonedDateTime timestamp, String input) implements TwitchEvent { }
 
-	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements Event { }
-	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements Event {
+	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent { }
+	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent {
 
 		@Override
 		public String id() {

@@ -2,6 +2,7 @@ package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.config.Configurator;
+import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.markup.MessageProcessor;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
@@ -31,6 +32,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
+	public EventBus createEventBus() {
+		return new EventBus();
+	}
+
+	@Bean
 	public HttpClient createHttpClient() {
 		return HttpClient.newHttpClient();
 	}
@@ -51,13 +57,13 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
-	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials) {
-		return new TwitchChatBot(credentials);
+	public TwitchChatBot createTwitchChatBot(TwitchCredentials credentials, EventBus eventBus) {
+		return new TwitchChatBot(credentials, eventBus);
 	}
 
 	@Bean(initMethod = "connectAndSubscribe", destroyMethod = "shutdown")
-	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
-		return new TwitchEventSubscriber(http, credentials, json);
+	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, EventBus eventBus, HttpClient http, ObjectMapper json) {
+		return new TwitchEventSubscriber(credentials, eventBus, http, json);
 	}
 
 	@Bean(initMethod = "fetchGraphics")

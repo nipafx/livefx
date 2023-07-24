@@ -3,15 +3,13 @@ package dev.nipafx.livefx.twitch;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.command.ChangeThemeColorCommand;
-import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.ThemeColor;
-import dev.nipafx.livefx.pipeline.Source;
-import dev.nipafx.livefx.pipeline.Step;
-import dev.nipafx.livefx.twitch.Event.Error;
-import dev.nipafx.livefx.twitch.Event.KeepAlive;
-import dev.nipafx.livefx.twitch.Event.RewardRedemption;
-import dev.nipafx.livefx.twitch.Event.SessionWelcome;
-import dev.nipafx.livefx.twitch.Event.Unknown;
+import dev.nipafx.livefx.event.EventSource;
+import dev.nipafx.livefx.twitch.TwitchEvent.Error;
+import dev.nipafx.livefx.twitch.TwitchEvent.KeepAlive;
+import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
+import dev.nipafx.livefx.twitch.TwitchEvent.SessionWelcome;
+import dev.nipafx.livefx.twitch.TwitchEvent.Unknown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,21 +34,17 @@ public class TwitchEventSubscriber {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchEventSubscriber.class);
 
 	private final TwitchCredentials credentials;
+	private final EventSource eventSource;
 	private final HttpClient http;
 	private final ObjectMapper json;
-	private final Source<Command> pipelineSource;
 	private final AtomicReference<WebSocket> connectedWebsocket;
 
-	public TwitchEventSubscriber(HttpClient http, TwitchCredentials credentials, ObjectMapper json) {
+	public TwitchEventSubscriber(TwitchCredentials credentials, EventSource eventSource, HttpClient http, ObjectMapper json) {
 		this.credentials = credentials;
+		this.eventSource = eventSource;
 		this.http = http;
 		this.json = json;
-		this.pipelineSource = Source.create();
 		this.connectedWebsocket = new AtomicReference<>(null);
-	}
-
-	public Step<Command> source() {
-		return pipelineSource.asStep();
 	}
 
 	public void connectAndSubscribe() {
@@ -75,7 +69,7 @@ public class TwitchEventSubscriber {
 	}
 
 	private void handleSubscriptionEvent(Map<String, Object> message) {
-		switch (Event.Factory.create(message)) {
+		switch (TwitchEvent.Factory.create(message)) {
 			case SessionWelcome welcome -> process(welcome);
 			case KeepAlive alive -> LOG.trace("Keep alive: {}", alive);
 			case RewardRedemption rewardRedemption -> process(rewardRedemption);
@@ -124,7 +118,8 @@ public class TwitchEventSubscriber {
 		LOG.info("Reward redeemed: {}", rewardRedemption);
 		try {
 			var newColor = ThemeColor.valueOf(rewardRedemption.input().toUpperCase(Locale.ROOT));
-			pipelineSource.emit(new ChangeThemeColorCommand(UUID.randomUUID().toString(), newColor));
+			var changeThemeColorCommand = new ChangeThemeColorCommand(UUID.randomUUID().toString(), newColor);
+			eventSource.submit(changeThemeColorCommand);
 		} catch (IllegalArgumentException ex) {
 			// the user input could not be parsed to a color ~> do nothing
 		}
