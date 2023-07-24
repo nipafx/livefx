@@ -63,8 +63,7 @@ public class SimpleMark {
 		// 	is to ferry the emote index info all the way here.
 		for (String emote : emotes.keySet())
 			textSnippets = textSnippets.stream()
-					// TODO: use bug-free `splitWithDelimiter` implementation from JDK 21
-					.flatMap(snippet -> Arrays.stream(splitWithDelimiter(snippet, emote)))
+					.flatMap(snippet -> Arrays.stream(snippet.splitWithDelimiters(emote, 0)))
 					.toList();
 
 		return textSnippets.stream()
@@ -73,23 +72,6 @@ public class SimpleMark {
 						: new TextElement(parseInlineMarkup(snippet))
 				)
 				.toList();
-	}
-
-	private static String[] splitWithDelimiter(String text, String delimiter) {
-		var split = text.split(Pattern.quote(delimiter));
-		// guess how we found this out (hint: it wasn't a test)
-		if (split.length == 0)
-			return new String[] { delimiter };
-
-		var splitWithDelimiter = new ArrayList<String>();
-		for (int i = 0; i < split.length; i++) {
-			splitWithDelimiter.add(split[i]);
-			splitWithDelimiter.add(delimiter);
-		}
-		if (!text.endsWith(delimiter))
-			splitWithDelimiter.remove(splitWithDelimiter.size() - 1);
-
-		return splitWithDelimiter.toArray(String[]::new);
 	}
 
 	private String parseInlineMarkup(String text) {

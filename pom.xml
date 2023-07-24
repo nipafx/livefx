@@ -16,7 +16,7 @@
 	<description>Nipafx OBS layout as a web app (for a browser source)</description>
 
 	<properties>
-		<java.version>20</java.version>
+		<java.version>21</java.version>
 	</properties>
 
 	<dependencies>
