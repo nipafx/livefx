@@ -1,6 +1,5 @@
 package dev.nipafx.livefx.messages;
 
-import dev.nipafx.livefx.command.ChatMessageEmote;
 import dev.nipafx.livefx.event.Event;
 
 import java.util.Collection;

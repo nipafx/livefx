@@ -2,7 +2,7 @@ package dev.nipafx.livefx.twitch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.ChatMessageEmote;
+import dev.nipafx.livefx.messages.ChatMessageEmote;
 import dev.nipafx.livefx.messages.TextChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

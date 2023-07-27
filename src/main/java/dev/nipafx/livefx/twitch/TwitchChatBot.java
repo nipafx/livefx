@@ -1,7 +1,7 @@
 package dev.nipafx.livefx.twitch;
 
-import dev.nipafx.livefx.command.ChatMessageEmote;
 import dev.nipafx.livefx.event.EventSource;
+import dev.nipafx.livefx.messages.ChatMessageEmote;
 import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.twitch.ChatMessage.Join;
 import dev.nipafx.livefx.twitch.ChatMessage.NameList;
