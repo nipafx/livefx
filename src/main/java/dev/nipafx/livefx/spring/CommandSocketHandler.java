@@ -19,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class CommandSocketHandler extends TextWebSocketHandler implements Commander {
 
-	private static final String ECHO_MESSAGE_PREFIX = "ECHO ";
 	private static final Logger LOG = LoggerFactory.getLogger(CommandSocketHandler.class);
 
 	private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
@@ -27,16 +26,6 @@ public class CommandSocketHandler extends TextWebSocketHandler implements Comman
 
 	public CommandSocketHandler(ObjectMapper jsonMapper) {
 		this.jsonMapper = jsonMapper;
-	}
-
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-		LOG.debug("Received text message: {}", message.getPayload());
-		if (message.getPayload().startsWith(ECHO_MESSAGE_PREFIX)) {
-			var echoText = message.getPayload().substring(ECHO_MESSAGE_PREFIX.length());
-			LOG.info("Echoing: {}", echoText);
-			broadcastText(echoText);
-		}
 	}
 
 	@Override
