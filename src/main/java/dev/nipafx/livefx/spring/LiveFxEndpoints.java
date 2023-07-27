@@ -1,5 +1,7 @@
 package dev.nipafx.livefx.spring;
 
+import dev.nipafx.livefx.guest.Guest;
+import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.RichChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
@@ -21,10 +23,12 @@ public class LiveFxEndpoints {
 
 	private final Messenger messenger;
 	private final Paintbox paintbox;
+	private final Host host;
 
-	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox) {
+	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox, Host host) {
 		this.messenger = messenger;
 		this.paintbox = paintbox;
+		this.host = host;
 	}
 
 	@GetMapping("messages")
@@ -39,6 +43,14 @@ public class LiveFxEndpoints {
 		var color = paintbox.currentColor();
 		LOG.debug("Returning theme color " + color);
 		return color;
+	}
+
+	@GetMapping("guests")
+	public List<Guest> guests() {
+		LOG.debug("Guests requested");
+		var guests = this.host.guests();
+		LOG.debug("Returning guests " + guests);
+		return guests;
 	}
 
 }

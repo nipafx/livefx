@@ -3,6 +3,7 @@ package dev.nipafx.livefx.spring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.config.Configurator;
 import dev.nipafx.livefx.event.EventBus;
+import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.theme.Paintbox;
@@ -85,6 +86,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public Paintbox createPaintbox(dev.nipafx.livefx.config.Configuration configuration, EventBus eventBus) {
 		return new Paintbox(configuration.theme(), eventBus);
+	}
+
+	@Bean
+	public Host createHost(dev.nipafx.livefx.config.Configuration configuration) {
+		return new Host(configuration.guests());
 	}
 
 	@Override

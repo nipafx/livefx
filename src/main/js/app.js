@@ -27,8 +27,9 @@ const App = () => {
 			reconnectInterval: 1000,
 		})
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
-	const [ theme, setTheme ] = useState(THEMES[0])
 	const [ messages, setMessages ] = useState([])
+	const [ theme, setTheme ] = useState(THEMES[0])
+	const [ guests, setGuests ] = useState([])
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -43,12 +44,14 @@ const App = () => {
 		updateThemeColor(setTheme)
 	}, [])
 
+	useEffect(() => {
+		updateGuests(setGuests)
+	}, [])
+
 	const debug = config?.debug
-	const guest = config?.guest
-	const guest2 = config?.guest2
 
 	return (
-		<Scene layout={layout} theme={theme} stream={config.stream} messages={messages}>
+		<Scene layout={layout} theme={theme} stream={config.stream} guests={guests} messages={messages}>
 			{debug && (
 				<Tab name="debug">
 					<DebugInfo
@@ -104,6 +107,12 @@ const updateThemeColor = (setTheme) => {
 		.then(response => response.json())
 		.then(color => color.toLowerCase().replaceAll("_", "-"))
 		.then(setTheme)
+}
+
+const updateGuests = (setGuests) => {
+	fetch(`/api/guests`)
+		.then(response => response.json())
+		.then(setGuests)
 }
 
 const triggerNextTheme = (sendMessage, theme) => {

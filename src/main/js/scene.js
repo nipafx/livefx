@@ -6,15 +6,18 @@ import Window from './components/window'
 import style from './scene.module.css'
 import Chat from "./components/chat";
 
-const Scene = ({ layout, theme, stream, guest, guest2, messages, children }) => {
+const Scene = ({ layout, theme, stream, guests, messages, children }) => {
 	const layoutClasses = determineLayoutClasses(layout)
 	const classes = [ ...layoutClasses, "theme-" + theme ]
 	children = Array.isArray(children) ? children : [ children ]
 
+	const guest1 = guests && guests[0]?.name
+	const guest2 = guests && guests[1]?.name
+
 	return (
 		<Layout id={style.root} className={classes}>
 			<Window name="screens" className={style.screen}>
-				{guest && [ "cam, screen", "guest, large cam" ].includes(layout) && <Tab name={guest} />}
+				{guest1 && [ "cam, screen", "guest, large cam" ].includes(layout) && <Tab name={guest1} />}
 				<Tab name="screen #1" />
 				<Tab name="screen #2" />
 			</Window>
@@ -27,7 +30,7 @@ const Scene = ({ layout, theme, stream, guest, guest2, messages, children }) => 
 				</Window>
 			)}
 			<Window name="misc" className={style.misc}>
-				{guest && layout.startsWith("screen, ") && <Tab name={guest} />}
+				{guest1 && layout.startsWith("screen, ") && <Tab name={guest1} />}
 				{guest2 && layout.startsWith("cam, ") && <Tab name={guest2} />}
 				<Tab name="chat" >
 					<Chat messages={messages} />
