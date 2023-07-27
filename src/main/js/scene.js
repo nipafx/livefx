@@ -6,7 +6,7 @@ import Window from './components/window'
 import style from './scene.module.css'
 import Chat from "./components/chat";
 
-const Scene = ({ layout, theme, stream, guests, messages, children }) => {
+const Scene = ({ layout, theme, topic, guests, messages, children }) => {
 	const layoutClasses = determineLayoutClasses(layout)
 	const classes = [ ...layoutClasses, "theme-" + theme ]
 	children = Array.isArray(children) ? children : [ children ]
@@ -36,7 +36,7 @@ const Scene = ({ layout, theme, stream, guests, messages, children }) => {
 					<Chat messages={messages} />
 				</Tab>
 				<Tab name="notes">
-					<Notes stream={stream} />
+					<Notes topic={topic} />
 				</Tab>
 				{children}
 			</Window>

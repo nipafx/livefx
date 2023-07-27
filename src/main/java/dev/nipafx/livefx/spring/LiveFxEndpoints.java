@@ -6,6 +6,7 @@ import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.RichChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
 import dev.nipafx.livefx.theme.ThemeColor;
+import dev.nipafx.livefx.topic.Topics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +24,13 @@ public class LiveFxEndpoints {
 
 	private final Messenger messenger;
 	private final Paintbox paintbox;
+	private final Topics topics;
 	private final Host host;
 
-	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox, Host host) {
+	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox, Topics topics, Host host) {
 		this.messenger = messenger;
 		this.paintbox = paintbox;
+		this.topics = topics;
 		this.host = host;
 	}
 
@@ -51,6 +54,12 @@ public class LiveFxEndpoints {
 		var guests = this.host.guests();
 		LOG.debug("Returning guests " + guests);
 		return guests;
+	}
+
+	@GetMapping("topic")
+	public String topicAsHtml() {
+		LOG.debug("Topic requested");
+		return topics.topicAsHtml();
 	}
 
 }

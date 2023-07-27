@@ -3,10 +3,6 @@ import useWebSocket from 'react-use-websocket'
 
 import Scene from "./scene";
 
-const config = {
-	"stream": "reboot",
-}
-
 const LAYOUTS = [ "cam, screen", "screen, large cam", "screen, small cam", "screen, small cam, guest2" ]
 const THEMES = [ "green", "red", "orange", "yellow", "blue-light", "blue-dark", "purple", "pink" ]
 
@@ -24,6 +20,7 @@ const App = () => {
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ messages, setMessages ] = useState([])
 	const [ theme, setTheme ] = useState(THEMES[0])
+	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
 
 	useEffect(() => {
@@ -40,11 +37,15 @@ const App = () => {
 	}, [])
 
 	useEffect(() => {
+		updateTopic(setTopic)
+	}, [])
+
+	useEffect(() => {
 		updateGuests(setGuests)
 	}, [])
 
 	return (
-		<Scene layout={layout} theme={theme} stream={config.stream} guests={guests} messages={messages} />
+		<Scene layout={layout} theme={theme} topic={topic} guests={guests} messages={messages} />
 	)
 }
 
@@ -80,6 +81,12 @@ const updateThemeColor = (setTheme) => {
 		.then(response => response.json())
 		.then(color => color.toLowerCase().replaceAll("_", "-"))
 		.then(setTheme)
+}
+
+const updateTopic = (setTopic) => {
+	fetch(`/api/topic`)
+		.then(response => response.text())
+		.then(setTopic)
 }
 
 const updateGuests = (setGuests) => {
