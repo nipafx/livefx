@@ -1,11 +1,11 @@
 package dev.nipafx.livefx.spring;
 
-import dev.nipafx.livefx.theme.Paintbox;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.TextChatMessage;
+import dev.nipafx.livefx.theme.Paintbox;
 import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

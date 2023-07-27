@@ -39,6 +39,10 @@ const App = () => {
 		if (command) executeCommand(command, setLayout, setMessages, setTheme)
 	}, [ command ])
 
+	useEffect(() => {
+		updateThemeColor(setTheme)
+	}, [])
+
 	const debug = config?.debug
 	const guest = config?.guest
 	const guest2 = config?.guest2

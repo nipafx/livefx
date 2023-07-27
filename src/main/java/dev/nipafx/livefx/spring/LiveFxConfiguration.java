@@ -93,8 +93,8 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public Paintbox createPaintbox(EventBus eventBus) {
-		return new Paintbox(eventBus);
+	public Paintbox createPaintbox(dev.nipafx.livefx.config.Configuration configuration, EventBus eventBus) {
+		return new Paintbox(configuration.theme(), eventBus);
 	}
 
 	@Bean("fetchThemeColor")

@@ -9,16 +9,22 @@ import java.util.UUID;
 
 public class Paintbox {
 
+	private final ThemeConfiguration configuration;
 	private final EventSource eventSource;
 
 	private ThemeColor color;
 
 	public Paintbox(ThemeConfiguration configuration, EventSource eventSource) {
+		this.configuration = configuration;
 		this.eventSource = eventSource;
-		this.color = ThemeColor.GREEN;
+		this.color = configuration.color();
 	}
 
 	public void updateColor(RewardRedemption redemption) {
+		// don't change the color if it's pinned
+		if (configuration.pinned())
+			return;
+
 		try {
 			// if the user input could not be parsed to a color, `valueOf` throws an `IllegalArgumentException`
 			color = ThemeColor.valueOf(redemption.input().toUpperCase(Locale.ROOT));
