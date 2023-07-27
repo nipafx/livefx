@@ -1,5 +1,7 @@
 package dev.nipafx.livefx.twitch;
 
+import dev.nipafx.livefx.event.Event;
+
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -84,7 +86,7 @@ public sealed interface TwitchEvent {
 
 	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements TwitchEvent { }
 	record KeepAlive(String id, ZonedDateTime timestamp) implements TwitchEvent { }
-	record RewardRedemption(String id, ZonedDateTime timestamp, String input) implements TwitchEvent { }
+	record RewardRedemption(String id, ZonedDateTime timestamp, String input) implements TwitchEvent, Event { }
 
 	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent { }
 	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent {

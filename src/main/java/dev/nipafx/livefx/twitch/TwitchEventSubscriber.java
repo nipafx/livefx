@@ -2,8 +2,6 @@ package dev.nipafx.livefx.twitch;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.nipafx.livefx.command.ChangeThemeColorCommand;
-import dev.nipafx.livefx.command.ThemeColor;
 import dev.nipafx.livefx.event.EventSource;
 import dev.nipafx.livefx.twitch.TwitchEvent.Error;
 import dev.nipafx.livefx.twitch.TwitchEvent.KeepAlive;
@@ -20,9 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
-import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -116,13 +112,7 @@ public class TwitchEventSubscriber {
 
 	private void process(RewardRedemption rewardRedemption) {
 		LOG.info("Reward redeemed: {}", rewardRedemption);
-		try {
-			var newColor = ThemeColor.valueOf(rewardRedemption.input().toUpperCase(Locale.ROOT));
-			var changeThemeColorCommand = new ChangeThemeColorCommand(UUID.randomUUID().toString(), newColor);
-			eventSource.submit(changeThemeColorCommand);
-		} catch (IllegalArgumentException ex) {
-			// the user input could not be parsed to a color ~> do nothing
-		}
+		eventSource.submit(rewardRedemption);
 	}
 
 	private class WebSocketListener implements WebSocket.Listener {

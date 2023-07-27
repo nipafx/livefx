@@ -36,7 +36,7 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
-		if (command) executeCommand(command, setLayout, setTheme, () => updateMessages(setMessages))
+		if (command) executeCommand(command, setLayout, setMessages, setTheme)
 	}, [ command ])
 
 	const debug = config?.debug
@@ -74,15 +74,18 @@ const triggerNextLayout = (layout) => {
 }
 
 
-const executeCommand = (command, setLayout, setTheme, updateMessages) => {
+const executeCommand = (command, setLayout, setMessages, setTheme) => {
 	console.log("Executing command", command)
 	switch (command.type) {
 		case "update-messages":
-			updateMessages()
+			updateMessages(setMessages)
 			break
-		case "change-theme-color":
-			setThemeColor(command.newColor, setTheme)
+		case "update-theme-color":
+			updateThemeColor(setTheme)
 			break
+		default:
+			// log unknown commands but do nothing else
+			console.log("Unknown command", command)
 	}
 }
 
@@ -92,9 +95,11 @@ const updateMessages = (setMessages) => {
 		.then(setMessages)
 }
 
-const setThemeColor = (newColor, setTheme) => {
-	const themeName = newColor.toLowerCase().replaceAll("_", "-")
-	setTheme(themeName)
+const updateThemeColor = (setTheme) => {
+	fetch(`/api/theme-color`)
+		.then(response => response.json())
+		.then(color => color.toLowerCase().replaceAll("_", "-"))
+		.then(setTheme)
 }
 
 const triggerNextTheme = (sendMessage, theme) => {

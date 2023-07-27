@@ -1,4 +1,4 @@
-package dev.nipafx.livefx.command;
+package dev.nipafx.livefx.theme;
 
 public enum ThemeColor {
 

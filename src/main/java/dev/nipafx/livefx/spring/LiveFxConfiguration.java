@@ -6,6 +6,8 @@ import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.RichChatMessage;
+import dev.nipafx.livefx.theme.Paintbox;
+import dev.nipafx.livefx.theme.ThemeColor;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
@@ -23,6 +25,7 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Configuration
 @EnableWebSocket
@@ -87,6 +90,16 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean("fetchMessages")
 	public Function<Integer, List<RichChatMessage>> createMessageFetching(Messenger messenger) {
 		return messenger::getMessages;
+	}
+
+	@Bean
+	public Paintbox createPaintbox(EventBus eventBus) {
+		return new Paintbox(eventBus);
+	}
+
+	@Bean("fetchThemeColor")
+	public Supplier<ThemeColor> createThemeColorFetching(Paintbox paintbox) {
+		return paintbox::currentColor;
 	}
 
 	@Override
