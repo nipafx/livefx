@@ -10,7 +10,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 
 public class Messenger {
@@ -40,7 +39,7 @@ public class Messenger {
 		messages.add(richMessage);
 		LOG.debug("Processed text message {} and added to message list - total count is now {}",
 				textMessage.id(), messages.size());
-		eventBus.submit(new UpdateMessages(UUID.randomUUID().toString()));
+		eventBus.submit(new UpdateMessages());
 	}
 
 	private RichChatMessage enrichTextMessage(TextChatMessage msg) {

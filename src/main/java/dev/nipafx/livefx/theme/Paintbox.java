@@ -28,7 +28,7 @@ public class Paintbox {
 		try {
 			// if the user input could not be parsed to a color, `valueOf` throws an `IllegalArgumentException`
 			color = ThemeColor.valueOf(redemption.input().toUpperCase(Locale.ROOT));
-			var updateThemeColor = new UpdateThemeColor(UUID.randomUUID().toString());
+			var updateThemeColor = new UpdateThemeColor();
 			eventSource.submit(updateThemeColor);
 		} catch (IllegalArgumentException ex) {
 			// the user input could not be parsed to a color ~> do nothing
