@@ -1,7 +1,6 @@
 package dev.nipafx.livefx.config;
 
-import dev.nipafx.livefx.guest.Guest;
-import dev.nipafx.livefx.theme.ThemeConfiguration;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -11,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 public record Configuration(
 		Path twitchCredentials,
 		ThemeConfiguration theme,
+		@JsonDeserialize(using = Configurator.TopicConverter.class)
 		String topic,
 		List<Guest> guests
 ) {

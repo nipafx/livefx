@@ -29,7 +29,7 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
-		if (command) executeCommand(command, setLayout, setMessages, setTheme)
+		if (command) executeCommand(command, setLayout, setMessages, setTheme, setTopic, setGuests)
 	}, [ command ])
 
 	useEffect(() => {
@@ -55,7 +55,7 @@ const registerLayoutSetter = (setLayout) => {
 	return () => window.removeEventListener('obsSceneChanged', sceneSetter)
 }
 
-const executeCommand = (command, setLayout, setMessages, setTheme) => {
+const executeCommand = (command, setLayout, setMessages, setTheme, setTopic, setGuests) => {
 	console.log("Executing command", command)
 	switch (command.type) {
 		case "update-messages":
@@ -63,6 +63,12 @@ const executeCommand = (command, setLayout, setMessages, setTheme) => {
 			break
 		case "update-theme-color":
 			updateThemeColor(setTheme)
+			break
+		case "update-topic":
+			updateTopic(setTopic)
+			break
+		case "update-guests":
+			updateGuests(setGuests)
 			break
 		default:
 			// log unknown commands but do nothing else

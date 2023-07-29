@@ -18,7 +18,7 @@ public sealed interface TwitchEvent {
 		static TwitchEvent create(Map<String, Object> msg) {
 			try {
 				return extract(msg, "metadata", "message_type")
-						.<TwitchEvent> map(messageType -> switch (messageType) {
+						.<TwitchEvent>map(messageType -> switch (messageType) {
 							case "session_keepalive" -> new KeepAlive(
 									extractRequiredId(msg),
 									extractRequiredTimestamp(msg));

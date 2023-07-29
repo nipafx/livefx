@@ -1,11 +1,11 @@
 package dev.nipafx.livefx.spring;
 
-import dev.nipafx.livefx.guest.Guest;
+import dev.nipafx.livefx.config.Guest;
+import dev.nipafx.livefx.config.ThemeColor;
 import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.RichChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
-import dev.nipafx.livefx.theme.ThemeColor;
 import dev.nipafx.livefx.topic.Topics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -46,7 +46,7 @@ public class TwitchAuthorizer {
 	private final HttpClient http;
 	private final ObjectMapper json;
 	private final Path credentialStore;
-	
+
 	public TwitchAuthorizer(HttpClient http, ObjectMapper json, Path credentialStore) {
 		this.http = requireNonNull(http);
 		this.json = requireNonNull(json);
@@ -119,7 +119,7 @@ public class TwitchAuthorizer {
 				.header("Authorization", "OAuth " + token)
 				.build();
 		var validationResponse = http.send(request, BodyHandlers.ofString());
-		if(validationResponse.statusCode() != 200)
+		if (validationResponse.statusCode() != 200)
 			return false;
 
 		var validationResponseJson = json.readTree(validationResponse.body());
@@ -190,7 +190,7 @@ public class TwitchAuthorizer {
 				.header("Content-Type", "application/x-www-form-urlencoded")
 				.build();
 		var refreshResponse = http.send(request, BodyHandlers.ofString());
-		if(refreshResponse.statusCode() != 200) {
+		if (refreshResponse.statusCode() != 200) {
 			LOG.warn("Unexpected response with status code %d when refreshing user token: %s"
 					.formatted(refreshResponse.statusCode(), refreshResponse.body()));
 			return Optional.empty();

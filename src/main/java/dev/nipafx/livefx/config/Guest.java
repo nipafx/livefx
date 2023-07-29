@@ -1,4 +1,4 @@
-package dev.nipafx.livefx.guest;
+package dev.nipafx.livefx.config;
 
 public record Guest(String name) {
 

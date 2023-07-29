@@ -1,37 +1,35 @@
 package dev.nipafx.livefx.topic;
 
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
+import dev.nipafx.livefx.command.UpdateTopic;
+import dev.nipafx.livefx.event.EventSource;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.function.Supplier;
 
 public class Topics {
 
-	private static final String TOPIC_FOLDER = "topics";
-	private static final Parser MARKDOWN_PARSER = Parser.builder().build();
-	private static final HtmlRenderer HTML_RENDERER = HtmlRenderer.builder().build();
+	private final Supplier<String> topic;
+	private final EventSource eventSource;
 
-	private final String topicAsHtml;
+	private String currentTopic;
 
-	public Topics(Path configFolder, String topicName) throws IOException {
-		topicAsHtml = parseTopicFile(configFolder, topicName);
+	public Topics(Supplier<String> topic, EventSource eventSource) {
+		this.topic = topic;
+		this.currentTopic = topic.get();
+		this.eventSource = eventSource;
 	}
 
-	private static String parseTopicFile(Path configFolder, String topicName) throws IOException {
-		var markdown = Files.readString(configFolder.resolve(TOPIC_FOLDER).resolve(topicName + ".md"));
-		return parseMarkdownToHtml(markdown);
+	public void onConfigChanged() {
+		var newTopic = topic.get();
+		if (newTopic.equals(currentTopic))
+			return;
+
+		currentTopic = newTopic;
+		eventSource.submit(new UpdateTopic());
 	}
 
-	private static String parseMarkdownToHtml(String markdown) {
-		Node document = MARKDOWN_PARSER.parse(markdown);
-		return HTML_RENDERER.render(document);
-	}
 
 	public String topicAsHtml() {
-		return topicAsHtml;
+		return currentTopic;
 	}
 
 }

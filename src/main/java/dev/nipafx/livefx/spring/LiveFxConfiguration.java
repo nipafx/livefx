@@ -45,18 +45,13 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean(initMethod = "loadAndObserveConfig")
-	public Configurator createConfigurator(@Value("${livefx.configFolder}") Path configFolder, ObjectMapper json) {
-		return new Configurator(configFolder, json);
+	public Configurator createConfigurator(@Value("${livefx.configFolder}") Path configFolder, ObjectMapper json, EventBus eventBus) {
+		return new Configurator(configFolder, json, eventBus);
 	}
 
 	@Bean
-	public dev.nipafx.livefx.config.Configuration getConfiguration(Configurator configurator) {
-		return configurator.config();
-	}
-
-	@Bean
-	public TwitchCredentials createTwitchCredentials(dev.nipafx.livefx.config.Configuration configuration, HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
-		return new TwitchAuthorizer(http, json, configuration.twitchCredentials()).createCredentials();
+	public TwitchCredentials createTwitchCredentials(Configurator configurator, HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
+		return new TwitchAuthorizer(http, json, configurator.config().twitchCredentials()).createCredentials();
 	}
 
 	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
@@ -85,18 +80,18 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public Paintbox createPaintbox(dev.nipafx.livefx.config.Configuration configuration, EventBus eventBus) {
-		return new Paintbox(configuration.theme(), eventBus);
+	public Paintbox createPaintbox(Configurator configurator, EventBus eventBus) {
+		return new Paintbox(() -> configurator.config().theme(), eventBus);
 	}
 
 	@Bean
-	public Topics createTopics(@Value("${livefx.configFolder}") Path configFolder, dev.nipafx.livefx.config.Configuration configuration) throws IOException {
-		return new Topics(configFolder, configuration.topic());
+	public Topics createTopics(Configurator configurator, EventBus eventBus) throws IOException {
+		return new Topics(() -> configurator.config().topic(), eventBus);
 	}
 
 	@Bean
-	public Host createHost(dev.nipafx.livefx.config.Configuration configuration) {
-		return new Host(configuration.guests());
+	public Host createHost(Configurator configurator, EventBus eventBus) {
+		return new Host(() -> configurator.config().guests(), eventBus);
 	}
 
 	@Override
