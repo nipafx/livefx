@@ -44,6 +44,7 @@
 	padding-right: 0.25em;
 	white-space: nowrap;
 	color: var(--alt-color);
+	transition: color var(--color-transition) ease;
 }
 
 .nick:after {
