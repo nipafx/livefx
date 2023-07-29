@@ -17,6 +17,7 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<commonmark.version>0.21.0</commonmark.version>
 	</properties>
 
 	<dependencies>
@@ -46,7 +47,12 @@
 		<dependency>
 			<groupId>org.commonmark</groupId>
 			<artifactId>commonmark</artifactId>
-			<version>0.21.0</version>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.commonmark</groupId>
+			<artifactId>commonmark-ext-yaml-front-matter</artifactId>
+			<version>${commonmark.version}</version>
 		</dependency>
 
 		<dependency>

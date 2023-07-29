@@ -32,6 +32,7 @@ public class Configurator {
 	private static final Logger LOG = LoggerFactory.getLogger(Configurator.class);
 	private static final Parser MARKDOWN_PARSER = Parser
 			.builder()
+			.extensions(List.of(YamlFrontMatterExtension.create()))
 			.build();
 	private static final HtmlRenderer HTML_RENDERER = HtmlRenderer.builder().build();
 
