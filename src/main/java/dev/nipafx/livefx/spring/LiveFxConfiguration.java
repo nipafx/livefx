@@ -13,6 +13,7 @@ import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchCredentials;
 import dev.nipafx.livefx.twitch.TwitchEventSubscriber;
 import dev.nipafx.livefx.twitch.TwitchGraphics;
+import dev.nipafx.livefx.twitch.TwitchHelixApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,6 +68,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean(initMethod = "fetchGraphics")
 	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
 		return new TwitchGraphics(http, credentials, json);
+	}
+
+	@Bean
+	public TwitchHelixApi createHelixCommunicator(HttpClient client, TwitchCredentials credentials) {
+		return new TwitchHelixApi(client, credentials);
 	}
 
 	@Bean

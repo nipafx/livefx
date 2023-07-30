@@ -45,6 +45,9 @@ public sealed interface TwitchEvent {
 						extractRequiredId(msg),
 						extractRequiredTimestamp(msg),
 						extractRequiredUserNick(msg),
+						new UpdateRedemptionStatus.Reward(
+							extractRequired(msg, "payload", "event", "reward", "id"),
+							extractRequired(msg, "payload", "event", "id")),
 						extract(msg, "payload", "event", "user_input").orElse(""));
 				default -> null;
 			};
@@ -91,7 +94,8 @@ public sealed interface TwitchEvent {
 
 	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements TwitchEvent { }
 	record KeepAlive(String id, ZonedDateTime timestamp) implements TwitchEvent { }
-	record RewardRedemption(String id, ZonedDateTime timestamp, String nick, String input) implements TwitchEvent, Event { }
+	record RewardRedemption(String id, ZonedDateTime timestamp, String nick, UpdateRedemptionStatus.Reward reward, String input)
+			implements TwitchEvent, Event { }
 
 	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent { }
 	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent {
