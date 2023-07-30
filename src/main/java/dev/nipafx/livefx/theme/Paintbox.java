@@ -25,17 +25,25 @@ public class Paintbox {
 		this.eventSource = eventSource;
 	}
 
-	public synchronized void updateColorToReward(RewardRedemption redemption) {
-		if (themeConfiguration.get().pinned())
-			return;
-
+	private static ThemeColor getThemeColorFromInput(String input) {
 		try {
 			// if the user input could not be parsed to a color, `valueOf` throws an `IllegalArgumentException`
-			currentColor = ThemeColor.valueOf(redemption.input().toUpperCase(Locale.ROOT));
-			submitUpdateThemeColorEvent();
+			return ThemeColor.valueOf(input.toUpperCase(Locale.ROOT));
 		} catch (IllegalArgumentException ex) {
-			// the user input could not be parsed to a color ~> do nothing
+			return null;
 		}
+	}
+
+	public synchronized void updateColorToReward(RewardRedemption redemption) {
+		var themeColor = getThemeColorFromInput(redemption.input());
+		if (themeConfiguration.get().pinned() || themeColor == null || themeColor == currentColor) {
+			this.eventSource.submit(new RedemptionStatusUpdateEvent(redemption.redemptionActionId(), redemption.rewardId(), false));
+			return;
+		}
+
+		this.currentColor = themeColor;
+		this.submitUpdateThemeColorEvent();
+		this.eventSource.submit(new RedemptionStatusUpdateEvent(redemption.redemptionActionId(), redemption.rewardId(), true));
 	}
 
 	private void submitUpdateThemeColorEvent() {

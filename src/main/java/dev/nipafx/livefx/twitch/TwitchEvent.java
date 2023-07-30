@@ -44,7 +44,9 @@ public sealed interface TwitchEvent {
 				case "channel.channel_points_custom_reward_redemption.add" -> new RewardRedemption(
 						extractRequiredId(msg),
 						extractRequiredTimestamp(msg),
-						extract(msg, "payload", "event", "user_input").orElse(""));
+						extract(msg, "payload", "event", "user_input").orElse(""),
+						extractRequired(msg, "payload", "event", "id"),
+						extractRequired(msg, "payload", "event", "reward", "id"));
 				default -> null;
 			};
 		}
@@ -86,7 +88,7 @@ public sealed interface TwitchEvent {
 
 	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements TwitchEvent { }
 	record KeepAlive(String id, ZonedDateTime timestamp) implements TwitchEvent { }
-	record RewardRedemption(String id, ZonedDateTime timestamp, String input) implements TwitchEvent, Event { }
+	record RewardRedemption(String id, ZonedDateTime timestamp, String input, String redemptionActionId, String rewardId) implements TwitchEvent, Event { }
 
 	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent { }
 	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent {
