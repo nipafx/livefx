@@ -59,6 +59,10 @@
 	margin: 0;
 }
 
+.text > p > * {
+	padding-right: 0.25em;
+}
+
 .text .emote {
 	vertical-align: middle;
 	height: calc(var(--font-size) * 1.25);

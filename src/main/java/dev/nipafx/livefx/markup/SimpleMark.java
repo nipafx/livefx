@@ -10,7 +10,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,23 +55,31 @@ public class SimpleMark {
 	}
 
 	private List<InlineElement> parseInline(String text, Map<String, URI> emotes) {
-		var textSnippets = List.of(text);
-		// TODO:
-		// 	Emote names can be prefixes of other emote names, e.g. "fooBar" of "fooBar2".
-		// 	Since the recursive split doesn't distinguish between text and emote,
-		// 	"fooBar2" will eventually be split into ["foobar", "2"]. One way to fix this
-		// 	is to ferry the emote index info all the way here.
-		for (String emote : emotes.keySet())
-			textSnippets = textSnippets.stream()
-					.flatMap(snippet -> Arrays.stream(snippet.splitWithDelimiters(emote, 0)))
-					.toList();
+		var inlineElements = new ArrayList<InlineElement>();
+		var nextText = new StringBuilder();
 
-		return textSnippets.stream()
-				.<InlineElement>map(snippet -> emotes.containsKey(snippet)
-						? new EmoteElement(emotes.get(snippet))
-						: new TextElement(parseInlineMarkup(snippet))
-				)
-				.toList();
+		for (String subtext : text.split(" ")) {
+			if (emotes.containsKey(subtext)) {
+				nextText = finishInlineElement(nextText, inlineElements);
+				inlineElements.add(new EmoteElement(emotes.get(subtext)));
+			} else {
+				if (!nextText.isEmpty())
+					nextText.append(" ");
+				nextText.append(subtext);
+			}
+		}
+		finishInlineElement(nextText, inlineElements);
+
+		return inlineElements;
+	}
+
+	private StringBuilder finishInlineElement(StringBuilder element, Collection<InlineElement> elements) {
+		if (element.isEmpty())
+			return element;
+
+		var markedUpText = parseInlineMarkup(element.toString());
+		elements.add(new TextElement(markedUpText));
+		return new StringBuilder();
 	}
 
 	private String parseInlineMarkup(String text) {
