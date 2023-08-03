@@ -22,6 +22,7 @@ const App = () => {
 	const [ theme, setTheme ] = useState(THEMES[0])
 	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
+	const setState = { setLayout, setMessages, setTheme, setTopic, setGuests }
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -29,19 +30,13 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
-		if (command) executeCommand(command, setLayout, setMessages, setTheme, setTopic, setGuests)
+		if (command) executeCommand(command, setState)
 	}, [ command ])
 
 	useEffect(() => {
-		updateThemeColor(setTheme)
-	}, [])
-
-	useEffect(() => {
-		updateTopic(setTopic)
-	}, [])
-
-	useEffect(() => {
-		updateGuests(setGuests)
+		updateThemeColor(setState)
+		updateTopic(setState)
+		updateGuests(setState)
 	}, [])
 
 	return (
@@ -55,20 +50,20 @@ const registerLayoutSetter = (setLayout) => {
 	return () => window.removeEventListener('obsSceneChanged', sceneSetter)
 }
 
-const executeCommand = (command, setLayout, setMessages, setTheme, setTopic, setGuests) => {
+const executeCommand = (command, setState) => {
 	console.log("Executing command", command)
 	switch (command.type) {
 		case "update-messages":
-			updateMessages(setMessages)
+			updateMessages(setState)
 			break
 		case "update-theme-color":
-			updateThemeColor(setTheme)
+			updateThemeColor(setState)
 			break
 		case "update-topic":
-			updateTopic(setTopic)
+			updateTopic(setState)
 			break
 		case "update-guests":
-			updateGuests(setGuests)
+			updateGuests(setState)
 			break
 		default:
 			// log unknown commands but do nothing else
@@ -76,29 +71,27 @@ const executeCommand = (command, setLayout, setMessages, setTheme, setTopic, set
 	}
 }
 
-const updateMessages = (setMessages) => {
-	fetch(`/api/messages?count=20`)
-		.then(response => response.json())
-		.then(setMessages)
+const updateMessages = (setState) => {
+	update(`/api/messages?count=20`, response => response.messages, setState.setMessages)
 }
 
-const updateThemeColor = (setTheme) => {
-	fetch(`/api/theme-color`)
-		.then(response => response.json())
-		.then(color => color.toLowerCase().replaceAll("_", "-"))
-		.then(setTheme)
+const updateThemeColor = (setState) => {
+	update(`/api/theme-color`, response => response.color.toLowerCase().replaceAll("_", "-"), setState.setTheme)
 }
 
-const updateTopic = (setTopic) => {
-	fetch(`/api/topic`)
-		.then(response => response.text())
-		.then(setTopic)
+const updateGuests = (setState) => {
+	update(`/api/guests`, response => response.guests, setState.setGuests)
 }
 
-const updateGuests = (setGuests) => {
-	fetch(`/api/guests`)
+const updateTopic = (setState) => {
+	update(`/api/topic`, response => response.topic, setState.setTopic)
+}
+
+const update = (endpoint, extract, set) => {
+	fetch(endpoint)
 		.then(response => response.json())
-		.then(setGuests)
+		.then(extract)
+		.then(set)
 }
 
 export default App

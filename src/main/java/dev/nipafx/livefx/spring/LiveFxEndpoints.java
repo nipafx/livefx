@@ -35,31 +35,39 @@ public class LiveFxEndpoints {
 	}
 
 	@GetMapping("messages")
-	public List<RichChatMessage> messages(@RequestParam("count") int count) {
+	public MessagesResponse messages(@RequestParam("count") int count) {
 		LOG.debug(count + " chat messages requested");
-		return messenger.getMessages(count);
+		return new MessagesResponse(messenger.getMessages(count));
 	}
 
+	public record MessagesResponse(List<RichChatMessage> messages) { }
+
 	@GetMapping("theme-color")
-	public ThemeColor themeColor() {
+	public ThemeColorResponse themeColor() {
 		LOG.debug("Theme color requested");
 		var color = paintbox.currentColor();
 		LOG.debug("Returning theme color " + color);
-		return color;
+		return new ThemeColorResponse(color);
 	}
 
+	public record ThemeColorResponse(ThemeColor color) { }
+
 	@GetMapping("guests")
-	public List<Guest> guests() {
+	public GuestsResponse guests() {
 		LOG.debug("Guests requested");
 		var guests = this.host.guests();
 		LOG.debug("Returning guests " + guests);
-		return guests;
+		return new GuestsResponse(guests);
 	}
 
+	public record GuestsResponse(List<Guest> guests) { }
+
 	@GetMapping("topic")
-	public String topicAsHtml() {
+	public TopicResponse topicAsHtml() {
 		LOG.debug("Topic requested");
-		return topics.topicAsHtml();
+		return new TopicResponse(topics.topicAsHtml());
 	}
+
+	public record TopicResponse(String topic) { }
 
 }
