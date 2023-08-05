@@ -85,7 +85,7 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public Topics createTopics(Configurator configurator, EventBus eventBus) throws IOException {
+	public Topics createTopics(Configurator configurator, EventBus eventBus) {
 		return new Topics(() -> configurator.config().topic(), eventBus);
 	}
 

@@ -2,7 +2,7 @@ package dev.nipafx.livefx.spring;
 
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
-import dev.nipafx.livefx.config.ConfigurationChangedEvent;
+import dev.nipafx.livefx.config.ConfigurationChanged;
 import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.messages.Messenger;
@@ -38,7 +38,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		eventBus.subscribe(ConfigurationChangedEvent.class, event -> {
+		eventBus.subscribe(ConfigurationChanged.class, event -> {
 			paintbox.onConfigChanged();
 			topics.onConfigChanged();
 			host.onConfigChanged();
