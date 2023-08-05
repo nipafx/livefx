@@ -27,6 +27,11 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 * replace Moobot
 * how does moderation work with the on-screen chat? / remove moderated messages
 
+#### Rewards
+
+* configure rewards locally (to easier configure rewards depending on stream topic or desk position)
+* auto-patch reward status (only works for rewards that were created by the app)
+
 ### OBS
 
 * allow scene change from Twitch
