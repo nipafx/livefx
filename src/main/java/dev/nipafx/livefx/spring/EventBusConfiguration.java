@@ -43,8 +43,11 @@ public class EventBusConfiguration implements ApplicationRunner {
 			topics.onConfigChanged();
 			host.onConfigChanged();
 		});
-		eventBus.subscribe(TextChatMessage.class, messenger::process);
-		eventBus.subscribe(RewardRedemption.class, paintbox::updateColorToReward);
+		eventBus.subscribe(TextChatMessage.class, messenger::showMessage);
+		eventBus.subscribe(RewardRedemption.class, reward -> {
+			messenger.haltMessageFor(reward);
+			paintbox.updateColorToReward(reward);
+		});
 		eventBus.subscribe(Command.class, commander::sendCommand);
 	}
 

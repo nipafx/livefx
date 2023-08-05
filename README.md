@@ -24,7 +24,6 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 * use author's Twitch color as alt-color for their messages
 * format code snippets
 * highlight snippets
-* prevent (certain) reward redemption messages from showing up in chat
 * replace Moobot
 * how does moderation work with the on-screen chat? / remove moderated messages
 
