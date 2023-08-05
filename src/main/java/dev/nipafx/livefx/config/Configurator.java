@@ -90,7 +90,7 @@ public class Configurator {
 				var changedConfig = loadConfig();
 				if (!config.equals(changedConfig)) {
 					config = changedConfig;
-					eventSource.submit(new ConfigurationChangedEvent());
+					eventSource.submit(new ConfigurationChanged());
 				}
 			} catch (IOException ex) {
 				LOG.error("Reloading the configuration failed", ex);

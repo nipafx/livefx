@@ -36,7 +36,7 @@ public class TwitchAuthorizer {
 	private static final URI AUTHORIZE_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/authorize");
 	private static final URI TOKEN_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/token");
 	private static final String AUTHORIZE_ENDPOINT_USER_TOKEN_PARAMS = "?response_type=code&client_id=%s&redirect_uri=http://localhost:%s&scope=%s";
-	private static final String USER_TOKEN_SCOPE = "channel:read:redemptions";
+	private static final String USER_TOKEN_SCOPE = "channel:read:redemptions channel:manage:redemptions";
 
 	private static final int LOCAL_HOST_PORT = 3000;
 	private static final Pattern AUTH_CODE_FORWARD_URI = Pattern.compile("\\/\\?.*code=(?<code>[^&]+).*&scope=(?<scope>[^&]+).*");
