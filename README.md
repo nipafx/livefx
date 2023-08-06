@@ -16,8 +16,6 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 ### Twitch
 
-* set stream info from configuration
-
 #### Chat
 
 * create chat log (with Chatty?)
@@ -26,6 +24,12 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 * highlight snippets
 * replace Moobot
 * how does moderation work with the on-screen chat? / remove moderated messages
+
+#### Channel
+
+* set stream language from configuration
+* set notification text from configuration once that is possible:
+  https://twitch.uservoice.com/forums/310213-developers/suggestions/39703660-live-notification
 
 #### Rewards
 

@@ -1,6 +1,5 @@
 package dev.nipafx.livefx.config;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import dev.nipafx.livefx.event.EventSource;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
+import org.commonmark.ext.front.matter.YamlFrontMatterVisitor;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static java.lang.StringTemplate.STR;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class Configurator {
@@ -111,24 +112,41 @@ public class Configurator {
 		return config;
 	}
 
-	static class TopicConverter extends JsonDeserializer<String> {
+	static class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 
 		@Override
-		public String deserialize(JsonParser value, DeserializationContext context) throws IOException, JacksonException {
+		public TopicConfiguration deserialize(JsonParser value, DeserializationContext context) throws IOException {
 			var configFolder = (Path) context.getAttribute(JSON_DESERIALIZER_CONFIG_FOLDER_ATTRIBUTE);
 			var topicName = value.getText();
-			return parseTopicFileToHtml(configFolder, topicName);
+
+			var topicFile = readTopicFile(configFolder, topicName);
+			return parseTopicFile(topicFile);
 		}
 
-		private static String parseTopicFileToHtml(Path configFolder, String topicName) throws IOException {
+		private static TopicConfiguration parseTopicFile(TopicFile file) {
+			if (file.title().size() != 1)
+				throw new IllegalArgumentException("Topic file doesn't define exactly ine title: " + file.title());
+			var title = file.title().getFirst();
+			var description = STR. """
+					<h1>\{title}</h1>
+					\{file.descriptionAsHtml()}
+					""";
+			return new TopicConfiguration(title, file.tags(), description);
+		}
+
+		private static TopicFile readTopicFile(Path configFolder, String topicName) throws IOException {
 			var markdown = Files.readString(configFolder.resolve(Configurator.TOPIC_FOLDER).resolve(topicName + ".md"));
-			return parseMarkdownToHtml(markdown);
+			Node document = MARKDOWN_PARSER.parse(markdown);
+			var yamlVisitor = new YamlFrontMatterVisitor();
+			document.accept(yamlVisitor);
+			return new TopicFile(
+					yamlVisitor.getData().getOrDefault("title", List.of()),
+					yamlVisitor.getData().getOrDefault("tags", List.of()),
+					HTML_RENDERER.render(document)
+			);
 		}
 
-		private static String parseMarkdownToHtml(String markdown) {
-			Node document = MARKDOWN_PARSER.parse(markdown);
-			return HTML_RENDERER.render(document);
-		}
+		private record TopicFile(List<String> title, List<String> tags, String descriptionAsHtml) { }
 
 	}
 

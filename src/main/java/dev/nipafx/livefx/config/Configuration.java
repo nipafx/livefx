@@ -11,7 +11,7 @@ public record Configuration(
 		Path twitchCredentials,
 		ThemeConfiguration theme,
 		@JsonDeserialize(using = Configurator.TopicConverter.class)
-		String topic,
+		TopicConfiguration topic,
 		List<Guest> guests
 ) {
 

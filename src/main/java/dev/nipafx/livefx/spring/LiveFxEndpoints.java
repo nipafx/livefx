@@ -63,9 +63,9 @@ public class LiveFxEndpoints {
 	public record GuestsResponse(List<Guest> guests) { }
 
 	@GetMapping("topic")
-	public TopicResponse topicAsHtml() {
-		LOG.debug("Topic requested");
-		return new TopicResponse(topics.topicAsHtml());
+	public TopicResponse topicDescriptionAsHtml() {
+		LOG.debug("Topic description requested");
+		return new TopicResponse(topics.topicDescriptionAsHtml());
 	}
 
 	public record TopicResponse(String topic) { }

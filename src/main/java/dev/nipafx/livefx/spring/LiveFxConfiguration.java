@@ -71,8 +71,8 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public TwitchHelixApi createHelixCommunicator(HttpClient client, TwitchCredentials credentials) {
-		return new TwitchHelixApi(client, credentials);
+	public TwitchHelixApi createHelixCommunicator(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
+		return new TwitchHelixApi(credentials, http, json);
 	}
 
 	@Bean
