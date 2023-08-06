@@ -11,6 +11,7 @@ import org.microhttp.Options;
 import org.microhttp.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -35,7 +36,6 @@ public class TwitchAuthorizer {
 	private static final URI VALIDATE_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/validate");
 	private static final URI AUTHORIZE_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/authorize");
 	private static final URI TOKEN_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/token");
-	private static final String AUTHORIZE_ENDPOINT_USER_TOKEN_PARAMS = "?response_type=code&client_id=%s&redirect_uri=http://localhost:%s&scope=%s";
 	private static final String USER_TOKEN_SCOPE = "channel:read:redemptions channel:manage:redemptions";
 
 	private static final int LOCAL_HOST_PORT = 3000;
@@ -259,15 +259,19 @@ public class TwitchAuthorizer {
 
 	private static void visitAuthorizationUrl(String appId) throws IOException {
 		LOG.debug("Visiting authorization URL to trigger forward to localhost with auth code...");
-		var queryString = AUTHORIZE_ENDPOINT_USER_TOKEN_PARAMS
-				.formatted(appId, LOCAL_HOST_PORT, URLEncoder.encode(USER_TOKEN_SCOPE, StandardCharsets.UTF_8));
-		var authorizationUrl = AUTHORIZE_ENDPOINT + queryString;
+		var authorizationUrl = UriComponentsBuilder
+				.fromUri(AUTHORIZE_ENDPOINT)
+				.queryParam("response_type", "code")
+				.queryParam("client_id", appId)
+				.queryParam("redirect_uri", "http://localhost:" + LOCAL_HOST_PORT)
+				.queryParam("scope", USER_TOKEN_SCOPE)
+				.build().toUri();
 
 		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
-			Desktop.getDesktop().browse(URI.create(authorizationUrl));
+			Desktop.getDesktop().browse(authorizationUrl);
 		else
 			// maybe we're on Linux - let's hope this works 🤞🏾
-			new ProcessBuilder("xdg-open", authorizationUrl).start();
+			new ProcessBuilder("xdg-open", authorizationUrl.toString()).start();
 	}
 
 	private UserToken resolveAuthCodeToUserToken(String appId, String appSecret, String userAuthCode) throws IOException, InterruptedException {
