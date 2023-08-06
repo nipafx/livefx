@@ -10,6 +10,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.lang.StringTemplate.STR;
+
 public class TwitchHelixApi {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchHelixApi.class);
@@ -36,7 +38,8 @@ public class TwitchHelixApi {
 				.queryParam("broadcaster_id", this.credentials.userId())
 				.queryParam("reward_id", status.reward().id())
 				.build().toUri();
-		var requestBody = "{\"status\":\"%s\"}".formatted(translateStatusToTwitch(status));
+		var requestBody = STR."""
+				{ "status": "\{translateStatusToTwitch(status)}" }""";
 
 		var request = HttpRequest.newBuilder(updateRedemptionUri)
 				.header("Client-Id", credentials.appId())

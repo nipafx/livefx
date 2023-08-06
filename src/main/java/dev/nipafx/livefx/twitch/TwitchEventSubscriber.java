@@ -69,8 +69,8 @@ public class TwitchEventSubscriber {
 			case SessionWelcome welcome -> process(welcome);
 			case KeepAlive alive -> LOG.trace("Keep alive: {}", alive);
 			case RewardRedemption rewardRedemption -> process(rewardRedemption);
-			case Unknown __ -> LOG.warn("Unknown Twitch event: {}", message);
-			case Error(var error, var __, var ___) -> LOG.error("Error while parsing Twitch event", error);
+			case Unknown _ -> LOG.warn("Unknown Twitch event: {}", message);
+			case Error(var error, _, _) -> LOG.error("Error while parsing Twitch event", error);
 		}
 	}
 
