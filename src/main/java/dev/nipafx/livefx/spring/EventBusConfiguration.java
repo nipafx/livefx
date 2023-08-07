@@ -8,9 +8,11 @@ import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
+import dev.nipafx.livefx.theme.SceneSelector;
 import dev.nipafx.livefx.topic.Topics;
 import dev.nipafx.livefx.twitch.TwitchHelixApi;
 import dev.nipafx.livefx.twitch.TwitchRewardRedemption;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ShowScreenRedemption;
 import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ThemeColorRedemption;
 import dev.nipafx.livefx.twitch.UpdateChannelInformation;
 import org.springframework.boot.ApplicationArguments;
@@ -26,6 +28,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 
 	private final Messenger messenger;
 	private final Paintbox paintbox;
+	private final SceneSelector sceneSelector;
 	private final Topics topics;
 	private final Host host;
 	private final TwitchHelixApi helixApi;
@@ -35,6 +38,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 			EventBus eventBus,
 			Messenger messenger,
 			Paintbox paintbox,
+			SceneSelector sceneSelector,
 			Topics topics,
 			Host host,
 			TwitchHelixApi helixApi,
@@ -42,6 +46,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 		this.eventBus = eventBus;
 		this.messenger = messenger;
 		this.paintbox = paintbox;
+		this.sceneSelector = sceneSelector;
 		this.topics = topics;
 		this.host = host;
 		this.helixApi = helixApi;
@@ -58,6 +63,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 		eventBus.subscribe(TextChatMessage.class, messenger::showMessage);
 		eventBus.subscribe(TwitchRewardRedemption.class, messenger::haltMessageFor);
 		eventBus.subscribe(ThemeColorRedemption.class, paintbox::updateColorToReward);
+		eventBus.subscribe(ShowScreenRedemption.class, sceneSelector::switchScene);
 		// uncomment this line to automate reward redemption status update
 		// (this only works if the rewards were created by this app)
 //		eventBus.subscribe(UpdateRedemptionStatus.class, helixApi::updateRedemptionStatus);

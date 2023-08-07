@@ -1,5 +1,6 @@
 package dev.nipafx.livefx.twitch;
 
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ShowScreenRedemption;
 import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ThemeColorRedemption;
 
 import java.time.ZonedDateTime;
@@ -53,6 +54,11 @@ public sealed interface TwitchEvent
 						extractRequiredUserNick(msg),
 						extractRequired(msg, "payload", "event", "id"),
 						extract(msg, "payload", "event", "user_input").orElse(""));
+				case ShowScreenRedemption.TWITCH_ID -> new ShowScreenRedemption(
+						extractRequiredId(msg),
+						extractRequiredTimestamp(msg),
+						extractRequiredUserNick(msg),
+						extractRequired(msg, "payload", "event", "id"));
 				default -> null;
 			};
 		}

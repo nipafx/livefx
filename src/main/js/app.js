@@ -59,6 +59,9 @@ const registerLayoutSetter = (setLayout) => {
 const executeCommand = (command, setState) => {
 	console.log("Executing command", command)
 	switch (command.type) {
+		case "show-screen":
+			showScreen()
+			break
 		case "update-messages":
 			updateMessages(setState)
 			break
@@ -75,6 +78,10 @@ const executeCommand = (command, setState) => {
 			// log unknown commands but do nothing else
 			console.log("Unknown command", command)
 	}
+}
+
+const showScreen = () => {
+	window?.obsstudio?.setCurrentScene("screen, large cam")
 }
 
 const updateMessages = (setState) => {

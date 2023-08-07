@@ -38,7 +38,6 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 ### OBS
 
-* allow scene change from Twitch
 * create intro screen
     * configure target time
     * display countdown in frontend

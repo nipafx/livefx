@@ -7,6 +7,7 @@ import dev.nipafx.livefx.guest.Host;
 import dev.nipafx.livefx.markup.SimpleMark;
 import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.theme.Paintbox;
+import dev.nipafx.livefx.theme.SceneSelector;
 import dev.nipafx.livefx.topic.Topics;
 import dev.nipafx.livefx.twitch.TwitchAuthorizer;
 import dev.nipafx.livefx.twitch.TwitchChatBot;
@@ -88,6 +89,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public Paintbox createPaintbox(Configurator configurator, EventBus eventBus) {
 		return new Paintbox(() -> configurator.config().theme(), eventBus);
+	}
+
+	@Bean
+	public SceneSelector createSceneSelector(Configurator configurator, EventBus eventBus) {
+		return new SceneSelector(() -> configurator.config().theme(), eventBus);
 	}
 
 	@Bean
