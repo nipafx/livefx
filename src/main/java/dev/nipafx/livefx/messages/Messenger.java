@@ -8,12 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +26,9 @@ public class Messenger {
 	private final SimpleMark simpleMark;
 	private final Function<TextChatMessage, List<URI>> badgeResolver;
 	private final Function<TextChatMessage, Map<String, URI>> emoteResolver;
-	private final List<RichChatMessage> messages;
+
+	// these collections need to thread-safe
+	private final ConcurrentLinkedDeque<RichChatMessage> messages;
 	private final Set<HaltMessage> messagesToHalt;
 
 	private final ScheduledExecutorService showMessageExecutor;
@@ -39,7 +41,7 @@ public class Messenger {
 		this.simpleMark = simpleMark;
 		this.badgeResolver = badgeResolver;
 		this.emoteResolver = emoteResolver;
-		this.messages = new ArrayList<>();
+		this.messages = new ConcurrentLinkedDeque<>();
 		this.messagesToHalt = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		this.showMessageExecutor = Executors.newSingleThreadScheduledExecutor();
 		this.eventBus = eventBus;
@@ -64,7 +66,7 @@ public class Messenger {
 
 	private void showMessageImmediately(TextChatMessage textMessage) {
 		var richMessage = enrichTextMessage(textMessage);
-		messages.add(richMessage);
+		messages.addLast(richMessage);
 		LOG.debug("Processed text message {} and added to message list - total count is now {}",
 				textMessage.id(), messages.size());
 		eventBus.submit(new UpdateMessages());
