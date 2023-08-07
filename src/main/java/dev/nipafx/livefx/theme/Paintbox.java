@@ -4,10 +4,10 @@ import dev.nipafx.livefx.command.UpdateThemeColor;
 import dev.nipafx.livefx.config.ThemeColor;
 import dev.nipafx.livefx.config.ThemeConfiguration;
 import dev.nipafx.livefx.event.EventSource;
-import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
-import dev.nipafx.livefx.twitch.UpdateRedemptionStatus;
-import dev.nipafx.livefx.twitch.UpdateRedemptionStatus.Reward;
-import dev.nipafx.livefx.twitch.UpdateRedemptionStatus.Status;
+import dev.nipafx.livefx.twitch.RedemptionAction;
+import dev.nipafx.livefx.twitch.RedemptionAction.Status;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ThemeColorRedemption;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -29,16 +29,16 @@ public class Paintbox {
 		this.eventSource = eventSource;
 	}
 
-	public synchronized void updateColorToReward(RewardRedemption redemption) {
+	public synchronized void updateColorToReward(ThemeColorRedemption redemption) {
 		var themeColor = getThemeColorFromInput(redemption.input());
 		if (themeConfiguration.get().pinned() || themeColor.isEmpty() || themeColor.get() == currentColor) {
-			submitRewardRedemption(redemption.reward(), Status.REJECTED);
+			submitRewardRedemption(redemption, Status.REJECTED);
 			return;
 		}
 
 		currentColor = themeColor.get();
 		submitUpdateThemeColorEvent();
-		submitRewardRedemption(redemption.reward(), Status.COMPLETED);
+		submitRewardRedemption(redemption, Status.COMPLETED);
 	}
 
 	private static Optional<ThemeColor> getThemeColorFromInput(String input) {
@@ -55,8 +55,8 @@ public class Paintbox {
 		eventSource.submit(updateThemeColor);
 	}
 
-	private void submitRewardRedemption(Reward reward, Status status) {
-		eventSource.submit(new UpdateRedemptionStatus(reward, status));
+	private void submitRewardRedemption(TwitchRewardRedemption redemption, Status status) {
+		eventSource.submit(new RedemptionAction(redemption.rewardId(), redemption.redemptionActionId(), status));
 	}
 
 	public synchronized void onConfigChanged() {

@@ -1,6 +1,6 @@
 package dev.nipafx.livefx.twitch;
 
-import dev.nipafx.livefx.event.Event;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ThemeColorRedemption;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -8,12 +8,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public sealed interface TwitchEvent {
+public sealed interface TwitchEvent
+		permits TwitchEvent.Error, TwitchEvent.KeepAlive, TwitchEvent.SessionWelcome, TwitchEvent.Unknown, TwitchRewardRedemption {
 
 	String id();
 	ZonedDateTime timestamp();
 
 	class Factory {
+
+		public static final String REWARD_REDEMPTION_SUBSCRIPTION_TYPE = "channel.channel_points_custom_reward_redemption.add";
 
 		static TwitchEvent create(Map<String, Object> msg) {
 			try {
@@ -27,7 +30,7 @@ public sealed interface TwitchEvent {
 									extractRequiredId(msg),
 									extractRequiredTimestamp(msg),
 									extractRequired(msg, "payload", "session", "id"));
-							// map tp empty Optional so `orElseGet` picks it up
+							// map to empty Optional so `orElseGet` picks it up
 							default -> null;
 						})
 						.orElseGet(() -> new Unknown(
@@ -40,14 +43,15 @@ public sealed interface TwitchEvent {
 		}
 
 		private static TwitchEvent createNotification(Map<String, Object> msg) {
-			return switch (extractRequired(msg, "metadata", "subscription_type")) {
-				case "channel.channel_points_custom_reward_redemption.add" -> new RewardRedemption(
+			if (!REWARD_REDEMPTION_SUBSCRIPTION_TYPE.equals(extractRequired(msg, "metadata", "subscription_type")))
+				return null;
+
+			return switch (extractRequired(msg, "payload", "event", "reward", "id")) {
+				case ThemeColorRedemption.TWITCH_ID -> new ThemeColorRedemption(
 						extractRequiredId(msg),
 						extractRequiredTimestamp(msg),
 						extractRequiredUserNick(msg),
-						new UpdateRedemptionStatus.Reward(
-							extractRequired(msg, "payload", "event", "reward", "id"),
-							extractRequired(msg, "payload", "event", "id")),
+						extractRequired(msg, "payload", "event", "id"),
 						extract(msg, "payload", "event", "user_input").orElse(""));
 				default -> null;
 			};
@@ -94,9 +98,6 @@ public sealed interface TwitchEvent {
 
 	record SessionWelcome(String id, ZonedDateTime timestamp, String sessionId) implements TwitchEvent { }
 	record KeepAlive(String id, ZonedDateTime timestamp) implements TwitchEvent { }
-	record RewardRedemption(String id, ZonedDateTime timestamp, String nick, UpdateRedemptionStatus.Reward reward, String input)
-			implements TwitchEvent, Event { }
-
 	record Unknown(String id, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent { }
 	record Error(Throwable error, ZonedDateTime timestamp, Map<String, Object> message) implements TwitchEvent {
 

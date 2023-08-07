@@ -61,15 +61,15 @@ public class TwitchHelixApi {
 		}
 	}
 
-	public void updateRedemptionStatus(UpdateRedemptionStatus status) {
+	public void updateRedemptionStatus(RedemptionAction status) {
 		LOG.debug("Updating reward redemption status {}...", status);
 		// https://dev.twitch.tv/docs/api/reference/#update-redemption-status
 		try {
 			var updateRedemptionUri = UriComponentsBuilder
 					.fromUri(UPDATE_REDEMPTION_STATUS_ENDPOINT)
-					.queryParam("id", status.reward().redemptionActionId())
+					.queryParam("id", status.redemptionActionId())
 					.queryParam("broadcaster_id", this.credentials.userId())
-					.queryParam("reward_id", status.reward().id())
+					.queryParam("reward_id", status.rewardId())
 					.build().toUri();
 			var requestBody = json.writeValueAsString(Map.of(
 					"status", translateStatusToTwitch(status)
@@ -96,7 +96,7 @@ public class TwitchHelixApi {
 				.header("Content-Type", "application/json");
 	}
 
-	private static Object translateStatusToTwitch(UpdateRedemptionStatus status) {
+	private static Object translateStatusToTwitch(RedemptionAction status) {
 		return switch (status.status()) {
 			case COMPLETED -> REDEMPTION_STATUS_COMPLETED;
 			case REJECTED -> REDEMPTION_STATUS_REJECTED;

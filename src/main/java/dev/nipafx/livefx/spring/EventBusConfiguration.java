@@ -9,8 +9,9 @@ import dev.nipafx.livefx.messages.Messenger;
 import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
 import dev.nipafx.livefx.topic.Topics;
-import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
 import dev.nipafx.livefx.twitch.TwitchHelixApi;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ThemeColorRedemption;
 import dev.nipafx.livefx.twitch.UpdateChannelInformation;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -55,10 +56,8 @@ public class EventBusConfiguration implements ApplicationRunner {
 			host.onConfigChanged();
 		});
 		eventBus.subscribe(TextChatMessage.class, messenger::showMessage);
-		eventBus.subscribe(RewardRedemption.class, reward -> {
-			messenger.haltMessageFor(reward);
-			paintbox.updateColorToReward(reward);
-		});
+		eventBus.subscribe(TwitchRewardRedemption.class, messenger::haltMessageFor);
+		eventBus.subscribe(ThemeColorRedemption.class, paintbox::updateColorToReward);
 		// uncomment this line to automate reward redemption status update
 		// (this only works if the rewards were created by this app)
 //		eventBus.subscribe(UpdateRedemptionStatus.class, helixApi::updateRedemptionStatus);

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.event.EventSource;
 import dev.nipafx.livefx.twitch.TwitchEvent.Error;
 import dev.nipafx.livefx.twitch.TwitchEvent.KeepAlive;
-import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
 import dev.nipafx.livefx.twitch.TwitchEvent.SessionWelcome;
 import dev.nipafx.livefx.twitch.TwitchEvent.Unknown;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class TwitchEventSubscriber {
 		switch (TwitchEvent.Factory.create(message)) {
 			case SessionWelcome welcome -> process(welcome);
 			case KeepAlive alive -> LOG.trace("Keep alive: {}", alive);
-			case RewardRedemption rewardRedemption -> process(rewardRedemption);
+			case TwitchRewardRedemption rewardRedemption -> process(rewardRedemption);
 			case Unknown _ -> LOG.warn("Unknown Twitch event: {}", message);
 			case Error(var error, _, _) -> LOG.error("Error while parsing Twitch event", error);
 		}
@@ -110,7 +109,7 @@ public class TwitchEventSubscriber {
 		}
 	}
 
-	private void process(RewardRedemption rewardRedemption) {
+	private void process(TwitchRewardRedemption rewardRedemption) {
 		LOG.info("Reward redeemed: {}", rewardRedemption);
 		eventSource.submit(rewardRedemption);
 	}

@@ -3,7 +3,7 @@ package dev.nipafx.livefx.messages;
 import dev.nipafx.livefx.command.UpdateMessages;
 import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.markup.SimpleMark;
-import dev.nipafx.livefx.twitch.TwitchEvent.RewardRedemption;
+import dev.nipafx.livefx.twitch.TwitchRewardRedemption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class Messenger {
 		this.eventBus = eventBus;
 	}
 
-	public void haltMessageFor(RewardRedemption reward) {
+	public void haltMessageFor(TwitchRewardRedemption reward) {
 		messagesToHalt.add(new HaltMessage(reward.nick(), reward.input()));
 	}
 
