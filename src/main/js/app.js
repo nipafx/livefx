@@ -34,6 +34,7 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
+		initializeLayout(setLayout)
 		updateThemeColor(setState)
 		updateTopic(setState)
 		updateGuests(setState)
@@ -42,6 +43,10 @@ const App = () => {
 	return (
 		<Scene layout={layout} theme={theme} topic={topic} guests={guests} messages={messages} />
 	)
+}
+
+const initializeLayout = (setLayout) => {
+	window?.obsstudio?.getCurrentScene(scene => setLayout(scene.name))
 }
 
 const registerLayoutSetter = (setLayout) => {
