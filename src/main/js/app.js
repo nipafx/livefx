@@ -38,6 +38,7 @@ const App = () => {
 		updateThemeColor(setState)
 		updateTopic(setState)
 		updateGuests(setState)
+		updateMessages(setState)
 	}, [])
 
 	return (
