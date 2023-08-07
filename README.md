@@ -18,7 +18,8 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 #### Chat
 
-* create chat log (with Chatty?)
+* create chat log
+* handle "RECONNECT" messages that Twitch sends, so IRC doesn't disconnect
 * use author's Twitch color as alt-color for their messages
 * format code snippets
 * highlight snippets
@@ -38,6 +39,7 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 ### OBS
 
+* allow (temporary display of "notes" instead of "chat" tab)
 * create intro screen
     * configure target time
     * display countdown in frontend
@@ -48,5 +50,6 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 ### Implementation
 
+* document existing features
 * use TypeScript
 * maybe replace microhttp with inbuilt simple web server
