@@ -12,8 +12,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
-import static java.lang.StringTemplate.STR;
-
 public class TwitchHelixApi {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchHelixApi.class);

@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TwitchEventSubscriber {
 
+	static final String REWARD_REDEMPTION_SUBSCRIPTION_TYPE = "channel.channel_points_custom_reward_redemption.add";
+
 	private static final URI TWITCH_EVENT_WEBSOCKET_URL = URI.create("wss://eventsub.wss.twitch.tv/ws");
 	private static final URI TWITCH_EVENT_SUBSCRIPTION_ENDPOINT = URI.create("https://api.twitch.tv/helix/eventsub/subscriptions");
 
@@ -75,27 +77,25 @@ public class TwitchEventSubscriber {
 
 	private void process(SessionWelcome welcome) {
 		LOG.debug("Processing welcome event: {}", welcome);
-		var requestBody = """
-				{
-					"type": "channel.channel_points_custom_reward_redemption.add",
-					"version": "1",
-					"condition": {
-						"broadcaster_user_id": "%s"
-					},
-					"transport": {
-						"method": "websocket",
-						"session_id": "%s"
-					}
-				}
-				""".formatted(credentials.userId(), welcome.sessionId());
-		var request = HttpRequest
-				.newBuilder(TWITCH_EVENT_SUBSCRIPTION_ENDPOINT)
-				.POST(HttpRequest.BodyPublishers.ofString(requestBody))
-				.header("Authorization", "Bearer " + credentials.userToken())
-				.header("Client-Id", credentials.appId())
-				.header("Content-Type", "application/json")
-				.build();
 		try {
+			var requestBody = json.writeValueAsString(Map.of(
+					"type", REWARD_REDEMPTION_SUBSCRIPTION_TYPE,
+					"version", "1",
+					"condition", Map.of(
+							"broadcaster_user_id", credentials.userId()
+					),
+					"transport", Map.of(
+							"method", "websocket",
+							"session_id", welcome.sessionId())
+			));
+			var request = HttpRequest
+					.newBuilder(TWITCH_EVENT_SUBSCRIPTION_ENDPOINT)
+					.POST(HttpRequest.BodyPublishers.ofString(requestBody))
+					.header("Authorization", "Bearer " + credentials.userToken())
+					.header("Client-Id", credentials.appId())
+					.header("Content-Type", "application/json")
+					.build();
+
 			var response = http.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() >= 400)
 				LOG.error("Response: [{}] {}", response.statusCode(), response.body());

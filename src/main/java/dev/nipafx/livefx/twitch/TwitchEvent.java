@@ -17,8 +17,6 @@ public sealed interface TwitchEvent
 
 	class Factory {
 
-		public static final String REWARD_REDEMPTION_SUBSCRIPTION_TYPE = "channel.channel_points_custom_reward_redemption.add";
-
 		static TwitchEvent create(Map<String, Object> msg) {
 			try {
 				return extract(msg, "metadata", "message_type")
@@ -44,7 +42,8 @@ public sealed interface TwitchEvent
 		}
 
 		private static TwitchEvent createNotification(Map<String, Object> msg) {
-			if (!REWARD_REDEMPTION_SUBSCRIPTION_TYPE.equals(extractRequired(msg, "metadata", "subscription_type")))
+			if (!TwitchEventSubscriber.REWARD_REDEMPTION_SUBSCRIPTION_TYPE
+					.equals(extractRequired(msg, "metadata", "subscription_type")))
 				return null;
 
 			return switch (extractRequired(msg, "payload", "event", "reward", "id")) {
