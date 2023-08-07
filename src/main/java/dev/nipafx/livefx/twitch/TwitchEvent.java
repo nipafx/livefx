@@ -87,7 +87,7 @@ public sealed interface TwitchEvent {
 		}
 
 		private static String extractRequiredUserNick(Map<String, Object> message) {
-			return extractRequired(message, "payload", "event", "broadcaster_user_name");
+			return extractRequired(message, "payload", "event", "user_name");
 		}
 
 	}
