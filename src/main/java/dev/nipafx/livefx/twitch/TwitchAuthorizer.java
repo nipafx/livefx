@@ -8,6 +8,7 @@ import dev.nipafx.livefx.twitch.store.UserToken;
 import org.microhttp.EventLoop;
 import org.microhttp.Handler;
 import org.microhttp.Options;
+import org.microhttp.OptionsBuilder;
 import org.microhttp.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,10 +230,12 @@ public class TwitchAuthorizer {
 
 	private static ServerShutdown launchLocalServer(BlockingValue<String> deferredAuthCode) throws IOException {
 		LOG.debug("Launching a server on localhost to capture the auth code...");
-		var options = new Options()
+		var options = OptionsBuilder
+				.newBuilder()
 				.withHost("localhost")
 				.withPort(LOCAL_HOST_PORT)
-				.withConcurrency(1);
+				.withConcurrency(1)
+				.build();
 		Handler handler = (request, callback) -> {
 			extractAuthCodeFromUri(request.uri()).ifPresent(deferredAuthCode::set);
 			callback.accept(new Response(200, "OK", List.of(), new byte[0]));
