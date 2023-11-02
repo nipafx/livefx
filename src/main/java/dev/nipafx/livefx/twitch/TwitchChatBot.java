@@ -1,5 +1,6 @@
 package dev.nipafx.livefx.twitch;
 
+import dev.nipafx.livefx.chat.OutgoingMessage;
 import dev.nipafx.livefx.event.EventSource;
 import dev.nipafx.livefx.messages.ChatMessageEmote;
 import dev.nipafx.livefx.messages.TextChatMessage;
@@ -19,11 +20,13 @@ import java.net.http.WebSocket.Listener;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import static dev.nipafx.livefx.twitch.TwitchGraphics.ROBOT_BADGE;
 import static java.util.stream.Collectors.toSet;
 
 public class TwitchChatBot {
@@ -66,9 +69,10 @@ public class TwitchChatBot {
 	}
 
 	private void interpretMessage(TextMessage message) {
+		var messageId = Optional.ofNullable(message.tags().get("id"));
 		var badges = parseBadges(message);
 		var emotes = parseEmotes(message);
-		var chatMessage = new TextChatMessage(UUID.randomUUID().toString(), message.nick(), message.text(), badges, emotes);
+		var chatMessage = new TextChatMessage(UUID.randomUUID().toString(), messageId, message.nick(), message.text(), badges, emotes);
 		eventSource.submit(chatMessage);
 	}
 
@@ -178,6 +182,33 @@ public class TwitchChatBot {
 			Listener.super.onError(webSocket, error);
 		}
 
+	}
+
+	public void send(OutgoingMessage message) {
+		sendMessageToTwitch(message);
+		submitMessageToEventBus(message);
+	}
+
+	private void sendMessageToTwitch(OutgoingMessage message) {
+		var replyHeader = message
+				.replyTo()
+				.flatMap(TextChatMessage::messageId)
+				.map(id -> STR."@reply-parent-msg-id=\{id} ")
+				.orElse("");
+		var textMessage = STR."\{replyHeader}PRIVMSG #\{credentials.userName()} :[🤖] \{message.text()}";
+		LOG.info(STR."Sending Twitch chat message: \"\{textMessage}\"");
+		connectedWebsocket.get().sendText(textMessage, true);
+	}
+
+	private void submitMessageToEventBus(OutgoingMessage message) {
+		var chatMessage = new TextChatMessage(
+				UUID.randomUUID().toString(),
+				Optional.empty(),
+				credentials.userName(),
+				message.text(),
+				List.of(ROBOT_BADGE.id()),
+				List.of());
+		eventSource.submit(chatMessage);
 	}
 
 }

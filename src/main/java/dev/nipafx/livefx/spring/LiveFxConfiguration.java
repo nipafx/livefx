@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.nipafx.livefx.chat.ChatBot;
 import dev.nipafx.livefx.config.Configurator;
 import dev.nipafx.livefx.event.EventBus;
 import dev.nipafx.livefx.guest.Host;
@@ -84,6 +85,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public Messenger createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics, EventBus eventBus) {
 		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus);
+	}
+
+	@Bean
+	public ChatBot createChatBot(EventBus eventBus) {
+		return new ChatBot(eventBus);
 	}
 
 	@Bean

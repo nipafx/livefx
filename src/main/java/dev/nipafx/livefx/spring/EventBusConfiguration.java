@@ -1,5 +1,7 @@
 package dev.nipafx.livefx.spring;
 
+import dev.nipafx.livefx.chat.ChatBot;
+import dev.nipafx.livefx.chat.OutgoingMessage;
 import dev.nipafx.livefx.command.Command;
 import dev.nipafx.livefx.command.Commander;
 import dev.nipafx.livefx.config.ConfigurationChanged;
@@ -10,6 +12,7 @@ import dev.nipafx.livefx.messages.TextChatMessage;
 import dev.nipafx.livefx.theme.Paintbox;
 import dev.nipafx.livefx.theme.SceneSelector;
 import dev.nipafx.livefx.topic.Topics;
+import dev.nipafx.livefx.twitch.TwitchChatBot;
 import dev.nipafx.livefx.twitch.TwitchHelixApi;
 import dev.nipafx.livefx.twitch.TwitchRewardRedemption;
 import dev.nipafx.livefx.twitch.TwitchRewardRedemption.ShowScreenRedemption;
@@ -27,6 +30,8 @@ public class EventBusConfiguration implements ApplicationRunner {
 	private final EventBus eventBus;
 
 	private final Messenger messenger;
+	private final ChatBot chatBot;
+	private final TwitchChatBot twitchChatBot;
 	private final Paintbox paintbox;
 	private final SceneSelector sceneSelector;
 	private final Topics topics;
@@ -37,6 +42,8 @@ public class EventBusConfiguration implements ApplicationRunner {
 	public EventBusConfiguration(
 			EventBus eventBus,
 			Messenger messenger,
+			ChatBot chatBot,
+			TwitchChatBot twitchChatBot,
 			Paintbox paintbox,
 			SceneSelector sceneSelector,
 			Topics topics,
@@ -45,6 +52,8 @@ public class EventBusConfiguration implements ApplicationRunner {
 			Commander commander) {
 		this.eventBus = eventBus;
 		this.messenger = messenger;
+		this.chatBot = chatBot;
+		this.twitchChatBot = twitchChatBot;
 		this.paintbox = paintbox;
 		this.sceneSelector = sceneSelector;
 		this.topics = topics;
@@ -61,6 +70,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 			host.onConfigChanged();
 		});
 		eventBus.subscribe(TextChatMessage.class, messenger::showMessage);
+		eventBus.subscribe(TextChatMessage.class, chatBot::processMessage);
 		eventBus.subscribe(TwitchRewardRedemption.class, messenger::haltMessageFor);
 		eventBus.subscribe(ThemeColorRedemption.class, paintbox::updateColorToReward);
 		eventBus.subscribe(ShowScreenRedemption.class, sceneSelector::switchScene);
@@ -68,6 +78,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 		// (this only works if the rewards were created by this app)
 //		eventBus.subscribe(UpdateRedemptionStatus.class, helixApi::updateRedemptionStatus);
 		eventBus.subscribe(UpdateChannelInformation.class, helixApi::updateChannelInformation);
+		eventBus.subscribe(OutgoingMessage.class, twitchChatBot::send);
 		eventBus.subscribe(Command.class, commander::sendCommand);
 
 		topics.afterInitialization();
