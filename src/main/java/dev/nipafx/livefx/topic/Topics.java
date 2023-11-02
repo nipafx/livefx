@@ -5,7 +5,6 @@ import dev.nipafx.livefx.config.TopicConfiguration;
 import dev.nipafx.livefx.event.EventSource;
 import dev.nipafx.livefx.twitch.UpdateChannelInformation;
 
-import java.util.Collections;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 

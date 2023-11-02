@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static java.lang.StringTemplate.STR;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class Configurator {
