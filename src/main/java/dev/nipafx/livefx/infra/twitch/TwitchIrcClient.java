@@ -29,6 +29,15 @@ import java.util.stream.Stream;
 import static dev.nipafx.livefx.infra.twitch.TwitchGraphics.ROBOT_BADGE;
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * Interacts with the <a href="https://dev.twitch.tv/docs/irc/">Twitch IRC server for channel</a> chat:
+ *
+ * <ul>
+ *     <li>connects to the server, authorizes the app, requires necessary capabilities, and joins the channel chat</li>
+ *     <li>keeps the connection open, e.g. by ponging when pinged</li>
+ *     <li>interprets chat messages and emits them as {@link TextChatMessage}s</li>
+ * </ul>
+ */
 public class TwitchIrcClient {
 
 	private static final URI TWITCH_IRC_URL = URI.create("wss://irc-ws.chat.twitch.tv:443");

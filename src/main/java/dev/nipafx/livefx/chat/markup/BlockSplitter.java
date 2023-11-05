@@ -6,6 +6,9 @@ import dev.nipafx.livefx.chat.markup.BlockSplitter.Block.Paragraph;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+/**
+ * Splits a line of text into {@link Block}s.
+ */
 class BlockSplitter {
 
 	public static Stream<Block> splitIntoBlocks(String text) {

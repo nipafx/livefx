@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
 
+/**
+ * Reads {@link TextChatMessage}s passed to {@link ChatBot#processMessage(TextChatMessage) processMessage}
+ * and, if they're identified as a command, replies to them by emitting an {@link OutgoingMessage} through
+ * the {@link EventSource}.
+ */
 public class ChatBot {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Messenger.class);

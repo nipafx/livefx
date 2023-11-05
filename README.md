@@ -7,10 +7,33 @@ To run this in development:
 
 * launch the class `LiveFxApplication`
 * in the root of the project:
-    * run `nvm use`
-    * run `npm run start`
+	* run `nvm use`
+	* run `npm run start`
 
 Note that building the Spring Boot UberJAR works but the app within it doesn't.
+
+## Features
+
+Chat:
+* simple markup with a Markdown-style syntax:
+	* text markup: `*bold*`, `_italic_`, `+emphasis+`, `~strikethrough~`, and `` `code` ``
+	* text between three backticks is interpreted as a code block
+* resolution of badges and emotes
+* a chatbot that reads `!$command` messages and replies to the `$command` with its own message
+* to keep the chat clean, it doesn't post reward redemption messages
+
+Audience interaction:
+* change accent color
+* switch to the scene that shows the large screen
+
+Back-end configuration (all updated live):
+* theme color and pinning (to prevent audience from changing it)
+* scene switching (to prevent audience from switching to the screen)
+* on-stream guests
+* stream title, description, and tags (the Twitch stream setting is updated accordingly)
+
+Misc:
+* Twitch credential management, including reauthorization when possible
 
 ## Feature Ideas
 
@@ -41,8 +64,8 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 * allow (temporary display of "notes" instead of "chat" tab)
 * create intro screen
-    * configure target time
-    * display countdown in frontend
+	* configure target time
+	* display countdown in frontend
 
 ### Internet of 💩
 
@@ -50,6 +73,5 @@ Note that building the Spring Boot UberJAR works but the app within it doesn't.
 
 ### Implementation
 
-* document existing features
 * use TypeScript
 * maybe replace microhttp with inbuilt simple web server

@@ -29,6 +29,10 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Loads {@link TwitchCredentials} from a dedicated config file, validates them, reauthorizes when necessary and possible,
+ * and updates the config file with new info.
+ */
 public class TwitchAuthorizer {
 
 	private static final URI VALIDATE_ENDPOINT = URI.create("https://id.twitch.tv/oauth2/validate");

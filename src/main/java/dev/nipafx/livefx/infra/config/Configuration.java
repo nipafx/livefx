@@ -7,6 +7,11 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * In-memory representation of JSON-based configuration.
+ *
+ * @param topic in the JSON config, this is a string, which needs to be converted to a {@link TopicConfiguration}
+ */
 public record Configuration(
 		Path twitchCredentials,
 		ThemeConfiguration theme,

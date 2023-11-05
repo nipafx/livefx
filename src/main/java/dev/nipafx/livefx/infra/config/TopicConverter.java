@@ -14,6 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Transforms a string to a {@link TopicConfiguration} by interpreting it as a path to a topic file
+ * (written in Markdown) that is then read and parsed.
+ */
 class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 
 	private static final Parser MARKDOWN_PARSER = Parser

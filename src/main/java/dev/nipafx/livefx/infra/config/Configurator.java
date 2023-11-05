@@ -13,6 +13,9 @@ import java.nio.file.Path;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
+/**
+ * Manages {@link Configuration} changes and reacts to changes by triggering config updates in other subsystems.
+ */
 public class Configurator {
 
 	static final String MAIN_CONFIG_FILE_NAME = "livefx.json";

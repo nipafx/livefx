@@ -22,6 +22,14 @@ import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Subscribes to <a href="https://dev.twitch.tv/docs/eventsub/handling-webhook-events/">Twitch webhook events</a>:
+ * <ul>
+ *     <li>connects to the server, authorizes the app, and subscribe to needed events</li>
+ *     <li>keeps the connection alive</li>
+ *     <li>parses {@link TwitchEvent}s and emits them</li>
+ * </ul>
+ */
 public class TwitchEventSubscriber {
 
 	static final String REWARD_REDEMPTION_SUBSCRIPTION_TYPE = "channel.channel_points_custom_reward_redemption.add";

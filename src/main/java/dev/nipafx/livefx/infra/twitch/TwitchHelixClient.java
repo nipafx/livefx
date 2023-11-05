@@ -13,6 +13,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
+/**
+ * Uses the <a href="https://dev.twitch.tv/docs/api/reference/">Twitch Helix API</a> to create and update
+ * channel-related information.
+ */
 public class TwitchHelixClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitchHelixClient.class);

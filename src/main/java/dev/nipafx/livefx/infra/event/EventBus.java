@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * A simple event bus that subsystems can subscribe to and emit events through.
+ */
 public class EventBus implements EventSource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EventBus.class);

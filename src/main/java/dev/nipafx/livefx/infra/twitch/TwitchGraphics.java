@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Gathers and resolves Twitch badges and emotes.
+ */
 public class TwitchGraphics {
 
 	public static final Badge ROBOT_BADGE = new Badge(

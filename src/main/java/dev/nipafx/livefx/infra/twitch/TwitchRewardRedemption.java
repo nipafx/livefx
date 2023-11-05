@@ -4,6 +4,9 @@ import dev.nipafx.livefx.infra.event.Event;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Redemption of a Twitch reward that interacts with this app
+ */
 public sealed interface TwitchRewardRedemption extends TwitchEvent, Event {
 
 	String nick();

@@ -5,6 +5,9 @@ import dev.nipafx.livefx.infra.event.Event;
 
 import java.util.Optional;
 
+/**
+ * A system message, e.g. sent by the {@link ChatBot} to the audience.
+ */
 public record OutgoingMessage(String text, Optional<TextChatMessage> replyTo) implements Event {
 
 	public OutgoingMessage(String text) {

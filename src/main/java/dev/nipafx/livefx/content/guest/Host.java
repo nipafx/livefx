@@ -7,6 +7,9 @@ import dev.nipafx.livefx.infra.event.EventSource;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * Manages {@link Guest guests} and reacts to config changes by triggering a guest update.
+ */
 public class Host {
 
 	private final Supplier<List<Guest>> guests;

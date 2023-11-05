@@ -18,6 +18,16 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * A simple parser for a subset of Markdown.
+ *
+ * <ul>
+ *     <li>"simple" because it does nothing sophisticated to understand nesting or escaping of markup</li>
+ *     <li>"subset" to exclude problematic tags (like images that can be used to trigger web requests from the
+ *     	streaming machine) and reduce attack surface from having a full-blown Markdown parser in the loop</li>
+ * </ul>
+ *
+ */
 public class SimpleMark {
 
 	private static final Pattern BOLD = createPatternForInlineMarkup("*");

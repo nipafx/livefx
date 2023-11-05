@@ -19,6 +19,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+/**
+ * Enriches {@link TextChatMessage}s to {@link RichChatMessage}s, so they can be displayed in the UI, but ignores
+ * reward redemption messages.
+ */
 public class Messenger {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Messenger.class);
@@ -27,7 +31,7 @@ public class Messenger {
 	private final Function<TextChatMessage, List<URI>> badgeResolver;
 	private final Function<TextChatMessage, Map<String, URI>> emoteResolver;
 
-	// these collections need to thread-safe
+	// these collections need to be thread-safe
 	private final ConcurrentLinkedDeque<RichChatMessage> messages;
 	private final Set<HaltMessage> messagesToHalt;
 

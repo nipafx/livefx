@@ -8,6 +8,9 @@ import dev.nipafx.livefx.infra.twitch.TwitchRewardRedemption.ShowScreenRedemptio
 
 import java.util.function.Supplier;
 
+/**
+ * Manages {@link SceneSwitch scenes} and reacts to audience interaction by triggering a scene update.
+ */
 public class SceneSelector {
 
 	private final Supplier<ThemeConfiguration> themeConfiguration;

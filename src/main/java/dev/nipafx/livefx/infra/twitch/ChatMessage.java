@@ -6,6 +6,9 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A chat message received from the Twitch IRC server.
+ */
 sealed interface ChatMessage {
 
 	String text();

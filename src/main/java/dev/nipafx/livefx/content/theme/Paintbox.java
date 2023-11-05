@@ -14,6 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+/**
+ * Manages {@link ThemeColor colors} and reacts to config changes and audience interaction by triggering a color update.
+ * <p>
+ * Note that color changes by the audience can be blocked in the configuration - see {@link ThemeConfiguration#pinned()}.
+ */
 public class Paintbox {
 
 	private final Supplier<ThemeConfiguration> themeConfiguration;

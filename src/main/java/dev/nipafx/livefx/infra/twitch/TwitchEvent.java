@@ -9,6 +9,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Events emitted through the {@link TwitchEventSubscriber}.
+ */
 public sealed interface TwitchEvent
 		permits TwitchEvent.Error, TwitchEvent.KeepAlive, TwitchEvent.SessionWelcome, TwitchEvent.Unknown, TwitchRewardRedemption {
 

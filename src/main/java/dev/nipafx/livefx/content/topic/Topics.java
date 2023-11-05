@@ -8,6 +8,9 @@ import dev.nipafx.livefx.infra.event.EventSource;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * Manages {@link TopicConfiguration topics} and reacts to config changes by triggering a topic update.
+ */
 public class Topics {
 
 	private final Supplier<TopicConfiguration> topic;

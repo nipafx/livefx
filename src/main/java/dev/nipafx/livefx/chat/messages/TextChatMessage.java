@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A message as received from the streaming platform, including various meta information.
+ */
 public record TextChatMessage(
 		String id,
 		Optional<String> messageId,
