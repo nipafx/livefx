@@ -1,0 +1,16 @@
+package dev.nipafx.livefx.chat.messages;
+
+import dev.nipafx.livefx.infra.event.Event;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+public record TextChatMessage(
+		String id,
+		Optional<String> messageId,
+		String nick,
+		String text,
+		List<String> badges,
+		Collection<ChatMessageEmote> emotes
+) implements Event { }
