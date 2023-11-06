@@ -115,6 +115,34 @@ final class PostSlides implements ChatCommand {
 
 }
 
+final class PostMusic implements ChatCommand {
+
+	@Override
+	public boolean isListed() {
+		return false;
+	}
+
+	@Override
+	public List<String> commandStrings() {
+		return List.of("music", "noise");
+	}
+
+	@Override
+	public String description() {
+		return "🎶";
+	}
+
+	@Override
+	public List<? extends Event> execute(TextChatMessage message) {
+		var text = """
+				Like the song? Nicolai didn't hook me up with his music backend, \
+				so I can't tell you what exact song he's listening to right now.
+				He's likely streaming StreamBeats (https://www.streambeats.com/), though.""";
+		return List.of(new OutgoingMessage(text, message));
+	}
+
+}
+
 final class ListCommands implements ChatCommand {
 
 	static final String COMMAND_STRING = "commands";
