@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -38,20 +37,22 @@ public class Messenger {
 	private final ConcurrentLinkedDeque<RichChatMessage> messages;
 	private final Set<HaltMessage> messagesToHalt;
 
-	private final ScheduledExecutorService showMessageExecutor;
 	private final EventSource eventSource;
+	private final ScheduledExecutorService showMessageExecutor;
 
 	public Messenger(
 			SimpleMark simpleMark,
 			Function<TextChatMessage, List<URI>> badgeResolver,
-			Function<TextChatMessage, Map<String, URI>> emoteResolver, EventSource eventSource) {
+			Function<TextChatMessage, Map<String, URI>> emoteResolver,
+			EventSource eventSource,
+			ScheduledExecutorService showMessageExecutor) {
 		this.simpleMark = simpleMark;
 		this.badgeResolver = badgeResolver;
 		this.emoteResolver = emoteResolver;
 		this.messages = new ConcurrentLinkedDeque<>();
 		this.messagesToHalt = Collections.newSetFromMap(new ConcurrentHashMap<>());
-		this.showMessageExecutor = Executors.newSingleThreadScheduledExecutor();
 		this.eventSource = eventSource;
+		this.showMessageExecutor = showMessageExecutor;
 	}
 
 	public void showMessage(OutgoingMessage message) {

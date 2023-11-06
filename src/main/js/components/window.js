@@ -2,12 +2,14 @@ import React from 'react'
 
 import style from './window.module.css'
 
-const Window = ({ name, className, children }) => {
+const Window = ({ name, activeTab, className, children }) => {
 	const _children = React.Children.toArray(children).filter(Boolean)
+	const activeTabIndex = _children.findIndex(tab => tab.props.name === activeTab)
+	console.log(activeTab, activeTabIndex)
 	return (
 		<div className={`${style.window} ${className}`}>
 			{_children.map((_, index) =>
-				<input key={index} id={`${name}-input${index}`} className={style.input} name={`${name}-inputs`} type="radio" defaultChecked={index === 0} />)
+				<input key={index} id={`${name}-input${index}`} className={style.input} name={`${name}-inputs`} type="radio" checked={index === activeTabIndex} />)
 			}
 			<div className={style.tabs}>
 				{_children.map((tab, index) =>

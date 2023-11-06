@@ -25,6 +25,7 @@ Chat:
 Audience interaction:
 * change accent color
 * switch to the scene that shows the large screen
+* show stream description in "notes" tab
 
 Back-end configuration (all updated live):
 * theme color and pinning (to prevent audience from changing it)
@@ -55,7 +56,7 @@ Misc:
 	* !tips: "Just FYI: If you have an IDE and browser open on the side, you can fact-check Nicolai live on stream. 😉"
 * advanced chatbot features
 	* timed messages
-    * cooldown timer for commands
+    * cooldown timer for commands (particularly "!notes" and its reset to the chat window)
 * how does moderation work with the on-screen chat? / remove moderated messages
 
 #### Channel

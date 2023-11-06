@@ -26,6 +26,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
 @EnableWebSocket
@@ -40,6 +42,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public EventBus createEventBus() {
 		return new EventBus();
+	}
+
+	@Bean
+	public ScheduledExecutorService scheduledExecutorService() {
+		return Executors.newSingleThreadScheduledExecutor();
 	}
 
 	@Bean
@@ -83,8 +90,9 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public Messenger createMessageProcessor(SimpleMark simpleMark, TwitchGraphics twitchGraphics, EventBus eventBus) {
-		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus);
+	public Messenger createMessageProcessor(
+			SimpleMark simpleMark, TwitchGraphics twitchGraphics, ScheduledExecutorService scheduledExecutorService, EventBus eventBus) {
+		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus, scheduledExecutorService);
 	}
 
 	@Bean
@@ -98,8 +106,8 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public SceneSelector createSceneSelector(Configurator configurator, EventBus eventBus) {
-		return new SceneSelector(() -> configurator.config().theme(), eventBus);
+	public SceneSelector createSceneSelector(Configurator configurator, ScheduledExecutorService scheduledExecutorService, EventBus eventBus) {
+		return new SceneSelector(() -> configurator.config().theme(), eventBus, scheduledExecutorService);
 	}
 
 	@Bean

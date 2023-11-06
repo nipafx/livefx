@@ -7,6 +7,7 @@ import dev.nipafx.livefx.chat.messages.TextChatMessage;
 import dev.nipafx.livefx.content.guest.Host;
 import dev.nipafx.livefx.content.theme.Paintbox;
 import dev.nipafx.livefx.content.theme.SceneSelector;
+import dev.nipafx.livefx.content.theme.ShowNotesTab;
 import dev.nipafx.livefx.content.topic.Topics;
 import dev.nipafx.livefx.infra.command.Command;
 import dev.nipafx.livefx.infra.command.Commander;
@@ -74,6 +75,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 		eventBus.subscribe(TwitchRewardRedemption.class, messenger::haltMessageFor);
 		eventBus.subscribe(ThemeColorRedemption.class, paintbox::updateColorToReward);
 		eventBus.subscribe(ShowScreenRedemption.class, sceneSelector::switchScene);
+		eventBus.subscribe(ShowNotesTab.class, sceneSelector::showNotesTab);
 		// uncomment this line to automate reward redemption status update
 		// (this only works if the rewards were created by this app)
 //		eventBus.subscribe(UpdateRedemptionStatus.class, helixApi::updateRedemptionStatus);

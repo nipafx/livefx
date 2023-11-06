@@ -20,9 +20,10 @@ const App = () => {
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ messages, setMessages ] = useState([])
 	const [ theme, setTheme ] = useState(THEMES[0])
+	const [ activeMiscTab, setActiveMiscTab ] = useState("chat")
 	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
-	const setState = { setLayout, setMessages, setTheme, setTopic, setGuests }
+	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests }
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -42,7 +43,7 @@ const App = () => {
 	}, [])
 
 	return (
-		<Scene layout={layout} theme={theme} topic={topic} guests={guests} messages={messages} />
+		<Scene layout={layout} theme={theme} activeMiscTab={activeMiscTab} topic={topic} guests={guests} messages={messages} />
 	)
 }
 
@@ -61,6 +62,9 @@ const executeCommand = (command, setState) => {
 	switch (command.type) {
 		case "show-screen":
 			showScreen()
+			break
+		case "show-tab":
+			showTab(command.tab, setState)
 			break
 		case "update-messages":
 			updateMessages(setState)
@@ -82,6 +86,14 @@ const executeCommand = (command, setState) => {
 
 const showScreen = () => {
 	window?.obsstudio?.setCurrentScene("screen, large cam")
+}
+
+const showTab = (tab, setState) => {
+	const tabName = {
+		DEFAULT: "chat",
+		NOTES: "notes",
+	}[tab]
+	setState.setActiveMiscTab(tabName)
 }
 
 const updateMessages = (setState) => {

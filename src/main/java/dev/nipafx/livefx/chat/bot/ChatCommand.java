@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.chat.bot;
 
 import dev.nipafx.livefx.chat.messages.TextChatMessage;
+import dev.nipafx.livefx.content.theme.ShowNotesTab;
 import dev.nipafx.livefx.infra.config.TopicConfiguration;
 import dev.nipafx.livefx.infra.event.Event;
 
@@ -163,7 +164,9 @@ final class ShowNotes implements ChatCommand {
 
 	@Override
 	public List<? extends Event> execute(TextChatMessage message) {
-		return List.of(OutgoingMessage.toTwitch(topic.get().descriptionAsMd(), message));
+		return List.of(
+				OutgoingMessage.toTwitch(topic.get().descriptionAsMd(), message),
+				new ShowNotesTab());
 	}
 
 }
