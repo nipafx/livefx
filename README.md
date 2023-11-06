@@ -46,7 +46,16 @@ Misc:
 * use author's Twitch color as alt-color for their messages
 * format code snippets
 * highlight snippets
-* replace Moobot
+* reimplement Moobot features:
+	* !follow: "Like what you see? For more, follow Nicolai here and on Twitter https://twitter.com/nipafx . Also, check out his YouTube channel https://youtube.com/nipafx and blog https://nipafx.dev . If you want to hang out together, join the Discord https://discord.com/invite/7m9w8Td ."
+	* !invite: "Having fun? Let your friends know about this stream. On Twitter: https://bit.ly/inv-twit On Facebook: https://bit.ly/inv-fb"
+	* !music: "Like the song? Nicolai didn't hook me up with his music backend, so I can't tell you what exact song he's listening to right now. He's likely streaming StreamBeats (https://www.streambeats.com/) though."
+	* !repo
+	* !schedule
+	* !timeline
+	* !slides: "If Nicolai is presenting some slides, you can find them here: https://slides.nipafx.dev ~> click on the titles (Those are 2D slide decks - use Page Up/Down to navigate, hit "?" for keyboard shortcuts.)"
+	* !tips: "Just FYI: If you have an IDE and browser open on the side, you can fact-check Nicolai live on stream. 😉"
+	* timed messages
 * how does moderation work with the on-screen chat? / remove moderated messages
 
 #### Channel
