@@ -1,7 +1,10 @@
 package dev.nipafx.livefx.chat.bot;
 
+import dev.nipafx.livefx.infra.config.Configuration;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -11,9 +14,10 @@ class ChatCommandBook {
 
 	private final List<ChatCommand> commands;
 
-	public ChatCommandBook() {
+	public ChatCommandBook(Supplier<Configuration> config) {
 		commands = List.of(
 				new HelloWorld(),
+				new PostRepository(() -> config.get().topic()),
 				new ListCommands(this::commands)
 		);
 	}
@@ -24,7 +28,6 @@ class ChatCommandBook {
 
 	public Optional<ChatCommand> findCommandFor(String commandString) {
 		return commands.stream()
-				.filter(ChatCommand::isActive)
 				.filter(command -> command.commandStrings().contains(commandString))
 				// should be `findOnly` 😠
 				.findFirst();

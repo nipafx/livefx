@@ -10,9 +10,11 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Transforms a string to a {@link TopicConfiguration} by interpreting it as a path to a topic file
@@ -43,6 +45,7 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 		return new TopicFile(
 				yamlVisitor.getData().getOrDefault("title", List.of()),
 				yamlVisitor.getData().getOrDefault("tags", List.of()),
+				yamlVisitor.getData().getOrDefault("repo", List.of()),
 				HTML_RENDERER.render(document)
 		);
 	}
@@ -55,9 +58,14 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 				<h1>\{title}</h1>
 				\{file.descriptionAsHtml()}
 				""";
-		return new TopicConfiguration(title, file.tags(), description);
+		if (file.repo().size() > 1)
+			throw new IllegalArgumentException("Topic file defines too many repositories: " + file.repo());
+		Optional<URI> repo = file.repo().size() == 1
+				? Optional.of(file.repo().getFirst()).map(URI::create)
+				: Optional.empty();
+		return new TopicConfiguration(title, file.tags(), repo, description);
 	}
 
-	private record TopicFile(List<String> title, List<String> tags, String descriptionAsHtml) { }
+	private record TopicFile(List<String> title, List<String> tags, List<String> repo, String descriptionAsHtml) { }
 
 }

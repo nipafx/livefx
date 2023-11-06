@@ -88,8 +88,8 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	}
 
 	@Bean
-	public ChatBot createChatBot(EventBus eventBus) {
-		return new ChatBot(eventBus);
+	public ChatBot createChatBot(Configurator configurator, EventBus eventBus) {
+		return new ChatBot(configurator::config, eventBus);
 	}
 
 	@Bean

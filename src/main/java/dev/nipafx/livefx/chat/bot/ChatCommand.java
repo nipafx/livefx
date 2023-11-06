@@ -1,8 +1,10 @@
 package dev.nipafx.livefx.chat.bot;
 
 import dev.nipafx.livefx.chat.messages.TextChatMessage;
+import dev.nipafx.livefx.infra.config.TopicConfiguration;
 import dev.nipafx.livefx.infra.event.Event;
 
+import java.net.URI;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -16,7 +18,6 @@ import static java.util.stream.Collectors.joining;
 sealed interface ChatCommand {
 
 	default boolean isListed() { return true; }
-	default boolean isActive() { return true; }
 	List<String> commandStrings();
 	String description();
 	List<? extends Event> execute(TextChatMessage message);
@@ -40,6 +41,40 @@ final class HelloWorld implements ChatCommand {
 		return List.of(new OutgoingMessage(
 				STR."Hello, \{message.nick()}. 👋",
 				message));
+	}
+
+}
+
+final class PostRepository implements ChatCommand {
+
+	private final Supplier<TopicConfiguration> topic;
+
+	PostRepository(Supplier<TopicConfiguration> topic) {
+		this.topic = topic;
+	}
+
+	@Override
+	public boolean isListed() {
+		return topic.get().repo().isPresent();
+	}
+
+	@Override
+	public List<String> commandStrings() {
+		return List.of("repo", "repository", "code");
+	}
+
+	@Override
+	public String description() {
+		return "the code being worked on";
+	}
+
+	@Override
+	public List<? extends Event> execute(TextChatMessage message) {
+		var text = topic.get()
+				.repo()
+				.map(URI::toString)
+				.orElse("It looks like there's no repo for this code. Sry.");
+		return List.of(new OutgoingMessage(text, message));
 	}
 
 }

@@ -1,12 +1,14 @@
 package dev.nipafx.livefx.chat.bot;
 
 import dev.nipafx.livefx.chat.messages.TextChatMessage;
+import dev.nipafx.livefx.infra.config.Configuration;
 import dev.nipafx.livefx.infra.event.Event;
 import dev.nipafx.livefx.infra.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /**
@@ -22,8 +24,8 @@ public class ChatBot {
 	private final ChatCommandBook commandBook;
 	private final EventSource eventSource;
 
-	public ChatBot(EventSource eventSource) {
-		this.commandBook = new ChatCommandBook();
+	public ChatBot(Supplier<Configuration> config, EventSource eventSource) {
+		this.commandBook = new ChatCommandBook(config);
 		this.eventSource = eventSource;
 	}
 
