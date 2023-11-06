@@ -8,14 +8,14 @@ import java.util.Optional;
 /**
  * A system message, e.g. sent by the {@link ChatBot} to the audience.
  */
-public record OutgoingMessage(String text, Optional<TextChatMessage> replyTo) implements Event {
+public record OutgoingMessage(String text, boolean onTwitch, boolean onScreen, Optional<TextChatMessage> replyTo) implements Event {
 
-	public OutgoingMessage(String text) {
-		this(text, Optional.empty());
+	public static OutgoingMessage toTwitchAndScreen(String text, TextChatMessage replyTo) {
+		return new OutgoingMessage(text, true, true, Optional.of(replyTo));
 	}
 
-	public OutgoingMessage(String text, TextChatMessage replyTo) {
-		this(text, Optional.of(replyTo));
+	public static OutgoingMessage toTwitch(String text, TextChatMessage replyTo) {
+		return new OutgoingMessage(text, true, false, Optional.of(replyTo));
 	}
 
 }

@@ -38,7 +38,7 @@ final class HelloWorld implements ChatCommand {
 
 	@Override
 	public List<? extends Event> execute(TextChatMessage message) {
-		return List.of(new OutgoingMessage(
+		return List.of(OutgoingMessage.toTwitchAndScreen(
 				STR."Hello, \{message.nick()}. 👋",
 				message));
 	}
@@ -74,7 +74,7 @@ final class PostRepository implements ChatCommand {
 				.repo()
 				.map(URI::toString)
 				.orElse("It looks like there's no repo for this code. Sry.");
-		return List.of(new OutgoingMessage(text, message));
+		return List.of(OutgoingMessage.toTwitchAndScreen(text, message));
 	}
 
 }
@@ -110,7 +110,7 @@ final class PostSlides implements ChatCommand {
 						\{slides.toString()} \
 						(Note: That's a 2D slide deck - use Page Up/Down to navigate, hit "?" for keyboard shortcuts.)""")
 				.orElse("It looks like there are no slides. Sry.");
-		return List.of(new OutgoingMessage(text, message));
+		return List.of(OutgoingMessage.toTwitchAndScreen(text, message));
 	}
 
 }
@@ -138,7 +138,7 @@ final class PostMusic implements ChatCommand {
 				Like the song? Nicolai didn't hook me up with his music backend, \
 				so I can't tell you what exact song he's listening to right now.
 				He's likely streaming StreamBeats (https://www.streambeats.com/), though.""";
-		return List.of(new OutgoingMessage(text, message));
+		return List.of(OutgoingMessage.toTwitchAndScreen(text, message));
 	}
 
 }
@@ -163,7 +163,7 @@ final class ShowNotes implements ChatCommand {
 
 	@Override
 	public List<? extends Event> execute(TextChatMessage message) {
-		return List.of(new OutgoingMessage(topic.get().descriptionAsMd(), message));
+		return List.of(OutgoingMessage.toTwitch(topic.get().descriptionAsMd(), message));
 	}
 
 }
@@ -200,7 +200,7 @@ final class ListCommands implements ChatCommand {
 				.sorted(comparing(command -> command.commandStrings().getFirst()))
 				.map(command -> STR."!\{command.commandStrings().getFirst()} - \{command.description()}")
 				.collect(joining(" // "));
-		return List.of(new OutgoingMessage(
+		return List.of(OutgoingMessage.toTwitchAndScreen(
 				STR."Here's what I can do for you, \{message.nick()}: \{commandsString}",
 				message));
 	}

@@ -1,5 +1,6 @@
 package dev.nipafx.livefx.chat.messages;
 
+import dev.nipafx.livefx.chat.bot.OutgoingMessage;
 import dev.nipafx.livefx.chat.markup.SimpleMark;
 import dev.nipafx.livefx.infra.command.UpdateMessages;
 import dev.nipafx.livefx.infra.event.EventSource;
@@ -11,7 +12,9 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;
@@ -51,18 +54,32 @@ public class Messenger {
 		this.eventSource = eventSource;
 	}
 
+	public void showMessage(OutgoingMessage message) {
+		if (!message.onScreen())
+			return;
+
+		var chatMessage = new TextChatMessage(
+				UUID.randomUUID().toString(),
+				Optional.empty(),
+				" ┗ 🤖",
+				message.text(),
+				List.of(),
+				List.of());
+		showMessage(chatMessage);
+	}
+
 	public void haltMessageFor(TwitchRewardRedemption reward) {
 		messagesToHalt.add(new HaltMessage(reward.nick(), reward.input()));
 	}
 
-	public void showMessage(TextChatMessage textMessage) {
+	public void showMessage(TextChatMessage message) {
 		showMessageExecutor.schedule(
 				() -> {
-					var asHalted = new HaltMessage(textMessage.nick(), textMessage.text());
+					var asHalted = new HaltMessage(message.nick(), message.text());
 					if (messagesToHalt.contains(asHalted))
 						messagesToHalt.remove(asHalted);
 					else
-						showMessageImmediately(textMessage);
+						showMessageImmediately(message);
 				},
 				500,
 				TimeUnit.MILLISECONDS);
@@ -72,7 +89,7 @@ public class Messenger {
 		var richMessage = enrichTextMessage(textMessage);
 		messages.addLast(richMessage);
 		LOG.debug("Processed text message {} and added to message list - total count is now {}",
-				textMessage.id(), messages.size());
+				richMessage.id(), messages.size());
 		eventSource.emit(new UpdateMessages());
 	}
 
@@ -90,8 +107,6 @@ public class Messenger {
 				.toList();
 	}
 
-	private record HaltMessage(String nick, String message) {
-
-	}
+	private record HaltMessage(String nick, String message) { }
 
 }

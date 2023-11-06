@@ -26,7 +26,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static dev.nipafx.livefx.infra.twitch.TwitchGraphics.ROBOT_BADGE;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -194,11 +193,9 @@ public class TwitchIrcClient {
 	}
 
 	public void send(OutgoingMessage message) {
-		sendMessageToTwitch(message);
-		submitMessageToEventBus(message);
-	}
+		if (!message.onTwitch())
+			return;
 
-	private void sendMessageToTwitch(OutgoingMessage message) {
 		var replyHeader = message
 				.replyTo()
 				.flatMap(TextChatMessage::messageId)
@@ -207,17 +204,6 @@ public class TwitchIrcClient {
 		var textMessage = STR."\{replyHeader}PRIVMSG #\{credentials.userName()} :[🤖] \{message.text()}";
 		LOG.info(STR."Sending Twitch chat message: \"\{textMessage}\"");
 		connectedWebsocket.get().sendText(textMessage, true);
-	}
-
-	private void submitMessageToEventBus(OutgoingMessage message) {
-		var chatMessage = new TextChatMessage(
-				UUID.randomUUID().toString(),
-				Optional.empty(),
-				credentials.userName(),
-				message.text(),
-				List.of(ROBOT_BADGE.id()),
-				List.of());
-		eventSource.emit(chatMessage);
 	}
 
 }

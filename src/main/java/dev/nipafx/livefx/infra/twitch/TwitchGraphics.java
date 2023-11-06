@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
  */
 public class TwitchGraphics {
 
-	public static final Badge ROBOT_BADGE = new Badge(
-			"nipafx-robot", URI.create("https://em-content.zobj.net/source/twitter/376/robot_1f916.png"));
-
 	private static final URI TWITCH_BADGE_ENDPOINT = URI.create("https://api.twitch.tv/helix/chat/badges");
 	private static final String TWITCH_EMOTE_ENDPOINT__DEFAULT_DARK_MEDIUM = "https://static-cdn.jtvnw.net/emoticons/v2/%s/default/dark/2.0";
 
@@ -54,7 +51,6 @@ public class TwitchGraphics {
 		var badges = new HashMap<String, Badge>();
 		badges.putAll(getBadges(BadgeType.GLOBAL));
 		badges.putAll(getBadges(BadgeType.CHANNEL));
-		badges.put(ROBOT_BADGE.id(), ROBOT_BADGE);
 		return Collections.unmodifiableMap(badges);
 	}
 

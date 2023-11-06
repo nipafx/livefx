@@ -79,6 +79,7 @@ public class EventBusConfiguration implements ApplicationRunner {
 //		eventBus.subscribe(UpdateRedemptionStatus.class, helixApi::updateRedemptionStatus);
 		eventBus.subscribe(UpdateChannelInformation.class, helixApiClient::updateChannelInformation);
 		eventBus.subscribe(OutgoingMessage.class, twitchIrcClient::send);
+		eventBus.subscribe(OutgoingMessage.class, messenger::showMessage);
 		eventBus.subscribe(Command.class, commander::sendCommand);
 
 		topics.afterInitialization();

@@ -56,7 +56,7 @@ public class ChatBot {
 				Hey \{message.nick()}, did you try to send a command? \
 				I didn't recognize "!\{commandString}". 🧮 \
 				Send "!\{ListCommands.COMMAND_STRING}" to see what I can do for you.""";
-		var reply = new OutgoingMessage(replyText, message);
+		var reply = OutgoingMessage.toTwitchAndScreen(replyText, message);
 		emit(List.of(reply), message);
 	}
 
