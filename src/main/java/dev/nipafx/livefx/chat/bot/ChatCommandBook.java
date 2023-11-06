@@ -1,6 +1,7 @@
 package dev.nipafx.livefx.chat.bot;
 
 import dev.nipafx.livefx.infra.config.Configuration;
+import dev.nipafx.livefx.infra.config.TopicConfiguration;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +16,11 @@ class ChatCommandBook {
 	private final List<ChatCommand> commands;
 
 	public ChatCommandBook(Supplier<Configuration> config) {
+		Supplier<TopicConfiguration> topic = () -> config.get().topic();
 		commands = List.of(
 				new HelloWorld(),
-				new PostRepository(() -> config.get().topic()),
+				new PostRepository(topic),
+				new PostSlides(topic),
 				new ListCommands(this::commands)
 		);
 	}

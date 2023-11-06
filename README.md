@@ -52,7 +52,6 @@ Misc:
 	* !music: "Like the song? Nicolai didn't hook me up with his music backend, so I can't tell you what exact song he's listening to right now. He's likely streaming StreamBeats (https://www.streambeats.com/) though."
 	* !schedule
 	* !timeline
-	* !slides: "If Nicolai is presenting some slides, you can find them here: https://slides.nipafx.dev ~> click on the titles (Those are 2D slide decks - use Page Up/Down to navigate, hit "?" for keyboard shortcuts.)"
 	* !tips: "Just FYI: If you have an IDE and browser open on the side, you can fact-check Nicolai live on stream. 😉"
 * advanced chatbot features
 	* timed messages

@@ -79,6 +79,42 @@ final class PostRepository implements ChatCommand {
 
 }
 
+final class PostSlides implements ChatCommand {
+
+	private final Supplier<TopicConfiguration> topic;
+
+	PostSlides(Supplier<TopicConfiguration> topic) {
+		this.topic = topic;
+	}
+
+	@Override
+	public boolean isListed() {
+		return topic.get().slides().isPresent();
+	}
+
+	@Override
+	public List<String> commandStrings() {
+		return List.of("slides");
+	}
+
+	@Override
+	public String description() {
+		return "the slides being shown";
+	}
+
+	@Override
+	public List<? extends Event> execute(TextChatMessage message) {
+		var text = topic.get()
+				.slides()
+				.map(slides -> STR."""
+						\{slides.toString()} \
+						(Note: That's a 2D slide deck - use Page Up/Down to navigate, hit "?" for keyboard shortcuts.)""")
+				.orElse("It looks like there are no slides. Sry.");
+		return List.of(new OutgoingMessage(text, message));
+	}
+
+}
+
 final class ListCommands implements ChatCommand {
 
 	static final String COMMAND_STRING = "commands";

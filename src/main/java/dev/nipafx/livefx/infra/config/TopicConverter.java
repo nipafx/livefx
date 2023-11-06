@@ -43,11 +43,16 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 		var yamlVisitor = new YamlFrontMatterVisitor();
 		document.accept(yamlVisitor);
 		return new TopicFile(
-				yamlVisitor.getData().getOrDefault("title", List.of()),
-				yamlVisitor.getData().getOrDefault("tags", List.of()),
-				yamlVisitor.getData().getOrDefault("repo", List.of()),
+				getProperty(yamlVisitor, "title"),
+				getProperty(yamlVisitor, "tags"),
+				getProperty(yamlVisitor, "repo"),
+				getProperty(yamlVisitor, "slides"),
 				HTML_RENDERER.render(document)
 		);
+	}
+
+	private static List<String> getProperty(YamlFrontMatterVisitor yamlVisitor, String propertyName) {
+		return yamlVisitor.getData().getOrDefault(propertyName, List.of());
 	}
 
 	private static TopicConfiguration parseTopicFile(TopicFile file) {
@@ -58,14 +63,26 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 				<h1>\{title}</h1>
 				\{file.descriptionAsHtml()}
 				""";
-		if (file.repo().size() > 1)
-			throw new IllegalArgumentException("Topic file defines too many repositories: " + file.repo());
-		Optional<URI> repo = file.repo().size() == 1
-				? Optional.of(file.repo().getFirst()).map(URI::create)
-				: Optional.empty();
-		return new TopicConfiguration(title, file.tags(), repo, description);
+
+		var repo = getOnlyListEntry(file.repo(), "repositories").map(URI::create);
+		var slides = getOnlyListEntry(file.slides(), "slide decks").map(URI::create);
+		return new TopicConfiguration(title, file.tags(), repo, slides, description);
 	}
 
-	private record TopicFile(List<String> title, List<String> tags, List<String> repo, String descriptionAsHtml) { }
+	private static Optional<String> getOnlyListEntry(List<String> strings, String propertyName) {
+		if (strings.size() > 1)
+			throw new IllegalArgumentException(STR."Topic file defines too many \{propertyName}: \{strings}");
+		return strings.size() == 1
+				? Optional.of(strings.getFirst())
+				: Optional.empty();
+	}
+
+	private record TopicFile(
+			List<String> title,
+			List<String> tags,
+			List<String> repo,
+			List<String> slides,
+			String descriptionAsHtml
+	) { }
 
 }
