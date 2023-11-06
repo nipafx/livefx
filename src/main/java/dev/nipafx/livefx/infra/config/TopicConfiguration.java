@@ -9,5 +9,6 @@ public record TopicConfiguration(
 		List<String> tags,
 		Optional<URI> repo,
 		Optional<URI> slides,
+		String descriptionAsMd,
 		String descriptionAsHtml
 ) { }

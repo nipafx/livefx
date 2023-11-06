@@ -22,6 +22,7 @@ class ChatCommandBook {
 				new PostRepository(topic),
 				new PostSlides(topic),
 				new PostMusic(),
+				new ShowNotes(topic),
 				new ListCommands(this::commands)
 		);
 	}

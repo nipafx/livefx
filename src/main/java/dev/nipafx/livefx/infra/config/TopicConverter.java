@@ -39,16 +39,33 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 
 	private static TopicFile readTopicFile(Path configFolder, String topicName) throws IOException {
 		var markdown = Files.readString(configFolder.resolve(Configurator.TOPIC_FOLDER).resolve(topicName + ".md"));
+		var descriptionAsMd = getDescriptionAsMd(markdown);
+
 		Node document = MARKDOWN_PARSER.parse(markdown);
+		var descriptionAsHtml = HTML_RENDERER.render(document);
+
 		var yamlVisitor = new YamlFrontMatterVisitor();
 		document.accept(yamlVisitor);
+
 		return new TopicFile(
 				getProperty(yamlVisitor, "title"),
 				getProperty(yamlVisitor, "tags"),
 				getProperty(yamlVisitor, "repo"),
 				getProperty(yamlVisitor, "slides"),
-				HTML_RENDERER.render(document)
+				descriptionAsMd,
+				descriptionAsHtml
 		);
+	}
+
+	private static String getDescriptionAsMd(String markdown) {
+		if (!markdown.startsWith("---"))
+			return markdown;
+
+		var closingDashesIndex = markdown.indexOf("---", 4);
+		if (closingDashesIndex < 0)
+			return markdown;
+
+		return markdown.substring(closingDashesIndex + 3).strip();
 	}
 
 	private static List<String> getProperty(YamlFrontMatterVisitor yamlVisitor, String propertyName) {
@@ -66,7 +83,7 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 
 		var repo = getOnlyListEntry(file.repo(), "repositories").map(URI::create);
 		var slides = getOnlyListEntry(file.slides(), "slide decks").map(URI::create);
-		return new TopicConfiguration(title, file.tags(), repo, slides, description);
+		return new TopicConfiguration(title, file.tags(), repo, slides, file.descriptionAsMd(), description);
 	}
 
 	private static Optional<String> getOnlyListEntry(List<String> strings, String propertyName) {
@@ -82,6 +99,7 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 			List<String> tags,
 			List<String> repo,
 			List<String> slides,
+			String descriptionAsMd,
 			String descriptionAsHtml
 	) { }
 

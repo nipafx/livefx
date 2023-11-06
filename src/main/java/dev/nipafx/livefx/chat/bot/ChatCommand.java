@@ -143,6 +143,31 @@ final class PostMusic implements ChatCommand {
 
 }
 
+final class ShowNotes implements ChatCommand {
+
+	private final Supplier<TopicConfiguration> topic;
+
+	ShowNotes(Supplier<TopicConfiguration> topic) {
+		this.topic = topic;
+	}
+
+	@Override
+	public List<String> commandStrings() {
+		return List.of("notes", "description");
+	}
+
+	@Override
+	public String description() {
+		return "stream description";
+	}
+
+	@Override
+	public List<? extends Event> execute(TextChatMessage message) {
+		return List.of(new OutgoingMessage(topic.get().descriptionAsMd(), message));
+	}
+
+}
+
 final class ListCommands implements ChatCommand {
 
 	static final String COMMAND_STRING = "commands";
