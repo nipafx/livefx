@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.chat.bot.ChatBot;
 import dev.nipafx.livefx.chat.markup.SimpleMark;
 import dev.nipafx.livefx.chat.messages.Messenger;
+import dev.nipafx.livefx.content.calendar.Calendar;
 import dev.nipafx.livefx.content.guest.Host;
 import dev.nipafx.livefx.content.theme.Paintbox;
 import dev.nipafx.livefx.content.theme.SceneSelector;
 import dev.nipafx.livefx.content.topic.Topics;
 import dev.nipafx.livefx.infra.config.Configurator;
 import dev.nipafx.livefx.infra.event.EventBus;
-import dev.nipafx.livefx.infra.twitch.TwitchAuthorizer;
-import dev.nipafx.livefx.infra.twitch.TwitchCredentials;
-import dev.nipafx.livefx.infra.twitch.TwitchEventSubscriber;
-import dev.nipafx.livefx.infra.twitch.TwitchGraphics;
-import dev.nipafx.livefx.infra.twitch.TwitchHelixClient;
-import dev.nipafx.livefx.infra.twitch.TwitchIrcClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +18,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -59,40 +55,46 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 		return new Configurator(configFolder, json, eventBus);
 	}
 
-	@Bean
-	public TwitchCredentials createTwitchCredentials(Configurator configurator, HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
-		return new TwitchAuthorizer(http, json, configurator.config().twitchCredentials()).createCredentials();
-	}
-
-	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
-	public TwitchIrcClient createTwitchChatBot(TwitchCredentials credentials, EventBus eventBus) {
-		return new TwitchIrcClient(credentials, eventBus);
-	}
-
-	@Bean(initMethod = "connectAndSubscribe", destroyMethod = "shutdown")
-	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, EventBus eventBus, HttpClient http, ObjectMapper json) {
-		return new TwitchEventSubscriber(credentials, eventBus, http, json);
-	}
-
-	@Bean(initMethod = "fetchGraphics")
-	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
-		return new TwitchGraphics(http, credentials, json);
-	}
-
-	@Bean
-	public TwitchHelixClient createHelixCommunicator(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
-		return new TwitchHelixClient(credentials, http, json);
-	}
+//	@Bean
+//	public TwitchCredentials createTwitchCredentials(Configurator configurator, HttpClient http, ObjectMapper json) throws IOException, InterruptedException {
+//		return new TwitchAuthorizer(http, json, configurator.config().twitchCredentials()).createCredentials();
+//	}
+//
+//	@Bean(initMethod = "connectAndListen", destroyMethod = "shutdown")
+//	public TwitchIrcClient createTwitchChatBot(TwitchCredentials credentials, EventBus eventBus) {
+//		return new TwitchIrcClient(credentials, eventBus);
+//	}
+//
+//	@Bean(initMethod = "connectAndSubscribe", destroyMethod = "shutdown")
+//	public TwitchEventSubscriber createTwitchEventSubscriber(TwitchCredentials credentials, EventBus eventBus, HttpClient http, ObjectMapper json) {
+//		return new TwitchEventSubscriber(credentials, eventBus, http, json);
+//	}
+//
+//	@Bean(initMethod = "fetchGraphics")
+//	public TwitchGraphics createTwitchGraphics(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
+//		return new TwitchGraphics(http, credentials, json);
+//	}
+//
+//	@Bean
+//	public TwitchHelixClient createHelixCommunicator(TwitchCredentials credentials, HttpClient http, ObjectMapper json) {
+//		return new TwitchHelixClient(credentials, http, json);
+//	}
 
 	@Bean
 	public SimpleMark createSimpleMark() {
 		return new SimpleMark();
 	}
 
+//	@Bean
+//	public Messenger createMessageProcessor(
+//			SimpleMark simpleMark, TwitchGraphics twitchGraphics, ScheduledExecutorService scheduledExecutorService, EventBus eventBus) {
+//		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus, scheduledExecutorService);
+//	}
+
 	@Bean
 	public Messenger createMessageProcessor(
-			SimpleMark simpleMark, TwitchGraphics twitchGraphics, ScheduledExecutorService scheduledExecutorService, EventBus eventBus) {
-		return new Messenger(simpleMark, twitchGraphics::resolveBadgesIn, twitchGraphics::resolveEmotesIn, eventBus, scheduledExecutorService);
+			SimpleMark simpleMark, ScheduledExecutorService scheduledExecutorService, EventBus eventBus) {
+		return new Messenger(simpleMark, _ -> List.of(), _ -> Map.of(), eventBus, scheduledExecutorService);
 	}
 
 	@Bean
@@ -118,6 +120,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public Host createHost(Configurator configurator, EventBus eventBus) {
 		return new Host(() -> configurator.config().guests(), eventBus);
+	}
+
+	@Bean
+	public Calendar createCalendar(Configurator configurator) {
+		return new Calendar(() -> configurator.config().streams());
 	}
 
 	@Override

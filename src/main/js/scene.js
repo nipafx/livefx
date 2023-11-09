@@ -38,6 +38,8 @@ const Scene = ({ layout, theme, activeMiscTab, topic, guests, messages, children
 				<Tab name="notes">
 					<Notes topic={topic} />
 				</Tab>
+				<Tab name="schedule">
+				</Tab>
 				{children}
 			</Window>
 			<div id={style.filler1} className={style.filler} />

@@ -20,10 +20,11 @@ const App = () => {
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ messages, setMessages ] = useState([])
 	const [ theme, setTheme ] = useState(THEMES[0])
-	const [ activeMiscTab, setActiveMiscTab ] = useState("chat")
+	const [ activeMiscTab, setActiveMiscTab ] = useState("schedule")
 	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
-	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests }
+	const [ schedule, setSchedule ] = useState([])
+	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests, setStreams }
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -40,6 +41,7 @@ const App = () => {
 		updateTopic(setState)
 		updateGuests(setState)
 		updateMessages(setState)
+		updateSchedule(setSchedule)
 	}, [])
 
 	return (
@@ -110,6 +112,10 @@ const updateGuests = (setState) => {
 
 const updateTopic = (setState) => {
 	update(`/api/topic`, response => response.topic, setState.setTopic)
+}
+
+const updateSchedule = (setState) => {
+	update(`/api/schedule`, response => response.schedule, setState.setSchedule)
 }
 
 const update = (endpoint, extract, set) => {

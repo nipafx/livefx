@@ -19,6 +19,7 @@ module dev.nipafx.livefx {
 
 	opens dev.nipafx.livefx.chat.markup to com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.chat.messages to com.fasterxml.jackson.databind;
+	opens dev.nipafx.livefx.content.calendar to com.fasterxml.jackson.databind;
 
 	opens dev.nipafx.livefx.infra.config to spring.beans, spring.core, com.fasterxml.jackson.databind;
 	opens dev.nipafx.livefx.infra.command to com.fasterxml.jackson.databind;

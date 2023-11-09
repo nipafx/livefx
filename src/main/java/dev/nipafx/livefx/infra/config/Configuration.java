@@ -17,7 +17,9 @@ public record Configuration(
 		ThemeConfiguration theme,
 		@JsonDeserialize(using = TopicConverter.class)
 		TopicConfiguration topic,
-		List<Guest> guests
+		List<Guest> guests,
+		@JsonDeserialize(using = LiveStreamConverter.class)
+		List<LiveStream> streams
 ) {
 
 	public Configuration {
@@ -25,6 +27,7 @@ public record Configuration(
 		requireNonNull(theme);
 		requireNonNull(topic);
 		requireNonNull(guests);
+		requireNonNull(streams);
 	}
 
 }

@@ -2,6 +2,8 @@ package dev.nipafx.livefx.infra.spring;
 
 import dev.nipafx.livefx.chat.messages.Messenger;
 import dev.nipafx.livefx.chat.messages.RichChatMessage;
+import dev.nipafx.livefx.content.calendar.Calendar;
+import dev.nipafx.livefx.content.calendar.UpcomingLiveStream;
 import dev.nipafx.livefx.content.guest.Host;
 import dev.nipafx.livefx.content.theme.Paintbox;
 import dev.nipafx.livefx.content.topic.Topics;
@@ -26,12 +28,14 @@ public class LiveFxEndpoints {
 	private final Paintbox paintbox;
 	private final Topics topics;
 	private final Host host;
+	private final Calendar calendar;
 
-	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox, Topics topics, Host host) {
+	public LiveFxEndpoints(Messenger messenger, Paintbox paintbox, Topics topics, Host host, Calendar calendar) {
 		this.messenger = messenger;
 		this.paintbox = paintbox;
 		this.topics = topics;
 		this.host = host;
+		this.calendar = calendar;
 	}
 
 	@GetMapping("messages")
@@ -52,6 +56,14 @@ public class LiveFxEndpoints {
 
 	public record ThemeColorResponse(ThemeColor color) { }
 
+	@GetMapping("topic")
+	public TopicResponse topicDescriptionAsHtml() {
+		LOG.debug("Topic description requested");
+		return new TopicResponse(topics.topicDescriptionAsHtml());
+	}
+
+	public record TopicResponse(String topic) { }
+
 	@GetMapping("guests")
 	public GuestsResponse guests() {
 		LOG.debug("Guests requested");
@@ -62,12 +74,12 @@ public class LiveFxEndpoints {
 
 	public record GuestsResponse(List<Guest> guests) { }
 
-	@GetMapping("topic")
-	public TopicResponse topicDescriptionAsHtml() {
-		LOG.debug("Topic description requested");
-		return new TopicResponse(topics.topicDescriptionAsHtml());
+	@GetMapping("schedule")
+	public LiveStreamResponse upcomingLiveStreams() {
+		LOG.debug("Upcoming live streams requested");
+		return new LiveStreamResponse(calendar.upcomingStreams());
 	}
 
-	public record TopicResponse(String topic) { }
+	public record LiveStreamResponse(List<UpcomingLiveStream> schedule) { }
 
 }

@@ -30,7 +30,7 @@ class TopicConverter extends JsonDeserializer<TopicConfiguration> {
 
 	@Override
 	public TopicConfiguration deserialize(JsonParser value, DeserializationContext context) throws IOException {
-		var configFolder = (Path) context.getAttribute(Configurator.JSON_DESERIALIZER_CONFIG_FOLDER_ATTRIBUTE);
+		var configFolder = (Path) context.getAttribute(Configurator.JSON_DESERIALIZER__CONFIG_FOLDER);
 		var topicName = value.getText();
 
 		var topicFile = readTopicFile(configFolder, topicName);
