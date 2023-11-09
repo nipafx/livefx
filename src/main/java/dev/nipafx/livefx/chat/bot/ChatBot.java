@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.not;
 
 /**
  * Reads {@link TextChatMessage}s passed to {@link ChatBot#processMessage(TextChatMessage) processMessage}
@@ -19,7 +22,7 @@ import java.util.regex.Pattern;
 public class ChatBot {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ChatBot.class);
-	private static final Pattern COMMAND = Pattern.compile("!(?<command>\\w+)");
+	private static final Pattern COMMAND = Pattern.compile("!(?<command>\\w+)(?<arguments>(?: \\S+)*)");
 
 	private final ChatCommandBook commandBook;
 	private final EventSource eventSource;
@@ -30,23 +33,31 @@ public class ChatBot {
 	}
 
 	public void processMessage(TextChatMessage message) {
-		var matcher = COMMAND.matcher(message.text());
+		var matcher = COMMAND.matcher(message.text().strip());
 		if (!matcher.matches())
 			return;
 
 		var command = matcher.group("command").toLowerCase();
-		LOG.trace(STR."Identified command string \"\{command}\" in \{message}");
+		var arguments = Stream
+				.of(matcher
+						.group("arguments")
+						.strip()
+						.split(" "))
+				.filter(not(String::isBlank))
+				.toList();
+		LOG.trace(STR."Identified command string \"\{command}\" with arguments \{arguments} in \{message}");
 		commandBook
 				.findCommandFor(command)
 				.ifPresentOrElse(
-						chatCommand -> executeCommand(chatCommand, message),
+						chatCommand -> executeCommand(chatCommand, arguments, message),
 						() -> handleUnknownCommand(command, message)
 				);
 	}
 
-	private void executeCommand(ChatCommand command, TextChatMessage message) {
-		LOG.trace(STR."Identified command \"\{command.getClass().getSimpleName()}\" in \{message}");
-		var events = command.execute(message);
+	private void executeCommand(ChatCommand command, List<String> arguments, TextChatMessage message) {
+		LOG.trace(STR.
+				"Identified command \"\{command.getClass().getSimpleName()}\" with arguments \{arguments}} in \{message}");
+		var events = command.execute(arguments, message);
 		emit(events, message);
 	}
 

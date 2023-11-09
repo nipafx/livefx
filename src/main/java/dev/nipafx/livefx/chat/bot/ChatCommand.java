@@ -21,7 +21,7 @@ sealed interface ChatCommand {
 	default boolean isListed() { return true; }
 	List<String> commandStrings();
 	String description();
-	List<? extends Event> execute(TextChatMessage message);
+	List<? extends Event> execute(List<String> arguments, TextChatMessage message);
 
 }
 
@@ -38,7 +38,7 @@ final class HelloWorld implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		return List.of(OutgoingMessage.toTwitchAndScreen(
 				STR."Hello, \{message.nick()}. 👋",
 				message));
@@ -70,7 +70,7 @@ final class PostRepository implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		var text = topic.get()
 				.repo()
 				.map(URI::toString)
@@ -104,7 +104,7 @@ final class PostSlides implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		var text = topic.get()
 				.slides()
 				.map(slides -> STR."""
@@ -134,7 +134,7 @@ final class PostMusic implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		var text = """
 				Like the song? Nicolai didn't hook me up with his music backend, \
 				so I can't tell you what exact song he's listening to right now.
@@ -163,7 +163,7 @@ final class ShowNotes implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		return List.of(
 				OutgoingMessage.toTwitch(topic.get().descriptionAsMd(), message),
 				new ShowNotesTab());
@@ -197,7 +197,7 @@ final class ListCommands implements ChatCommand {
 	}
 
 	@Override
-	public List<? extends Event> execute(TextChatMessage message) {
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
 		var commandsString = commands.get()
 				.filter(ChatCommand::isListed)
 				.sorted(comparing(command -> command.commandStrings().getFirst()))
