@@ -5,7 +5,6 @@ import style from './window.module.css'
 const Window = ({ name, activeTab, className, children }) => {
 	const _children = React.Children.toArray(children).filter(Boolean)
 	const activeTabIndex = _children.findIndex(tab => tab.props.name === activeTab)
-	console.log(activeTab, activeTabIndex)
 	return (
 		<div className={`${style.window} ${className}`}>
 			{_children.map((_, index) =>

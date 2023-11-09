@@ -20,7 +20,8 @@ public class Configurator {
 
 	static final String MAIN_CONFIG_FILE_NAME = "livefx.json";
 	static final String TOPIC_FOLDER = "topics";
-	static final String JSON_DESERIALIZER_CONFIG_FOLDER_ATTRIBUTE = "configFolder";
+	static final String JSON_DESERIALIZER__CONFIG_FOLDER = "configFolder";
+	static final String JSON_DESERIALIZER__MAPPER = "nestedMapper";
 
 	private static final Logger LOG = LoggerFactory.getLogger(Configurator.class);
 
@@ -34,7 +35,8 @@ public class Configurator {
 		this.configFolder = configFolder;
 		this.json = json
 				.readerFor(Configuration.class)
-				.withAttribute(JSON_DESERIALIZER_CONFIG_FOLDER_ATTRIBUTE, configFolder)
+				.withAttribute(JSON_DESERIALIZER__CONFIG_FOLDER, configFolder)
+				.withAttribute(JSON_DESERIALIZER__MAPPER, json)
 				.with(JsonReadFeature.ALLOW_JAVA_COMMENTS)
 				.with(JsonReadFeature.ALLOW_TRAILING_COMMA);
 		this.eventSource = eventSource;

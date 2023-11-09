@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.nipafx.livefx.chat.bot.ChatBot;
 import dev.nipafx.livefx.chat.markup.SimpleMark;
 import dev.nipafx.livefx.chat.messages.Messenger;
+import dev.nipafx.livefx.content.calendar.Calendar;
 import dev.nipafx.livefx.content.guest.Host;
 import dev.nipafx.livefx.content.theme.Paintbox;
 import dev.nipafx.livefx.content.theme.SceneSelector;
@@ -118,6 +119,11 @@ public class LiveFxConfiguration implements WebSocketConfigurer {
 	@Bean
 	public Host createHost(Configurator configurator, EventBus eventBus) {
 		return new Host(() -> configurator.config().guests(), eventBus);
+	}
+
+	@Bean
+	public Calendar createCalendar(Configurator configurator) {
+		return new Calendar(() -> configurator.config().schedule());
 	}
 
 	@Override

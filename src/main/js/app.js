@@ -23,7 +23,8 @@ const App = () => {
 	const [ activeMiscTab, setActiveMiscTab ] = useState("chat")
 	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
-	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests }
+	const [ schedule, setSchedule ] = useState([])
+	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests, setSchedule }
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -40,10 +41,19 @@ const App = () => {
 		updateTopic(setState)
 		updateGuests(setState)
 		updateMessages(setState)
+		updateSchedule(setState)
 	}, [])
 
 	return (
-		<Scene layout={layout} theme={theme} activeMiscTab={activeMiscTab} topic={topic} guests={guests} messages={messages} />
+		<Scene
+			layout={layout}
+			theme={theme}
+			activeMiscTab={activeMiscTab}
+			topic={topic}
+			guests={guests}
+			schedule={schedule}
+			messages={messages}
+		/>
 	)
 }
 
@@ -110,6 +120,10 @@ const updateGuests = (setState) => {
 
 const updateTopic = (setState) => {
 	update(`/api/topic`, response => response.topic, setState.setTopic)
+}
+
+const updateSchedule = (setState) => {
+	update(`/api/schedule`, response => response.schedule, setState.setSchedule)
 }
 
 const update = (endpoint, extract, set) => {

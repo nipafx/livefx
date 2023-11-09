@@ -5,8 +5,9 @@ import Window from './components/window'
 
 import style from './scene.module.css'
 import Chat from "./components/chat";
+import Schedule from "./components/schedule";
 
-const Scene = ({ layout, theme, activeMiscTab, topic, guests, messages, children }) => {
+const Scene = ({ layout, theme, activeMiscTab, topic, guests, schedule, messages, children }) => {
 	const layoutClasses = determineLayoutClasses(layout)
 	const classes = [ ...layoutClasses, "theme-" + theme ]
 	children = Array.isArray(children) ? children : [ children ]
@@ -37,6 +38,9 @@ const Scene = ({ layout, theme, activeMiscTab, topic, guests, messages, children
 				</Tab>
 				<Tab name="notes">
 					<Notes topic={topic} />
+				</Tab>
+				<Tab name="schedule">
+					<Schedule schedule={schedule} />
 				</Tab>
 				{children}
 			</Window>

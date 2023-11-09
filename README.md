@@ -35,6 +35,7 @@ Back-end configuration (all updated live):
 
 Misc:
 * Twitch credential management, including reauthorization when possible
+* shows a schedule of upcoming streams
 
 ## Feature Ideas
 

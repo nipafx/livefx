@@ -1,7 +1,6 @@
 package dev.nipafx.livefx.infra.command;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.UUID;
 
