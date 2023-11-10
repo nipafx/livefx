@@ -2,6 +2,10 @@
 	display: none;
 }
 
+.misc {
+	background: var(--bg-color);
+}
+
 /*
  * LARGE SCREEN LEFT ...
  */

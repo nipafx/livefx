@@ -19,9 +19,11 @@ public record ScheduleConfiguration(
 	}
 
 	public Stream<ScheduleEntry> upcomingEntries() {
-		var now = ZonedDateTime.now();
+		var inSixHours = ZonedDateTime.now().plusHours(6);
 		return allEntries()
-				.filter(stream -> stream.startTime().isAfter(now));
+				// this data is usually only requested on startup and the app is often launched before the stream,
+				// so to make sure the current stream doesn't show up, filter a bit in the future
+				.filter(stream -> stream.startTime().isAfter(inSixHours));
 	}
 
 	private static ScheduleEntry transform(LiveStream stream) {

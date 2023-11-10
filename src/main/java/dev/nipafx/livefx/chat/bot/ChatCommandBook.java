@@ -23,6 +23,7 @@ class ChatCommandBook {
 				new PostSlides(topic),
 				new PostMusic(),
 				new ShowNotes(topic),
+				new ShowSchedule(() -> config.get().schedule()),
 				new ListCommands(this::commands)
 		);
 	}

@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import static dev.nipafx.livefx.infra.command.ShowTab.Tab.DEFAULT;
 import static dev.nipafx.livefx.infra.command.ShowTab.Tab.NOTES;
+import static dev.nipafx.livefx.infra.command.ShowTab.Tab.SCHEDULE;
 
 /**
  * Manages {@link SceneSwitch scenes} and reacts to audience interaction by triggering a scene update.
@@ -36,8 +37,17 @@ public class SceneSelector {
 		eventSource.emit(new ShowScreen());
 	}
 
-	public void showNotesTab(ShowNotesTab showNotesTab) {
+	public void showTab(ShowNotesTab showNotesTab) {
 		eventSource.emit(new ShowTab(NOTES));
+
+		resetTabExecutor.schedule(
+				() -> eventSource.emit(new ShowTab(DEFAULT)),
+				15,
+				TimeUnit.SECONDS);
+	}
+
+	public void showTab(ShowScheduleTab showScheduleTab) {
+		eventSource.emit(new ShowTab(SCHEDULE, showScheduleTab.timeZoneId()));
 
 		resetTabExecutor.schedule(
 				() -> eventSource.emit(new ShowTab(DEFAULT)),

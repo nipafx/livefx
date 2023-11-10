@@ -1,3 +1,17 @@
+p.timeZone {
+	margin: 0.75em 0 0;
+	color: var(--fg-color-shade-2);
+	text-align: center;
+}
+
+.timeZone:before {
+	content: " // "
+}
+
+.timeZone:after {
+	content: " // "
+}
+
 .scheduleList {
 	list-style: none;
 	margin: 0;
@@ -5,27 +19,20 @@
 }
 
 .entry {
-	margin: 0 0 1em;
-	padding: 0 0 1em;
+	margin: 0.75em 0 0;
+	padding: 0.75em 0 0;
+	border-top: 1px solid var(--alt-color);
 }
 
-.entry:first-child {
-	padding-top: 0.5em;
-}
-
-.entry:not(:last-child) {
-	border-bottom: 1px solid var(--alt-color);
-}
-
-.entry .time:after {
+.time:after {
 	content: ": ";
 }
 
-.entry .title {
+.title {
 	color: var(--alt-color);
 }
 
-.entry .description {
+p.description {
 	margin: 0.25em 0 0;
 	color: var(--fg-color-shade-2);
 }

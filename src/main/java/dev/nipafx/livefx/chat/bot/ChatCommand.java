@@ -2,16 +2,26 @@ package dev.nipafx.livefx.chat.bot;
 
 import dev.nipafx.livefx.chat.messages.TextChatMessage;
 import dev.nipafx.livefx.content.theme.ShowNotesTab;
+import dev.nipafx.livefx.content.theme.ShowScheduleTab;
+import dev.nipafx.livefx.infra.config.ScheduleConfiguration;
 import dev.nipafx.livefx.infra.config.TopicConfiguration;
 import dev.nipafx.livefx.infra.event.Event;
 
 import java.net.URI;
+import java.time.DateTimeException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * A command that users can give in chat (meta information and execution).
@@ -167,6 +177,69 @@ final class ShowNotes implements ChatCommand {
 		return List.of(
 				OutgoingMessage.toTwitch(topic.get().descriptionAsMd(), message),
 				new ShowNotesTab());
+	}
+
+}
+
+final class ShowSchedule implements ChatCommand {
+
+	private static final DateTimeFormatter START_TIME = DateTimeFormatter.ofPattern("dd.MM., HHmm");
+	private static final ZoneId UTC = ZoneId.of("UTC");
+	private static final Map<String, ZoneId> ZONES_BY_ABBREVIATION = ZoneId
+			.getAvailableZoneIds().stream()
+			.collect(toMap(
+					zone -> abbreviate(ZoneId.of(zone)),
+					ZoneId::of,
+					(_, zone) -> zone));
+
+	private final Supplier<ScheduleConfiguration> schedule;
+
+	ShowSchedule(Supplier<ScheduleConfiguration> schedule) {
+		this.schedule = schedule;
+	}
+
+	@Override
+	public List<String> commandStrings() {
+		return List.of("schedule");
+	}
+
+	@Override
+	public String description() {
+		return "upcoming streams";
+	}
+
+	@Override
+	public List<? extends Event> execute(List<String> arguments, TextChatMessage message) {
+		record Entry(ZonedDateTime time, String title) { }
+		var zone = determineTimeZone(arguments);
+		var entries = schedule.get()
+				.upcomingEntries()
+				.map(entry -> new Entry(entry.startTime().withZoneSameInstant(zone), entry.title()))
+				.map(entry -> STR."\{START_TIME.format(entry.time())}: \{entry.title()}")
+				.collect(joining(" // "));
+		var text = STR."Upcoming streams (all times \{abbreviate(zone)}): \{entries}";
+		return List.of(
+				OutgoingMessage.toTwitch(text, message),
+				new ShowScheduleTab(zone.getId()));
+	}
+
+	private static String abbreviate(ZoneId zone) {
+		return zone.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.ENGLISH);
+	}
+
+	private ZoneId determineTimeZone(List<String> arguments) {
+		if (arguments.isEmpty())
+			return UTC;
+		var zone = arguments.getFirst();
+
+		if (ZONES_BY_ABBREVIATION.containsKey(zone.toUpperCase()))
+			return ZONES_BY_ABBREVIATION.get(zone.toUpperCase());
+
+		try {
+			return ZoneId.of(arguments.getFirst());
+		} catch (DateTimeException ex) {
+			return UTC;
+		}
 	}
 
 }

@@ -20,11 +20,22 @@ const App = () => {
 	const [ layout, setLayout ] = useState(LAYOUTS[0])
 	const [ messages, setMessages ] = useState([])
 	const [ theme, setTheme ] = useState(THEMES[0])
-	const [ activeMiscTab, setActiveMiscTab ] = useState("chat")
+	const [ miscTabInfo, setMiscTabInfo ] = useState({ active: "chat" })
 	const [ topic, setTopic ] = useState("")
 	const [ guests, setGuests ] = useState([])
 	const [ schedule, setSchedule ] = useState([])
-	const setState = { setLayout, setMessages, setTheme, setActiveMiscTab, setTopic, setGuests, setSchedule }
+	const state = {
+		miscTabInfo
+	}
+	const setState = {
+		setLayout,
+		setMessages,
+		setTheme,
+		setMiscTabInfo,
+		setTopic,
+		setGuests,
+		setSchedule,
+	}
 
 	useEffect(() => {
 		const unregisterSceneSetter = registerLayoutSetter(setLayout)
@@ -32,7 +43,7 @@ const App = () => {
 	}, [ command ])
 
 	useEffect(() => {
-		if (command) executeCommand(command, setState)
+		if (command) executeCommand(command, state, setState)
 	}, [ command ])
 
 	useEffect(() => {
@@ -48,7 +59,7 @@ const App = () => {
 		<Scene
 			layout={layout}
 			theme={theme}
-			activeMiscTab={activeMiscTab}
+			miscTabInfo={miscTabInfo}
 			topic={topic}
 			guests={guests}
 			schedule={schedule}
@@ -67,14 +78,14 @@ const registerLayoutSetter = (setLayout) => {
 	return () => window.removeEventListener('obsSceneChanged', sceneSetter)
 }
 
-const executeCommand = (command, setState) => {
+const executeCommand = (command, state, setState) => {
 	console.log("Executing command", command)
 	switch (command.type) {
 		case "show-screen":
 			showScreen()
 			break
 		case "show-tab":
-			showTab(command.tab, setState)
+			showTab(command.tab, command.info, state, setState)
 			break
 		case "update-messages":
 			updateMessages(setState)
@@ -98,12 +109,18 @@ const showScreen = () => {
 	window?.obsstudio?.setCurrentScene("screen, large cam")
 }
 
-const showTab = (tab, setState) => {
+const showTab = (tab, info, state, setState) => {
 	const tabName = {
 		DEFAULT: "chat",
 		NOTES: "notes",
+		SCHEDULE: "schedule"
 	}[tab]
-	setState.setActiveMiscTab(tabName)
+	state.miscTabInfo = {
+		...state.miscTabInfo,
+		active: tabName,
+		[tabName]: info,
+	}
+	setState.setMiscTabInfo(state.miscTabInfo)
 }
 
 const updateMessages = (setState) => {
