@@ -64,9 +64,8 @@ public class ChatBot {
 	private void handleUnknownCommand(String commandString, TextChatMessage message) {
 		LOG.trace(STR."Unknown command string \"\{commandString}\" in \{message}");
 		var replyText = STR."""
-				Hey \{message.nick()}, did you try to send a command? \
-				I didn't recognize "!\{commandString}". 🧮 \
-				Send "!\{ListCommands.COMMAND_STRING}" to see what I can do for you.""";
+				Hey \{message.nick()}, did you try to send a command? 🧮 \
+				I didn't recognize it - send "!\{ListCommands.COMMAND_STRING}" to see what I can do for you.""";
 		var reply = OutgoingMessage.toTwitchAndScreen(replyText, message);
 		emit(List.of(reply), message);
 	}
